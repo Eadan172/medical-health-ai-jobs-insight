@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "name": "张敏",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhangmin",
+    "company": "猎聘网-医药猎头",
+    "company_url": "https://www.liepin.com",
+    "profile_url": "https://www.liepin.com/headhunter/1001",
+    "platform": "猎聘网",
+    "specialty": "医药健康+AI",
+    "experience": "8年猎头经验"
+  },
+  {
+    "id": 2,
+    "name": "李明",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=liming",
+    "company": "Boss直聘-科技猎头",
+    "company_url": "https://www.zhipin.com",
+    "profile_url": "https://www.zhipin.com/headhunter/2001",
+    "platform": "Boss直聘",
+    "specialty": "AI算法",
+    "experience": "6年猎头经验"
+  },
+  {
+    "id": 3,
+    "name": "王芳",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=wangfang",
+    "company": "51job-医疗猎头",
+    "company_url": "https://www.51job.com",
+    "profile_url": "https://www.51job.com/headhunter/3001",
+    "platform": "51job",
+    "specialty": "医疗行业",
+    "experience": "10年猎头经验"
+  },
+  {
+    "id": 4,
+    "name": "陈华",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=chenhua",
+    "company": "猎聘网-高端人才",
+    "company_url": "https://www.liepin.com",
+    "profile_url": "https://www.liepin.com/headhunter/1002",
+    "platform": "猎聘网",
+    "specialty": "高管招聘",
+    "experience": "12年猎头经验"
+  },
+  {
+    "id": 5,
+    "name": "刘洋",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=liuyang",
+    "company": "Boss直聘-互联网医疗",
+    "company_url": "https://www.zhipin.com",
+    "profile_url": "https://www.zhipin.com/headhunter/2002",
+    "platform": "Boss直聘",
+    "specialty": "互联网医疗",
+    "experience": "5年猎头经验"
+  },
+  {
+    "id": 6,
+    "name": "赵静",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=zhaojing",
+    "company": "51job-生物制药",
+    "company_url": "https://www.51job.com",
+    "profile_url": "https://www.51job.com/headhunter/3002",
+    "platform": "51job",
+    "specialty": "生物制药",
+    "experience": "7年猎头经验"
+  }
+]

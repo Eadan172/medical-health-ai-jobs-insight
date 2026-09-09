@@ -1,0 +1,25 @@
+services:
+  jobsinsight:
+    build: .
+    image: jobsinsight:latest
+    container_name: jobsinsight
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    environment:
+      # ---- 运行时间（也可以直接改 automation/config.toml）----
+      JOBSINSIGHT_SCHEDULE_MODE: daily
+      JOBSINSIGHT_SCHEDULE_DAILY_TIMES: "00:00"
+      JOBSINSIGHT_SCHEDULE_TIMEZONE: Asia/Shanghai
+      JOBSINSIGHT_SCHEDULE_RUN_ON_START: "false"
+      # ---- LLM ----
+      JOBSINSIGHT_LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      JOBSINSIGHT_LLM_MODEL: ${LLM_MODEL:-mock-1}
+      JOBSINSIGHT_LLM_API_KEY: ${LLM_API_KEY:-}
+      # 写接口的访问令牌，留空表示不校验
+      JOBSINSIGHT_API_TOKEN: ${API_TOKEN:-}
+      JOBSINSIGHT_LOG_LEVEL: INFO
+    volumes:
+      # 运行状态与产出数据落在宿主机上，容器重建不丢历史
+      - ./automation/state:/app/automation/state
+      - ./web/public/data:/app/web/public/data

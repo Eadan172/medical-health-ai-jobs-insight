@@ -1,0 +1,46 @@
+[
+  {
+    "id": 1,
+    "name": "科锐国际",
+    "logo": "https://via.placeholder.com/100x100/1B45F4/FFFFFF?text=科锐",
+    "website": "https://www.careerintlinc.com",
+    "description": "专注医药健康领域高端人才招聘",
+    "platforms": [
+      "猎聘网",
+      "Boss直聘",
+      "51job"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "万宝盛华",
+    "logo": "https://via.placeholder.com/100x100/4D6CFA/FFFFFF?text=万宝",
+    "website": "https://www.manpower.com.cn",
+    "description": "全球领先的人力资源解决方案提供商",
+    "platforms": [
+      "猎聘网",
+      "51job"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "智联卓聘",
+    "logo": "https://via.placeholder.com/100x100/F5B935/FFFFFF?text=智联",
+    "website": "https://www.zhaopin.com",
+    "description": "专注AI与医药交叉领域人才",
+    "platforms": [
+      "Boss直聘",
+      "51job"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "猎上网",
+    "logo": "https://via.placeholder.com/100x100/00B578/FFFFFF?text=猎上",
+    "website": "https://www.lie.com",
+    "description": "专业猎头服务平台",
+    "platforms": [
+      "猎聘网"
+    ]
+  }
+]

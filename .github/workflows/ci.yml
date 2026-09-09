@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  automation:
+    name: 自动化后端（pytest + ruff）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install pytest ruff
+
+      - name: 校验配置
+        working-directory: automation
+        run: python -m jobsinsight config
+
+      - name: 检查 workflow 的 cron 与配置一致
+        working-directory: automation
+        run: python -m jobsinsight sync-cron --check
+
+      - name: ruff
+        working-directory: automation
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: pytest
+        working-directory: automation
+        run: python -m pytest
+
+      - name: 端到端跑一次流水线（离线 mock provider）
+        working-directory: automation
+        run: python -m jobsinsight run --dry-run
+
+  web:
+    name: 前端（tsc + eslint + build）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - run: npm ci
+        working-directory: web
+
+      - run: npm run lint
+        working-directory: web
+
+      - run: npm run build
+        working-directory: web

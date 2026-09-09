@@ -1,0 +1,138 @@
+# 医药健康 + AI 岗位洞察 —— 自动化配置
+#
+# 校验配置：      python -m jobsinsight config
+# 查看运行时间：  python -m jobsinsight next-runs
+# 立即运行一次：  python -m jobsinsight run
+#
+# 字符串里可以用 ${ENV_VAR} 或 ${ENV_VAR:-默认值} 引用环境变量，
+# 也可以用 JOBSINSIGHT_* 环境变量覆盖（见 README）。
+
+log_level = "INFO"
+
+
+# ---------------------------------------------------------------------------
+# 运行时间：由你自己定
+#   mode = "daily"    每天定点，用 daily_times
+#   mode = "cron"     cron 表达式，用 cron
+#   mode = "interval" 固定间隔，用 interval_minutes
+#   mode = "manual"   不自动运行，只接受手动 / 接口触发
+# ---------------------------------------------------------------------------
+[schedule]
+enabled = true
+mode = "daily"
+timezone = "Asia/Shanghai"
+daily_times = ["00:00"]        # 例：["00:00", "12:30"] 每天两次
+cron = "0 0 * * *"             # 例："30 */6 * * 1-5" 工作日每 6 小时
+interval_minutes = 360         # mode = "interval" 时生效
+jitter_seconds = 0             # 触发时随机延迟，避免整点集中请求
+catch_up = true                # 进程重启后补跑错过的窗口
+run_on_start = false           # 启动时立刻跑一次
+
+
+# ---------------------------------------------------------------------------
+# LLM 调用接口
+# provider 可选：openai / deepseek / moonshot(kimi) / dashscope(qwen) /
+#                zhipu / siliconflow / groq / ollama / openai_compatible /
+#                anthropic(claude) / mock
+# mock 为离线内置实现，不需要网络与 API Key，适合先跑通流程。
+# ---------------------------------------------------------------------------
+[llm]
+enabled = true
+provider = "mock"
+model = "mock-1"
+# api_key 建议放环境变量，不要写进仓库
+api_key = "${JOBSINSIGHT_LLM_API_KEY:-}"
+base_url = ""                  # 自建/代理网关时填，如 http://localhost:11434/v1
+timeout_seconds = 60
+max_retries = 3
+backoff_seconds = 1.5
+min_interval_seconds = 0       # 两次请求之间的最小间隔，用于避开限流
+temperature = 0.2
+max_tokens = 4096
+max_jobs_per_run = 60          # 每次运行送入 LLM 的岗位上限，0 表示不限
+batch_size = 8                 # 单次请求合并的岗位数
+enrich_jobs = true             # 用 LLM 规范化岗位字段
+generate_insights = true       # 用 LLM 生成每日洞察
+
+
+# 切到真实模型时，把上面的 provider/model 换成下面任意一组：
+#
+# [llm]
+# provider = "deepseek"
+# model = "deepseek-chat"
+# api_key = "${DEEPSEEK_API_KEY}"
+#
+# [llm]
+# provider = "moonshot"
+# model = "moonshot-v1-8k"
+# api_key = "${MOONSHOT_API_KEY}"
+#
+# [llm]
+# provider = "openai_compatible"
+# model = "qwen2.5-72b-instruct"
+# base_url = "http://your-gateway/v1"
+# api_key = "${LLM_API_KEY}"
+
+
+# ---------------------------------------------------------------------------
+# 数据来源，可以配置多个 [[sources]]
+# type = "fixture"  读取本地 JSON（离线可用，默认）
+# type = "json_api" 任意 JSON 接口，字段通过 options.field_map 映射
+# type = "html_llm" 抓网页 + 让 LLM 抽取结构化岗位
+# ---------------------------------------------------------------------------
+[[sources]]
+name = "seed"
+type = "fixture"
+enabled = true
+path = "automation/data/seed_postings.json"
+limit = 500
+
+# 真实平台示例：填入你有权访问的搜索接口与 Cookie 后启用。
+# [[sources]]
+# name = "51job"
+# type = "json_api"
+# enabled = false
+# platform = "51job"
+# urls = ["https://we.51job.com/api/job/search-pc?keyword={keyword}&pageNum={page}"]
+# keywords = ["医疗 AI", "药物研发 算法"]
+# limit = 200
+# headers = { Cookie = "${JOB51_COOKIE}" }
+#
+# [sources.options]
+# items_path = "resultbody.job.items"
+# pages = 3
+# delay_seconds = 1.5
+# field_map = { title = "jobName", company = "fullCompanyName", city = "jobAreaString", salary_text = "provideSalaryString", url = "jobHref", publish_date = "issueDateString", description = "jobTags" }
+
+# [[sources]]
+# name = "liepin-html"
+# type = "html_llm"
+# enabled = false
+# platform = "猎聘网"
+# urls = ["https://www.liepin.com/zhaopin/?key=医疗AI"]
+#
+# [sources.options]
+# max_chars = 12000
+
+
+# ---------------------------------------------------------------------------
+# 产出
+# ---------------------------------------------------------------------------
+[output]
+data_dir = "web/public/data"    # 前端读取的目录
+state_dir = "automation/state"  # 运行状态、历史、快照
+keep_runs = 50
+min_relevance = 30              # 相关度低于该值的岗位会被丢弃（0-100）
+max_jobs = 1000
+write_insights = true
+
+
+# ---------------------------------------------------------------------------
+# HTTP 接口（python -m jobsinsight serve）
+# ---------------------------------------------------------------------------
+[server]
+host = "127.0.0.1"
+port = 8787
+auth_token = "${JOBSINSIGHT_API_TOKEN:-}"   # 非空时写操作需要 Bearer token
+cors_origin = "*"
+serve_web_dist = true

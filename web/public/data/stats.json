@@ -1,0 +1,203 @@
+{
+  "total_jobs": 398,
+  "last_update": "2026-09-09",
+  "new_jobs_today": 0,
+  "updated_jobs_today": 0,
+  "deleted_jobs_today": 0,
+  "avg_salary": 63.9,
+  "platform_stats": {
+    "猎聘网": {
+      "count": 139,
+      "avg_salary": 64.5
+    },
+    "Boss直聘": {
+      "count": 132,
+      "avg_salary": 65.5
+    },
+    "51job": {
+      "count": 127,
+      "avg_salary": 61.6
+    }
+  },
+  "city_stats": {
+    "南京": {
+      "count": 50,
+      "avg_salary": 62.6
+    },
+    "武汉": {
+      "count": 49,
+      "avg_salary": 66.2
+    },
+    "上海": {
+      "count": 42,
+      "avg_salary": 75.0
+    },
+    "西安": {
+      "count": 42,
+      "avg_salary": 56.2
+    },
+    "杭州": {
+      "count": 42,
+      "avg_salary": 58.0
+    },
+    "广州": {
+      "count": 39,
+      "avg_salary": 57.1
+    },
+    "成都": {
+      "count": 39,
+      "avg_salary": 51.0
+    },
+    "苏州": {
+      "count": 34,
+      "avg_salary": 76.4
+    },
+    "北京": {
+      "count": 33,
+      "avg_salary": 65.2
+    },
+    "深圳": {
+      "count": 28,
+      "avg_salary": 77.2
+    }
+  },
+  "skill_stats": {
+    "数据分析": 176,
+    "药物研发": 132,
+    "基因组学": 130,
+    "临床知识": 127,
+    "生物信息学": 111,
+    "分子生物学": 106,
+    "医学影像": 105,
+    "TensorFlow": 99,
+    "机器学习": 98,
+    "SQL": 92,
+    "NLP": 88,
+    "计算机视觉": 85,
+    "统计建模": 83,
+    "Python": 83,
+    "PyTorch": 82,
+    "深度学习": 81,
+    "R语言": 79,
+    "Spark": 77
+  },
+  "experience_stats": {
+    "应届": {
+      "count": 84,
+      "avg_salary": 24.4
+    },
+    "1-3年": {
+      "count": 69,
+      "avg_salary": 33.2
+    },
+    "3-5年": {
+      "count": 81,
+      "avg_salary": 48.3
+    },
+    "5-10年": {
+      "count": 80,
+      "avg_salary": 76.4
+    },
+    "10年以上": {
+      "count": 84,
+      "avg_salary": 131.8
+    }
+  },
+  "education_stats": {
+    "本科": {
+      "count": 134,
+      "avg_salary": 64.9
+    },
+    "硕士": {
+      "count": 132,
+      "avg_salary": 66.3
+    },
+    "博士": {
+      "count": 132,
+      "avg_salary": 60.6
+    }
+  },
+  "job_level_stats": {
+    "高级": {
+      "count": 168,
+      "avg_salary": 95.1
+    },
+    "中级": {
+      "count": 114,
+      "avg_salary": 40.4
+    },
+    "初级": {
+      "count": 69,
+      "avg_salary": 24.4
+    },
+    "专家": {
+      "count": 27,
+      "avg_salary": 72.9
+    },
+    "资深专家": {
+      "count": 20,
+      "avg_salary": 59.7
+    }
+  },
+  "category_stats": {
+    "AI药物研发": 152,
+    "生物信息": 66,
+    "临床数据科学": 62,
+    "医学影像AI": 45,
+    "智能医疗产品": 31,
+    "医疗大模型": 27,
+    "其他": 15
+  },
+  "salary_distribution": {
+    "15-25K": 56,
+    "25-35K": 69,
+    "35-50K": 74,
+    "50-70K": 65,
+    "70-100K": 59,
+    "100K+": 75
+  },
+  "salary_distribution_detail": {
+    "15-25K": {
+      "count": 56,
+      "top_city": "成都",
+      "top_city_count": 12,
+      "top_title": "健康数据分析员",
+      "top_title_count": 7
+    },
+    "25-35K": {
+      "count": 69,
+      "top_city": "上海",
+      "top_city_count": 12,
+      "top_title": "健康数据分析员",
+      "top_title_count": 7
+    },
+    "35-50K": {
+      "count": 74,
+      "top_city": "南京",
+      "top_city_count": 13,
+      "top_title": "AI药物研发工程师",
+      "top_title_count": 10
+    },
+    "50-70K": {
+      "count": 65,
+      "top_city": "苏州",
+      "top_city_count": 9,
+      "top_title": "AI药物研发工程师",
+      "top_title_count": 9
+    },
+    "70-100K": {
+      "count": 59,
+      "top_city": "武汉",
+      "top_city_count": 11,
+      "top_title": "智能健康管理师",
+      "top_title_count": 7
+    },
+    "100K+": {
+      "count": 75,
+      "top_city": "上海",
+      "top_city_count": 12,
+      "top_title": "医疗机器学习工程师",
+      "top_title_count": 8
+    }
+  }
+}
