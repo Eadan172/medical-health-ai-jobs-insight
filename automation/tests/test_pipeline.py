@@ -120,6 +120,7 @@ def test_llm_failure_falls_back_to_heuristics(config: Config):
     jobs = read(config.data_dir / "jobs.json")
     assert all(job["enriched_by"] == "heuristic" for job in jobs)
     assert all(job["salary_min"] > 0 for job in jobs)
+    assert read(config.data_dir / "insights.json")["source"] == "rules"
 
 
 def test_llm_can_be_disabled_entirely(config: Config):
@@ -130,7 +131,23 @@ def test_llm_can_be_disabled_entirely(config: Config):
 
     assert pipeline.llm is None
     assert report.kept == 2
-    assert read(config.data_dir / "insights.json")["provider"] == "disabled"
+    assert report.insights_generated is False
+
+    # Without a model the insight card still gets real, rule-derived content.
+    insights = read(config.data_dir / "insights.json")
+    assert insights["provider"] == "disabled"
+    assert insights["source"] == "rules"
+    assert insights["headline"]
+    assert insights["hot_skills"]
+
+
+def test_insights_come_from_the_model_when_it_answers(config: Config):
+    report = Pipeline(config).run()
+
+    insights = read(config.data_dir / "insights.json")
+    assert report.insights_generated is True
+    assert insights["source"] == "llm"
+    assert insights["model"] == "mock-1"
 
 
 def test_a_broken_source_does_not_abort_the_run(config: Config, seed_file: Path):
