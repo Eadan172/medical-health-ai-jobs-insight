@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jobsinsight"
+version = "1.0.0"
+description = "医药健康 + AI 岗位数据自动化流水线：LLM 富化、自定义运行时间、HTTP 控制接口"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+# 运行时零依赖：只用标准库（urllib / tomllib / zoneinfo / http.server）。
+dependencies = []
+
+[project.optional-dependencies]
+yaml = ["pyyaml>=6"]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.scripts]
+jobsinsight = "jobsinsight.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["jobsinsight*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "N"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
