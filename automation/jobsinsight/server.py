@@ -367,14 +367,21 @@ def make_handler(service: AutomationService) -> type[BaseHTTPRequestHandler]:
             if config.server.cors_origin:
                 self.send_header("Access-Control-Allow-Origin", config.server.cors_origin)
 
-        def _send_json(self, status: HTTPStatus, payload: Any) -> None:
-            body = json.dumps(payload, ensure_ascii=False, default=str).encode("utf-8")
+        def _send(self, status: HTTPStatus, body: bytes, content_type: str) -> None:
             self.send_response(status)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Type", content_type)
             self.send_header("Content-Length", str(len(body)))
+            # Idle keep-alive sockets that this single-purpose server later drops
+            # surface as spurious 408s in the browser console, so close each one.
+            self.send_header("Connection", "close")
             self._cors()
             self.end_headers()
             self.wfile.write(body)
+            self.close_connection = True
+
+        def _send_json(self, status: HTTPStatus, payload: Any) -> None:
+            body = json.dumps(payload, ensure_ascii=False, default=str).encode("utf-8")
+            self._send(status, body, "application/json; charset=utf-8")
 
         def _serve_static(self, path: str, root: Path) -> None:
             if not config.server.serve_web_dist or not root.is_dir():
@@ -393,14 +400,11 @@ def make_handler(service: AutomationService) -> type[BaseHTTPRequestHandler]:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "index.html 不存在"})
                 return
 
-            body = target.read_bytes()
-            content_type = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", content_type)
-            self.send_header("Content-Length", str(len(body)))
-            self._cors()
-            self.end_headers()
-            self.wfile.write(body)
+            self._send(
+                HTTPStatus.OK,
+                target.read_bytes(),
+                mimetypes.guess_type(target.name)[0] or "application/octet-stream",
+            )
 
         def log_message(self, fmt: str, *args: Any) -> None:
             LOGGER.info("%s - %s", self.address_string(), fmt % args)
