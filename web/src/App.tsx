@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -10,6 +10,8 @@ import {
   Filter, Clock, TrendingUp, Award, RefreshCw, Calendar,
   Search, X, AlertCircle, ExternalLink
 } from 'lucide-react'
+import { AutomationPanel } from '@/components/AutomationPanel'
+import { useAutomation } from '@/hooks/useAutomation'
 import './App.css'
 
 // 类型定义
@@ -172,54 +174,42 @@ function App() {
   const [showFilters, setShowFilters] = useState(false)
   const [updateResult, setUpdateResult] = useState<string>('')
 
-  // 每日更新处理函数
+  // 自动化后端状态（运行时间、上次运行、LLM 洞察）
+  const automation = useAutomation()
+
+  const loadData = useCallback(async () => {
+    const [jobsData, statsData] = await Promise.all([
+      fetch('/data/jobs.json', { cache: 'no-store' }).then(r => r.json()),
+      fetch('/data/stats.json', { cache: 'no-store' }).then(r => r.json())
+    ])
+    setJobs(jobsData)
+    setStats(statsData)
+    return { jobs: jobsData as Job[], stats: statsData as Stats }
+  }, [])
+
+  // 更新按钮：接口在线时触发后台流水线跑一次，否则只重新拉取已产出的数据
   const handleDailyUpdate = async () => {
     setIsUpdating(true)
     setUpdateResult('')
-    
+
     try {
-      // 获取今天的日期
-      const today = new Date()
-      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0)
-      
-      // 重新加载数据
-      const [jobsData, statsData] = await Promise.all([
-        fetch('/data/jobs.json').then(r => r.json()),
-        fetch('/data/stats.json').then(r => r.json())
-      ])
-      
-      // 过滤出今天0点之后发布或更新的岗位
-      const todayJobs = jobsData.filter((job: Job) => {
-        const publishDate = new Date(job.publish_date)
-        const updateDate = new Date(job.update_date)
-        return (publishDate >= todayStart || updateDate >= todayStart) && job.status === 'active'
-      })
-      
-      // 统计今日数据
-      const newJobs = todayJobs.filter((job: Job) => {
-        const publishDate = new Date(job.publish_date)
-        return publishDate >= todayStart
-      })
-      
-      const updatedJobs = todayJobs.filter((job: Job) => {
-        const publishDate = new Date(job.publish_date)
-        const updateDate = new Date(job.update_date)
-        return updateDate >= todayStart && publishDate < todayStart
-      })
-      
-      // 更新状态
-      setJobs(jobsData)
-      setStats(statsData)
-      
-      // 显示更新结果
-      const resultMsg = `更新完成！今日新增 ${newJobs.length} 个岗位，更新 ${updatedJobs.length} 个岗位`
-      setUpdateResult(resultMsg)
-      
-      // 3秒后清除提示
-      setTimeout(() => setUpdateResult(''), 3000)
+      if (automation.online) {
+        const report = await automation.runNow()
+        if (!report) throw new Error(automation.error ?? '运行失败')
+        await loadData()
+        setUpdateResult(
+          `更新完成！新增 ${report.diff?.new_jobs ?? 0} 个岗位，更新 ${report.diff?.updated_jobs ?? 0} 个，下架 ${report.diff?.deleted_jobs ?? 0} 个`
+        )
+      } else {
+        const { stats: latest } = await loadData()
+        setUpdateResult(
+          `已同步最新数据（${latest.last_update}）：新增 ${latest.new_jobs_today} 个岗位，更新 ${latest.updated_jobs_today} 个`
+        )
+      }
+      setTimeout(() => setUpdateResult(''), 4000)
     } catch (error) {
-      setUpdateResult('更新失败，请稍后重试')
-      setTimeout(() => setUpdateResult(''), 3000)
+      setUpdateResult(error instanceof Error ? `更新失败：${error.message}` : '更新失败，请稍后重试')
+      setTimeout(() => setUpdateResult(''), 4000)
     } finally {
       setIsUpdating(false)
     }
@@ -228,18 +218,15 @@ function App() {
   useEffect(() => {
     // 加载数据
     Promise.all([
-      fetch('/data/jobs.json').then(r => r.json()),
-      fetch('/data/stats.json').then(r => r.json()),
+      loadData(),
       fetch('/data/headhunters.json').then(r => r.json()),
       fetch('/data/agencies.json').then(r => r.json())
-    ]).then(([jobsData, statsData, headhuntersData, agenciesData]) => {
-      setJobs(jobsData)
-      setStats(statsData)
+    ]).then(([, headhuntersData, agenciesData]) => {
       setHeadhunters(headhuntersData)
       setAgencies(agenciesData)
       setLoading(false)
     })
-  }, [])
+  }, [loadData])
 
   // 去重函数：同一公司相同岗位只保留最新发布的
   const deduplicateJobs = (jobs: Job[]): Job[] => {
@@ -298,19 +285,21 @@ function App() {
         case 'publish_date':
           comparison = new Date(a.publish_date).getTime() - new Date(b.publish_date).getTime()
           break
-        case 'salary':
+        case 'salary': {
           const avgA = (a.salary_min + a.salary_max) / 2
           const avgB = (b.salary_min + b.salary_max) / 2
           comparison = avgA - avgB
           break
+        }
         case 'company_scale_value':
           comparison = a.company_scale_value - b.company_scale_value
           break
-        case 'job_level':
+        case 'job_level': {
           const levelA = JOB_LEVEL_ORDER.indexOf(a.job_level)
           const levelB = JOB_LEVEL_ORDER.indexOf(b.job_level)
           comparison = levelA - levelB
           break
+        }
         default:
           comparison = 0
       }
@@ -555,6 +544,9 @@ function App() {
           <ChevronDown className="w-8 h-8 text-white/40" />
         </motion.div>
       </section>
+
+      {/* 自动化运行状态与 LLM 洞察 */}
+      <AutomationPanel automation={automation} />
 
       {/* 平台生态概览 */}
       <section className="py-20 px-4">
