@@ -7,6 +7,9 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
   globalIgnores(['dist']),
+  // src/components/ui/** 是 shadcn 生成的组件库代码，按上游原样保留，
+  // 不参与本项目的 lint 规则（它会在同一文件里导出组件与 variants）。
+  globalIgnores(['src/components/ui/**']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
