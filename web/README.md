@@ -1,13 +1,14 @@
 # 医药健康+AI岗位洞察平台
 
-[![Website](https://img.shields.io/badge/Website-Live-blue)](https://fpbec7iecuz4g.ok.kimi.link)
-[![React](https://img.shields.io/badge/React-18.2.0-61DAFB?logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0.0-3178C6?logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4.19-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite)](https://vite.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
 
-> 实时聚合51job、Boss直聘、猎聘网数据，解码医药健康+AI行业人才趋势
+> 聚合 51job、Boss直聘、猎聘网数据，解码医药健康+AI行业人才趋势
 
-![Platform Preview](https://via.placeholder.com/800x400/0A1628/FFFFFF?text=医药健康+AI岗位洞察平台)
+看板本身不做采集：`public/data/*.json` 全部由仓库根目录的
+[`automation/`](../automation/README.md) 流水线按设定时间自动产出。
 
 ## 🌟 功能特性
 
@@ -24,10 +25,12 @@
 - **智能排序** - 发布时间、薪资、公司体量、岗位等级
 - **自动去重** - 同一公司相同岗位只保留最新发布
 
-### 🔄 每日自动更新
-- 实时同步三大平台数据
-- 自动识别新增、更新、下线岗位
-- 今日更新统计展示
+### 🔄 自动化运行面板
+- 展示后台流水线的运行时间与下一次触发时刻
+- 展示上次运行结果：状态、耗时、今日新增 / 更新 / 下架
+- 展示每日洞察（LLM 撰写，或未配置 LLM 时由统计规则生成）
+- 控制接口在线时可直接触发运行、切换运行时间（每天定点 / cron / 固定间隔 / 仅手动）
+- 接口不可用时自动降级为只读，页面其余部分不受影响
 
 ### 👔 猎头资源
 - **专业猎头顾问** - 点击头像进入招聘网站主页
@@ -47,15 +50,23 @@
 ## 📁 项目结构
 
 ```
-my-app/
+web/
 ├── public/
-│   └── data/
+│   └── data/                   # 由 automation/ 流水线产出
 │       ├── jobs.json           # 岗位数据
 │       ├── stats.json          # 统计数据
+│       ├── insights.json       # 每日洞察 + 运行时间与上次运行信息
 │       ├── headhunters.json    # 猎头数据
 │       └── agencies.json       # 猎头机构数据
 ├── src/
 │   ├── App.tsx                 # 主应用组件
+│   ├── components/
+│   │   ├── AutomationPanel.tsx # 自动化状态与洞察面板
+│   │   └── ui/                 # shadcn/ui 组件（按上游原样保留）
+│   ├── hooks/
+│   │   └── useAutomation.ts    # 汇总静态洞察 + 实时接口状态
+│   ├── lib/
+│   │   └── automation.ts       # 自动化接口客户端与类型
 │   ├── App.css                 # 全局样式
 │   ├── index.css               # 入口样式
 │   └── main.tsx                # 入口文件
@@ -96,6 +107,20 @@ npm run build
 npm run preview
 ```
 
+### 连接自动化接口
+
+自动化面板会先读静态的 `public/data/insights.json`（任何部署方式下都有），
+再尝试请求 `/api/status`。接口在线时才显示「立即运行」与运行时间编辑器。
+
+- `python -m jobsinsight serve` 会同时托管 `web/dist` 与 `/api/*`，同源，无需额外配置。
+- `npm run dev` 与后端不同源时，用环境变量指向后端：
+
+```bash
+# web/.env.local
+VITE_AUTOMATION_API=http://127.0.0.1:8787
+VITE_AUTOMATION_TOKEN=   # 后端配置了 server.auth_token 时填
+```
+
 ## 📊 数据结构
 
 ### 岗位数据 (Job)
@@ -120,6 +145,34 @@ interface Job {
   publish_date: string       // 发布日期
   update_date: string        // 更新日期
   status: 'active' | 'deleted' | 'updated'
+  // 以下为流水线附加的元信息
+  url: string                // 原始岗位链接
+  category: string           // 岗位方向，如 AI药物研发 / 医学影像AI
+  relevance: number          // 与「医药健康 + AI」的相关度 0-100
+  enriched_by: 'llm' | 'heuristic'  // 字段由模型规范化还是规则解析
+}
+```
+
+### 洞察数据 (Insights)
+
+```typescript
+interface AutomationInsights {
+  generated_at: string       // 产出时间
+  provider: string           // LLM provider，未启用时为 disabled
+  model: string
+  source: 'llm' | 'rules'    // 模型撰写 / 统计规则生成
+  schedule: {                // 运行时间
+    mode: 'daily' | 'cron' | 'interval' | 'manual'
+    description: string      // 如「每天 00:00 (Asia/Shanghai)」
+    timezone: string
+    next_run: string
+  }
+  run: { total_jobs: number; new_jobs: number; updated_jobs: number; deleted_jobs: number }
+  headline: string
+  summary: string
+  highlights: string[]       // 数据发现
+  hot_skills: string[]       // 值得投入的技能
+  advice: string[]           // 求职建议
 }
 ```
 
@@ -161,6 +214,12 @@ interface Agency {
 
 ## 📝 更新日志
 
+### v2.0.0
+- ✨ 新增「自动化运行」面板：运行时间、上次运行结果、每日洞察
+- ✨ 面板可直接触发后台流水线运行、在线修改运行时间
+- 🔧 数据改为由 `automation/` 流水线自动产出，不再手工维护
+- 🔧 Hero 的「每日自动更新」按钮改为真正触发一次流水线运行
+
 ### v1.1.0 (2024-02-19)
 - ✨ 新增猎头资源板块
 - ✨ 新增薪资区间分布详情Tooltip
@@ -183,4 +242,4 @@ MIT License © 2024 医药健康AI人才洞察平台
 
 ---
 
-> 💡 **提示**: 本项目数据仅供演示使用，实际使用时请替换为真实数据源。
+> 💡 **提示**: 仓库自带的 `public/data/*.json` 由 `automation/` 流水线从示例数据源产出，用于演示。接上真实招聘接口或 LLM 后，重新跑一次流水线即可替换。
