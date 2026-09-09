@@ -10,7 +10,7 @@
     "experience": "3-5年",
     "education": "本科",
     "job_level": "专家",
-    "summary": "AI驱动的药物发现、靶点预测、化合物设计",
+    "summary": "[mock] AI驱动的药物发现、靶点预测、化合物设计",
     "skills": [
       "PyTorch",
       "计算机视觉",
@@ -27,7 +27,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 55,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|医渡科技|药物发现ai专家|深圳"
   },
   {
@@ -41,7 +41,7 @@
     "experience": "5-10年",
     "education": "硕士",
     "job_level": "高级",
-    "summary": "医疗AI产品规划、需求分析、项目管理",
+    "summary": "[mock] 医疗AI产品规划、需求分析、项目管理",
     "skills": [
       "基因组学",
       "分子生物学",
@@ -57,7 +57,7 @@
     "url": "",
     "category": "智能医疗产品",
     "relevance": 85,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|数坤科技|医疗ai产品经理|武汉"
   },
   {
@@ -71,7 +71,7 @@
     "experience": "5-10年",
     "education": "博士",
     "job_level": "资深专家",
-    "summary": "临床数据分析、试验设计、统计建模",
+    "summary": "[mock] 临床数据分析、试验设计、统计建模",
     "skills": [
       "机器学习",
       "临床知识",
@@ -89,7 +89,7 @@
     "url": "",
     "category": "临床数据科学",
     "relevance": 55,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|体素科技|临床数据科学家|上海"
   },
   {
@@ -103,7 +103,7 @@
     "experience": "5-10年",
     "education": "博士",
     "job_level": "高级",
-    "summary": "高通量药物筛选、活性预测、副作用评估",
+    "summary": "[mock] 高通量药物筛选、活性预测、副作用评估",
     "skills": [
       "PyTorch",
       "NLP",
@@ -119,7 +119,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 55,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|联影医疗|药物筛选ai工程师|广州"
   },
   {
@@ -133,7 +133,7 @@
     "experience": "10年以上",
     "education": "本科",
     "job_level": "高级",
-    "summary": "医学文本处理、病历分析、知识图谱构建",
+    "summary": "[mock] 医学文本处理、病历分析、知识图谱构建",
     "skills": [
       "Python",
       "NLP",
@@ -149,7 +149,7 @@
     "url": "",
     "category": "医疗大模型",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|迈瑞医疗|医学nlp工程师|西安"
   },
   {
@@ -163,7 +163,7 @@
     "experience": "应届",
     "education": "本科",
     "job_level": "初级",
-    "summary": "医疗场景机器学习模型开发、特征工程",
+    "summary": "[mock] 医疗场景机器学习模型开发、特征工程",
     "skills": [
       "TensorFlow",
       "机器学习",
@@ -180,7 +180,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 85,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|联影医疗|医疗机器学习工程师|西安"
   },
   {
@@ -194,7 +194,7 @@
     "experience": "10年以上",
     "education": "本科",
     "job_level": "高级",
-    "summary": "医疗数据平台搭建、ETL流程、数据治理",
+    "summary": "[mock] 医疗数据平台搭建、ETL流程、数据治理",
     "skills": [
       "计算机视觉",
       "SQL",
@@ -209,7 +209,7 @@
     "url": "",
     "category": "其他",
     "relevance": 39,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|体素科技|医疗大数据工程师|成都"
   },
   {
@@ -223,7 +223,7 @@
     "experience": "应届",
     "education": "硕士",
     "job_level": "初级",
-    "summary": "医疗数据平台搭建、ETL流程、数据治理",
+    "summary": "[mock] 医疗数据平台搭建、ETL流程、数据治理",
     "skills": [
       "Python",
       "机器学习",
@@ -239,7 +239,7 @@
     "url": "",
     "category": "临床数据科学",
     "relevance": 85,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|医渡科技|医疗大数据工程师|杭州"
   },
   {
@@ -253,7 +253,7 @@
     "experience": "1-3年",
     "education": "硕士",
     "job_level": "中级",
-    "summary": "医学文本处理、病历分析、知识图谱构建",
+    "summary": "[mock] 医学文本处理、病历分析、知识图谱构建",
     "skills": [
       "Python",
       "NLP",
@@ -270,7 +270,7 @@
     "url": "",
     "category": "医疗大模型",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|平安好医|医学nlp工程师|上海"
   },
   {
@@ -284,7 +284,7 @@
     "experience": "5-10年",
     "education": "博士",
     "job_level": "高级",
-    "summary": "基因组数据分析、序列比对、生物标志物发现",
+    "summary": "[mock] 基因组数据分析、序列比对、生物标志物发现",
     "skills": [
       "TensorFlow",
       "生物信息学",
@@ -302,7 +302,7 @@
     "url": "",
     "category": "生物信息",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|联影医疗|生物信息学分析师|武汉"
   },
   {
@@ -316,7 +316,7 @@
     "experience": "5-10年",
     "education": "本科",
     "job_level": "高级",
-    "summary": "医疗AI产品规划、需求分析、项目管理",
+    "summary": "[mock] 医疗AI产品规划、需求分析、项目管理",
     "skills": [
       "Python",
       "TensorFlow",
@@ -332,7 +332,7 @@
     "url": "",
     "category": "智能医疗产品",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|腾讯医疗|医疗ai产品经理|成都"
   },
   {
@@ -346,7 +346,7 @@
     "experience": "1-3年",
     "education": "硕士",
     "job_level": "高级",
-    "summary": "医疗AI产品规划、需求分析、项目管理",
+    "summary": "[mock] 医疗AI产品规划、需求分析、项目管理",
     "skills": [
       "TensorFlow",
       "计算机视觉",
@@ -362,7 +362,7 @@
     "url": "",
     "category": "智能医疗产品",
     "relevance": 55,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|体素科技|医疗ai产品经理|武汉"
   },
   {
@@ -376,7 +376,7 @@
     "experience": "应届",
     "education": "博士",
     "job_level": "初级",
-    "summary": "健康管理算法、慢病管理、健康干预策略",
+    "summary": "[mock] 健康管理算法、慢病管理、健康干预策略",
     "skills": [
       "TensorFlow",
       "临床知识",
@@ -391,7 +391,7 @@
     "url": "",
     "category": "临床数据科学",
     "relevance": 84,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|京东健康|智能健康管理师|武汉"
   },
   {
@@ -405,7 +405,7 @@
     "experience": "3-5年",
     "education": "博士",
     "job_level": "中级",
-    "summary": "基因组测序数据分析、变异检测、功能注释",
+    "summary": "[mock] 基因组测序数据分析、变异检测、功能注释",
     "skills": [
       "生物信息学",
       "基因组学",
@@ -422,7 +422,7 @@
     "url": "",
     "category": "生物信息",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|药明康德|基因组学数据分析师|北京"
   },
   {
@@ -436,7 +436,7 @@
     "experience": "10年以上",
     "education": "本科",
     "job_level": "高级",
-    "summary": "开发医学影像分析算法，包括CT、MRI、X光等图像处理",
+    "summary": "[mock] 开发医学影像分析算法，包括CT、MRI、X光等图像处理",
     "skills": [
       "PyTorch",
       "医学影像",
@@ -453,7 +453,7 @@
     "url": "",
     "category": "医学影像AI",
     "relevance": 40,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|贝瑞基因|医学影像算法工程师|南京"
   },
   {
@@ -467,7 +467,7 @@
     "experience": "应届",
     "education": "本科",
     "job_level": "初级",
-    "summary": "健康数据分析、用户画像、健康风险评估",
+    "summary": "[mock] 健康数据分析、用户画像、健康风险评估",
     "skills": [
       "PyTorch",
       "统计建模",
@@ -484,7 +484,7 @@
     "url": "",
     "category": "临床数据科学",
     "relevance": 40,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|药明康德|健康数据分析员|上海"
   },
   {
@@ -498,7 +498,7 @@
     "experience": "10年以上",
     "education": "博士",
     "job_level": "高级",
-    "summary": "临床AI算法研究、论文发表、临床试验",
+    "summary": "[mock] 临床AI算法研究、论文发表、临床试验",
     "skills": [
       "PyTorch",
       "临床知识",
@@ -515,7 +515,7 @@
     "url": "",
     "category": "临床数据科学",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|药明康德|临床ai研究员|广州"
   },
   {
@@ -529,7 +529,7 @@
     "experience": "3-5年",
     "education": "博士",
     "job_level": "中级",
-    "summary": "健康数据分析、用户画像、健康风险评估",
+    "summary": "[mock] 健康数据分析、用户画像、健康风险评估",
     "skills": [
       "NLP",
       "生物信息学",
@@ -546,7 +546,7 @@
     "url": "",
     "category": "临床数据科学",
     "relevance": 85,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|森亿智能|健康数据分析员|南京"
   },
   {
@@ -560,7 +560,7 @@
     "experience": "5-10年",
     "education": "本科",
     "job_level": "高级",
-    "summary": "健康管理算法、慢病管理、健康干预策略",
+    "summary": "[mock] 健康管理算法、慢病管理、健康干预策略",
     "skills": [
       "深度学习",
       "机器学习",
@@ -576,7 +576,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 100,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|鹰瞳科技|智能健康管理师|武汉"
   },
   {
@@ -590,7 +590,7 @@
     "experience": "3-5年",
     "education": "本科",
     "job_level": "高级",
-    "summary": "临床AI算法研究、论文发表、临床试验",
+    "summary": "[mock] 临床AI算法研究、论文发表、临床试验",
     "skills": [
       "PyTorch",
       "深度学习",
@@ -607,7 +607,7 @@
     "url": "",
     "category": "临床数据科学",
     "relevance": 85,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|恒瑞医药|临床ai研究员|深圳"
   },
   {
@@ -621,7 +621,7 @@
     "experience": "应届",
     "education": "博士",
     "job_level": "初级",
-    "summary": "临床AI算法研究、论文发表、临床试验",
+    "summary": "[mock] 临床AI算法研究、论文发表、临床试验",
     "skills": [
       "PyTorch",
       "TensorFlow",
@@ -638,7 +638,7 @@
     "url": "",
     "category": "临床数据科学",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|华大基因|临床ai研究员|成都"
   },
   {
@@ -652,7 +652,7 @@
     "experience": "应届",
     "education": "博士",
     "job_level": "初级",
-    "summary": "临床AI算法研究、论文发表、临床试验",
+    "summary": "[mock] 临床AI算法研究、论文发表、临床试验",
     "skills": [
       "计算机视觉",
       "分子生物学",
@@ -668,7 +668,7 @@
     "url": "",
     "category": "临床数据科学",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|医渡科技|临床ai研究员|西安"
   },
   {
@@ -682,7 +682,7 @@
     "experience": "3-5年",
     "education": "博士",
     "job_level": "中级",
-    "summary": "基因组数据分析、序列比对、生物标志物发现",
+    "summary": "[mock] 基因组数据分析、序列比对、生物标志物发现",
     "skills": [
       "Python",
       "TensorFlow",
@@ -701,7 +701,7 @@
     "url": "",
     "category": "生物信息",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|京东健康|生物信息学分析师|南京"
   },
   {
@@ -715,7 +715,7 @@
     "experience": "3-5年",
     "education": "本科",
     "job_level": "中级",
-    "summary": "临床AI算法研究、论文发表、临床试验",
+    "summary": "[mock] 临床AI算法研究、论文发表、临床试验",
     "skills": [
       "Python",
       "TensorFlow",
@@ -732,7 +732,7 @@
     "url": "",
     "category": "临床数据科学",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|京东健康|临床ai研究员|北京"
   },
   {
@@ -746,7 +746,7 @@
     "experience": "5-10年",
     "education": "博士",
     "job_level": "高级",
-    "summary": "医疗AI产品规划、需求分析、项目管理",
+    "summary": "[mock] 医疗AI产品规划、需求分析、项目管理",
     "skills": [
       "TensorFlow",
       "深度学习",
@@ -762,7 +762,7 @@
     "url": "",
     "category": "智能医疗产品",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|腾讯医疗|医疗ai产品经理|杭州"
   },
   {
@@ -776,7 +776,7 @@
     "experience": "10年以上",
     "education": "硕士",
     "job_level": "高级",
-    "summary": "医学文本处理、病历分析、知识图谱构建",
+    "summary": "[mock] 医学文本处理、病历分析、知识图谱构建",
     "skills": [
       "PyTorch",
       "NLP",
@@ -792,7 +792,7 @@
     "url": "",
     "category": "医疗大模型",
     "relevance": 85,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|贝瑞基因|医学nlp工程师|南京"
   },
   {
@@ -806,7 +806,7 @@
     "experience": "应届",
     "education": "硕士",
     "job_level": "初级",
-    "summary": "高通量药物筛选、活性预测、副作用评估",
+    "summary": "[mock] 高通量药物筛选、活性预测、副作用评估",
     "skills": [
       "深度学习",
       "生物信息学",
@@ -822,7 +822,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|汇医慧影|药物筛选ai工程师|上海"
   },
   {
@@ -836,7 +836,7 @@
     "experience": "5-10年",
     "education": "硕士",
     "job_level": "专家",
-    "summary": "AI驱动的药物发现、靶点预测、化合物设计",
+    "summary": "[mock] AI驱动的药物发现、靶点预测、化合物设计",
     "skills": [
       "TensorFlow",
       "生物信息学",
@@ -853,7 +853,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|恒瑞医药|药物发现ai专家|成都"
   },
   {
@@ -867,7 +867,7 @@
     "experience": "5-10年",
     "education": "博士",
     "job_level": "高级",
-    "summary": "健康管理算法、慢病管理、健康干预策略",
+    "summary": "[mock] 健康管理算法、慢病管理、健康干预策略",
     "skills": [
       "医学影像",
       "基因组学",
@@ -882,7 +882,7 @@
     "url": "",
     "category": "医学影像AI",
     "relevance": 84,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|微医|智能健康管理师|上海"
   },
   {
@@ -896,7 +896,7 @@
     "experience": "1-3年",
     "education": "博士",
     "job_level": "资深专家",
-    "summary": "临床数据分析、试验设计、统计建模",
+    "summary": "[mock] 临床数据分析、试验设计、统计建模",
     "skills": [
       "PyTorch",
       "TensorFlow",
@@ -915,7 +915,7 @@
     "url": "",
     "category": "临床数据科学",
     "relevance": 55,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|阿里健康|临床数据科学家|深圳"
   },
   {
@@ -929,7 +929,7 @@
     "experience": "应届",
     "education": "本科",
     "job_level": "初级",
-    "summary": "基因组数据分析、序列比对、生物标志物发现",
+    "summary": "[mock] 基因组数据分析、序列比对、生物标志物发现",
     "skills": [
       "Python",
       "PyTorch",
@@ -947,7 +947,7 @@
     "url": "",
     "category": "生物信息",
     "relevance": 55,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|平安好医|生物信息学分析师|深圳"
   },
   {
@@ -961,7 +961,7 @@
     "experience": "10年以上",
     "education": "本科",
     "job_level": "高级",
-    "summary": "开发AI诊断系统、疾病预测模型、辅助决策算法",
+    "summary": "[mock] 开发AI诊断系统、疾病预测模型、辅助决策算法",
     "skills": [
       "生物信息学",
       "基因组学",
@@ -977,7 +977,7 @@
     "url": "",
     "category": "生物信息",
     "relevance": 100,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|药明康德|ai辅助诊断工程师|武汉"
   },
   {
@@ -991,7 +991,7 @@
     "experience": "3-5年",
     "education": "本科",
     "job_level": "中级",
-    "summary": "医疗场景机器学习模型开发、特征工程",
+    "summary": "[mock] 医疗场景机器学习模型开发、特征工程",
     "skills": [
       "Python",
       "机器学习",
@@ -1008,7 +1008,7 @@
     "url": "",
     "category": "其他",
     "relevance": 55,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|京东健康|医疗机器学习工程师|武汉"
   },
   {
@@ -1022,7 +1022,7 @@
     "experience": "3-5年",
     "education": "硕士",
     "job_level": "中级",
-    "summary": "医疗数据平台搭建、ETL流程、数据治理",
+    "summary": "[mock] 医疗数据平台搭建、ETL流程、数据治理",
     "skills": [
       "Python",
       "深度学习",
@@ -1038,7 +1038,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 85,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|平安好医|医疗大数据工程师|深圳"
   },
   {
@@ -1052,7 +1052,7 @@
     "experience": "应届",
     "education": "博士",
     "job_level": "初级",
-    "summary": "开发AI诊断系统、疾病预测模型、辅助决策算法",
+    "summary": "[mock] 开发AI诊断系统、疾病预测模型、辅助决策算法",
     "skills": [
       "PyTorch",
       "深度学习",
@@ -1068,7 +1068,7 @@
     "url": "",
     "category": "生物信息",
     "relevance": 100,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|森亿智能|ai辅助诊断工程师|成都"
   },
   {
@@ -1082,7 +1082,7 @@
     "experience": "3-5年",
     "education": "博士",
     "job_level": "中级",
-    "summary": "医疗数据平台搭建、ETL流程、数据治理",
+    "summary": "[mock] 医疗数据平台搭建、ETL流程、数据治理",
     "skills": [
       "PyTorch",
       "TensorFlow",
@@ -1098,7 +1098,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 55,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|丁香园|医疗大数据工程师|南京"
   },
   {
@@ -1112,7 +1112,7 @@
     "experience": "应届",
     "education": "硕士",
     "job_level": "初级",
-    "summary": "医学文本处理、病历分析、知识图谱构建",
+    "summary": "[mock] 医学文本处理、病历分析、知识图谱构建",
     "skills": [
       "Python",
       "NLP",
@@ -1129,7 +1129,7 @@
     "url": "",
     "category": "医疗大模型",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|丁香园|医学nlp工程师|西安"
   },
   {
@@ -1143,7 +1143,7 @@
     "experience": "5-10年",
     "education": "本科",
     "job_level": "高级",
-    "summary": "开发AI诊断系统、疾病预测模型、辅助决策算法",
+    "summary": "[mock] 开发AI诊断系统、疾病预测模型、辅助决策算法",
     "skills": [
       "TensorFlow",
       "机器学习",
@@ -1159,7 +1159,7 @@
     "url": "",
     "category": "临床数据科学",
     "relevance": 100,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|阿里健康|ai辅助诊断工程师|南京"
   },
   {
@@ -1173,7 +1173,7 @@
     "experience": "3-5年",
     "education": "硕士",
     "job_level": "中级",
-    "summary": "负责AI药物筛选、分子建模、药物优化算法开发",
+    "summary": "[mock] 负责AI药物筛选、分子建模、药物优化算法开发",
     "skills": [
       "机器学习",
       "生物信息学",
@@ -1190,7 +1190,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 100,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|微医|ai药物研发工程师|杭州"
   },
   {
@@ -1204,7 +1204,7 @@
     "experience": "5-10年",
     "education": "本科",
     "job_level": "高级",
-    "summary": "医疗AI产品规划、需求分析、项目管理",
+    "summary": "[mock] 医疗AI产品规划、需求分析、项目管理",
     "skills": [
       "PyTorch",
       "深度学习",
@@ -1220,7 +1220,7 @@
     "url": "",
     "category": "智能医疗产品",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|推想科技|医疗ai产品经理|北京"
   },
   {
@@ -1234,7 +1234,7 @@
     "experience": "3-5年",
     "education": "本科",
     "job_level": "中级",
-    "summary": "基因组数据分析、序列比对、生物标志物发现",
+    "summary": "[mock] 基因组数据分析、序列比对、生物标志物发现",
     "skills": [
       "医学影像",
       "生物信息学",
@@ -1252,7 +1252,7 @@
     "url": "",
     "category": "生物信息",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|阿里健康|生物信息学分析师|武汉"
   },
   {
@@ -1266,7 +1266,7 @@
     "experience": "应届",
     "education": "博士",
     "job_level": "初级",
-    "summary": "高通量药物筛选、活性预测、副作用评估",
+    "summary": "[mock] 高通量药物筛选、活性预测、副作用评估",
     "skills": [
       "机器学习",
       "分子生物学",
@@ -1282,7 +1282,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 100,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|鹰瞳科技|药物筛选ai工程师|北京"
   },
   {
@@ -1296,7 +1296,7 @@
     "experience": "10年以上",
     "education": "硕士",
     "job_level": "高级",
-    "summary": "健康管理算法、慢病管理、健康干预策略",
+    "summary": "[mock] 健康管理算法、慢病管理、健康干预策略",
     "skills": [
       "Python",
       "NLP",
@@ -1312,7 +1312,7 @@
     "url": "",
     "category": "医学影像AI",
     "relevance": 85,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|京东健康|智能健康管理师|苏州"
   },
   {
@@ -1326,7 +1326,7 @@
     "experience": "5-10年",
     "education": "硕士",
     "job_level": "高级",
-    "summary": "基因组测序数据分析、变异检测、功能注释",
+    "summary": "[mock] 基因组测序数据分析、变异检测、功能注释",
     "skills": [
       "PyTorch",
       "计算机视觉",
@@ -1344,7 +1344,7 @@
     "url": "",
     "category": "生物信息",
     "relevance": 55,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|医渡科技|基因组学数据分析师|北京"
   },
   {
@@ -1358,7 +1358,7 @@
     "experience": "10年以上",
     "education": "硕士",
     "job_level": "专家",
-    "summary": "AI驱动的药物发现、靶点预测、化合物设计",
+    "summary": "[mock] AI驱动的药物发现、靶点预测、化合物设计",
     "skills": [
       "TensorFlow",
       "生物信息学",
@@ -1375,7 +1375,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|京东健康|药物发现ai专家|上海"
   },
   {
@@ -1389,7 +1389,7 @@
     "experience": "应届",
     "education": "硕士",
     "job_level": "初级",
-    "summary": "高通量药物筛选、活性预测、副作用评估",
+    "summary": "[mock] 高通量药物筛选、活性预测、副作用评估",
     "skills": [
       "NLP",
       "基因组学",
@@ -1404,7 +1404,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 84,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|腾讯医疗|药物筛选ai工程师|杭州"
   },
   {
@@ -1418,7 +1418,7 @@
     "experience": "应届",
     "education": "本科",
     "job_level": "初级",
-    "summary": "基因组数据分析、序列比对、生物标志物发现",
+    "summary": "[mock] 基因组数据分析、序列比对、生物标志物发现",
     "skills": [
       "NLP",
       "计算机视觉",
@@ -1436,7 +1436,7 @@
     "url": "",
     "category": "生物信息",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|森亿智能|生物信息学分析师|上海"
   },
   {
@@ -1450,7 +1450,7 @@
     "experience": "5-10年",
     "education": "本科",
     "job_level": "高级",
-    "summary": "高通量药物筛选、活性预测、副作用评估",
+    "summary": "[mock] 高通量药物筛选、活性预测、副作用评估",
     "skills": [
       "PyTorch",
       "分子生物学",
@@ -1466,7 +1466,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|百度健康|药物筛选ai工程师|广州"
   },
   {
@@ -1480,7 +1480,7 @@
     "experience": "5-10年",
     "education": "本科",
     "job_level": "专家",
-    "summary": "AI驱动的药物发现、靶点预测、化合物设计",
+    "summary": "[mock] AI驱动的药物发现、靶点预测、化合物设计",
     "skills": [
       "PyTorch",
       "基因组学",
@@ -1496,7 +1496,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|华大基因|药物发现ai专家|深圳"
   },
   {
@@ -1510,7 +1510,7 @@
     "experience": "10年以上",
     "education": "博士",
     "job_level": "高级",
-    "summary": "健康数据分析、用户画像、健康风险评估",
+    "summary": "[mock] 健康数据分析、用户画像、健康风险评估",
     "skills": [
       "分子生物学",
       "统计建模",
@@ -1526,7 +1526,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 55,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|联影医疗|健康数据分析员|苏州"
   },
   {
@@ -1540,7 +1540,7 @@
     "experience": "1-3年",
     "education": "博士",
     "job_level": "资深专家",
-    "summary": "临床数据分析、试验设计、统计建模",
+    "summary": "[mock] 临床数据分析、试验设计、统计建模",
     "skills": [
       "深度学习",
       "计算机视觉",
@@ -1558,7 +1558,7 @@
     "url": "",
     "category": "临床数据科学",
     "relevance": 55,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|腾讯医疗|临床数据科学家|深圳"
   },
   {
@@ -1572,7 +1572,7 @@
     "experience": "10年以上",
     "education": "博士",
     "job_level": "高级",
-    "summary": "医学文本处理、病历分析、知识图谱构建",
+    "summary": "[mock] 医学文本处理、病历分析、知识图谱构建",
     "skills": [
       "TensorFlow",
       "NLP",
@@ -1589,7 +1589,7 @@
     "url": "",
     "category": "医疗大模型",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|鹰瞳科技|医学nlp工程师|武汉"
   },
   {
@@ -1603,7 +1603,7 @@
     "experience": "3-5年",
     "education": "博士",
     "job_level": "中级",
-    "summary": "健康管理算法、慢病管理、健康干预策略",
+    "summary": "[mock] 健康管理算法、慢病管理、健康干预策略",
     "skills": [
       "医学影像",
       "生物信息学",
@@ -1619,7 +1619,7 @@
     "url": "",
     "category": "医学影像AI",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|恒瑞医药|智能健康管理师|武汉"
   },
   {
@@ -1633,7 +1633,7 @@
     "experience": "5-10年",
     "education": "硕士",
     "job_level": "高级",
-    "summary": "基因组测序数据分析、变异检测、功能注释",
+    "summary": "[mock] 基因组测序数据分析、变异检测、功能注释",
     "skills": [
       "生物信息学",
       "基因组学",
@@ -1650,7 +1650,7 @@
     "url": "",
     "category": "生物信息",
     "relevance": 55,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|体素科技|基因组学数据分析师|上海"
   },
   {
@@ -1664,7 +1664,7 @@
     "experience": "应届",
     "education": "硕士",
     "job_level": "初级",
-    "summary": "开发AI诊断系统、疾病预测模型、辅助决策算法",
+    "summary": "[mock] 开发AI诊断系统、疾病预测模型、辅助决策算法",
     "skills": [
       "NLP",
       "计算机视觉",
@@ -1680,7 +1680,7 @@
     "url": "",
     "category": "医疗大模型",
     "relevance": 85,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "猎聘网|华大基因|ai辅助诊断工程师|成都"
   },
   {
@@ -1694,7 +1694,7 @@
     "experience": "1-3年",
     "education": "博士",
     "job_level": "中级",
-    "summary": "医学文本处理、病历分析、知识图谱构建",
+    "summary": "[mock] 医学文本处理、病历分析、知识图谱构建",
     "skills": [
       "TensorFlow",
       "NLP",
@@ -1711,7 +1711,7 @@
     "url": "",
     "category": "医疗大模型",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|鹰瞳科技|医学nlp工程师|成都"
   },
   {
@@ -1725,7 +1725,7 @@
     "experience": "5-10年",
     "education": "硕士",
     "job_level": "高级",
-    "summary": "高通量药物筛选、活性预测、副作用评估",
+    "summary": "[mock] 高通量药物筛选、活性预测、副作用评估",
     "skills": [
       "TensorFlow",
       "生物信息学",
@@ -1741,7 +1741,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 85,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "boss直聘|鹰瞳科技|药物筛选ai工程师|苏州"
   },
   {
@@ -1755,7 +1755,7 @@
     "experience": "1-3年",
     "education": "博士",
     "job_level": "中级",
-    "summary": "负责AI药物筛选、分子建模、药物优化算法开发",
+    "summary": "[mock] 负责AI药物筛选、分子建模、药物优化算法开发",
     "skills": [
       "PyTorch",
       "TensorFlow",
@@ -1772,7 +1772,7 @@
     "url": "",
     "category": "AI药物研发",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|森亿智能|ai药物研发工程师|成都"
   },
   {
@@ -1786,7 +1786,7 @@
     "experience": "5-10年",
     "education": "硕士",
     "job_level": "高级",
-    "summary": "医疗AI产品规划、需求分析、项目管理",
+    "summary": "[mock] 医疗AI产品规划、需求分析、项目管理",
     "skills": [
       "TensorFlow",
       "分子生物学",
@@ -1801,7 +1801,7 @@
     "url": "",
     "category": "智能医疗产品",
     "relevance": 54,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|体素科技|医疗ai产品经理|西安"
   },
   {
@@ -1815,7 +1815,7 @@
     "experience": "1-3年",
     "education": "硕士",
     "job_level": "中级",
-    "summary": "基因组数据分析、序列比对、生物标志物发现",
+    "summary": "[mock] 基因组数据分析、序列比对、生物标志物发现",
     "skills": [
       "生物信息学",
       "基因组学",
@@ -1832,7 +1832,7 @@
     "url": "",
     "category": "生物信息",
     "relevance": 70,
-    "enriched_by": "heuristic",
+    "enriched_by": "llm",
     "fingerprint": "51job|腾讯医疗|生物信息学分析师|北京"
   },
   {

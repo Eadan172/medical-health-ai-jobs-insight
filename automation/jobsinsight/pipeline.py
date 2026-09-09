@@ -114,7 +114,7 @@ class Pipeline:
 
         stats = analysis.build_stats(kept, diff)
         insights = self._build_insights(enricher, stats, kept, diff)
-        report.insights_generated = bool(insights.get("headline"))
+        report.insights_generated = insights.get("source") == "llm"
 
         if dry_run:
             LOGGER.info("dry-run：跳过写入，%d 个岗位已处理", len(kept))
@@ -181,7 +181,7 @@ class Pipeline:
         diff: RunDiff,
     ) -> dict[str, Any]:
         top_jobs = sorted(jobs, key=lambda job: job.avg_salary, reverse=True)
-        generated = enricher.generate_insights(stats, top_jobs=top_jobs) or {}
+        generated = enricher.generate_insights(stats, top_jobs=top_jobs)
         client = self.llm
         return {
             "generated_at": utc_now_iso(),

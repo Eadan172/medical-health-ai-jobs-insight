@@ -117,11 +117,15 @@ class Enricher:
                     overrides[posting.source_id] = entry
         return overrides
 
-    def generate_insights(self, stats: Mapping[str, Any], *, top_jobs: Sequence[Job] = ()) -> dict[str, Any] | None:
-        """Ask the model for a short daily read on the market."""
+    def generate_insights(self, stats: Mapping[str, Any], *, top_jobs: Sequence[Job] = ()) -> dict[str, Any]:
+        """Daily read on the market: from the model, or computed from the stats.
+
+        The rule-based version is always a valid answer — it just states what
+        the numbers say — so the dashboard never has an empty insight card.
+        """
 
         if not (self.client and self.settings.enabled and self.settings.generate_insights):
-            return None
+            return summarise_stats(stats)
         payload = {
             "stats": _insight_stats(stats),
             "sample_jobs": [
@@ -138,17 +142,21 @@ class Enricher:
             )
         except LLMError as exc:
             self.errors.append(f"洞察生成失败：{exc}")
-            LOGGER.warning("洞察生成失败：%s", exc)
-            return None
+            LOGGER.warning("洞察生成失败：%s，改用统计摘要", exc)
+            return summarise_stats(stats)
         if not isinstance(result, Mapping):
-            return None
-        return {
+            return summarise_stats(stats)
+
+        insight = {
+            "source": "llm",
             "headline": _clean_text(result.get("headline"), 60),
             "summary": _clean_text(result.get("summary"), 400),
             "highlights": _clean_list(result.get("highlights"), 6, 80),
             "hot_skills": _clean_list(result.get("hot_skills"), 8, 30),
             "advice": _clean_list(result.get("advice"), 5, 120),
         }
+        # A model that answered with an empty shell is no better than no answer.
+        return insight if insight["headline"] else summarise_stats(stats)
 
     def ask(self, question: str, *, context: Mapping[str, Any] | None = None) -> str:
         """Free-form question against the current dataset (used by the HTTP API)."""
@@ -175,6 +183,58 @@ class Enricher:
         if self.client:
             report["llm"] = {**self.client.describe(), **self.client.metrics.as_dict()}
         return report
+
+
+def summarise_stats(stats: Mapping[str, Any]) -> dict[str, Any]:
+    """Describe the dataset without an LLM: purely what the numbers show."""
+
+    cities = _rank(stats.get("city_stats", {}), "count")
+    skills = _rank(stats.get("skill_stats", {}), None)
+    experience = stats.get("experience_stats", {})
+    total = stats.get("total_jobs", 0)
+
+    top_city, top_city_stats = cities[0] if cities else ("全国", {})
+    highlights: list[str] = []
+    if cities:
+        highlights.append(
+            f"{top_city}岗位最多，{top_city_stats.get('count', 0)} 个，均薪 {top_city_stats.get('avg_salary', 0)}K"
+        )
+    richest = _rank(stats.get("city_stats", {}), "avg_salary")
+    if richest:
+        highlights.append(f"{richest[0][0]}薪资最高，均薪 {richest[0][1].get('avg_salary', 0)}K")
+    if skills:
+        highlights.append(f"最高频技能是{skills[0][0]}，出现在 {skills[0][1]} 个岗位中")
+    senior = experience.get("10年以上") or experience.get("5-10年")
+    junior = experience.get("应届")
+    if senior and junior and junior.get("avg_salary"):
+        multiple = round(senior.get("avg_salary", 0) / junior["avg_salary"], 1)
+        highlights.append(f"资深岗位均薪是应届的 {multiple} 倍")
+
+    return {
+        "source": "rules",
+        "headline": f"共 {total} 个医药健康+AI 岗位，{top_city}需求最集中",
+        "summary": (
+            f"本次共收录 {total} 个岗位，其中今日新增 {stats.get('new_jobs_today', 0)} 个。"
+            f"整体均薪约 {stats.get('avg_salary', 0)}K/月。"
+            "该摘要由统计规则生成；在配置里启用真实 LLM 后，会替换为模型撰写的分析。"
+        ),
+        "highlights": highlights[:5],
+        "hot_skills": [name for name, _ in skills[:5]],
+        "advice": [
+            f"优先补齐高频技能：{'、'.join(name for name, _ in skills[:3])}" if skills else "关注高频技能",
+            f"岗位机会集中在{'、'.join(name for name, _ in cities[:3])}" if cities else "关注重点城市",
+        ],
+    }
+
+
+def _rank(mapping: Mapping[str, Any], key: str | None, limit: int = 12) -> list[tuple[str, Any]]:
+    def score(item: tuple[str, Any]) -> float:
+        value = item[1]
+        if key and isinstance(value, Mapping):
+            return float(value.get(key) or 0)
+        return float(value) if isinstance(value, (int, float)) else 0.0
+
+    return sorted(mapping.items(), key=score, reverse=True)[:limit]
 
 
 # ------------------------------------------------------------------ validation

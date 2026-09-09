@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-09T11:42:27+00:00",
-  "provider": "disabled",
-  "model": "",
+  "generated_at": "2026-09-09T11:59:02+00:00",
+  "provider": "mock",
+  "model": "mock-1",
   "schedule": {
     "mode": "daily",
     "description": "每天 00:00 (Asia/Shanghai)",
@@ -10,9 +10,28 @@
   },
   "run": {
     "total_jobs": 398,
-    "new_jobs": 398,
+    "new_jobs": 0,
     "updated_jobs": 0,
     "deleted_jobs": 0,
-    "unchanged_jobs": 0
-  }
+    "unchanged_jobs": 398
+  },
+  "source": "llm",
+  "headline": "共 398 个医药健康+AI 岗位，南京需求最集中",
+  "summary": "[mock] 离线模式生成的示例洞察，配置真实 LLM 后将由模型产出。",
+  "highlights": [
+    "数据分析: 176 个岗位",
+    "药物研发: 132 个岗位",
+    "基因组学: 130 个岗位"
+  ],
+  "hot_skills": [
+    "数据分析",
+    "药物研发",
+    "基因组学",
+    "临床知识",
+    "生物信息学"
+  ],
+  "advice": [
+    "优先补齐排名前三的技能",
+    "关注需求最集中的城市"
+  ]
 }
