@@ -8,10 +8,12 @@ import {
   Briefcase, MapPin, DollarSign, Building2, 
   GraduationCap, Code, Activity, ChevronDown, ChevronUp,
   Filter, Clock, TrendingUp, Award, RefreshCw, Calendar,
-  Search, X, AlertCircle, ExternalLink
+  Search, X, AlertCircle, ExternalLink, User
 } from 'lucide-react'
 import { AutomationPanel } from '@/components/AutomationPanel'
+import { CareerPanel } from '@/components/CareerPanel'
 import { DataStatusBar } from '@/components/DataStatusBar'
+import { SourceHealthPanel } from '@/components/SourceHealthPanel'
 import { useAutomation } from '@/hooks/useAutomation'
 import {
   fetchDataFile,
@@ -41,7 +43,12 @@ interface Job {
   skills: string[]
   publish_date: string
   update_date: string
-  status: 'active' | 'deleted' | 'updated'
+  status: 'active' | 'deleted' | 'updated' | 'stale'
+  url?: string
+  source_url?: string
+  partial?: boolean
+  last_seen_at?: string
+  discovery_method?: string
 }
 
 interface Headhunter {
@@ -184,6 +191,7 @@ function App() {
   const [showAllJobs, setShowAllJobs] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   const [updateResult, setUpdateResult] = useState<string>('')
+  const [view, setView] = useState<'market' | 'career'>('market')
 
   // 自动化后端状态（运行时间、上次运行、LLM 洞察）
   const automation = useAutomation()
@@ -439,6 +447,39 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#0A1628] text-white overflow-x-hidden">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0A1628]/90 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          <div className="font-semibold">Healthcare AI Career Copilot</div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setView('market')}
+              className={`px-3 py-1.5 rounded-lg text-sm ${view === 'market' ? 'bg-[#1B45F4]' : 'bg-white/10 text-white/70'}`}
+            >
+              岗位洞察
+            </button>
+            <button
+              type="button"
+              onClick={() => setView('career')}
+              className={`px-3 py-1.5 rounded-lg text-sm inline-flex items-center gap-1 ${view === 'career' ? 'bg-[#1B45F4]' : 'bg-white/10 text-white/70'}`}
+            >
+              <User className="w-3.5 h-3.5" />
+              My Career
+            </button>
+          </div>
+        </div>
+      </header>
+      <SourceHealthPanel />
+      {view === 'career' ? (
+        <CareerPanel
+          onViewJob={(title) => {
+            setSearchSummary(title)
+            setShowFilters(true)
+            setView('market')
+          }}
+        />
+      ) : (
+        <>
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* 动态背景 */}
@@ -1169,6 +1210,16 @@ function App() {
                         <span className="px-2 py-1 text-xs rounded-full bg-[#F5B935]/20 text-[#F5B935]">
                           {job.job_level}
                         </span>
+                        {job.partial && (
+                          <span className="px-2 py-1 text-xs rounded-full bg-[#F5B935]/20 text-[#F5B935]">
+                            部分数据
+                          </span>
+                        )}
+                        {job.status === 'stale' && (
+                          <span className="px-2 py-1 text-xs rounded-full bg-white/10 text-white/60">
+                            待确认
+                          </span>
+                        )}
                         {/* 今日新发布标签 */}
                         {job.publish_date === new Date().toISOString().split('T')[0] && (
                           <span className="px-2 py-1 text-xs rounded-full bg-[#00B578]/20 text-[#00B578] flex items-center gap-1">
@@ -1201,6 +1252,11 @@ function App() {
                           <MapPin className="w-4 h-4" />
                           {job.city}
                         </span>
+                        {(job.source_url || job.url) && (
+                          <a className="text-[#4D6CFA] hover:underline" href={job.source_url || job.url} target="_blank" rel="noreferrer">
+                            查看原职位
+                          </a>
+                        )}
                         <span className="flex items-center gap-1">
                           <GraduationCap className="w-4 h-4" />
                           {job.education}
@@ -1413,6 +1469,9 @@ function App() {
           </motion.div>
         </div>
       </section>
+
+        </>
+      )}
 
       {/* Footer */}
       <footer className="py-12 px-4 border-t border-white/10">
