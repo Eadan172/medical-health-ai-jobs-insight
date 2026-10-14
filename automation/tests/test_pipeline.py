@@ -115,8 +115,7 @@ def test_write_manifest_valid_matches_jobs_written_not_round_kept(config: Config
         data_version="abc",
     )
     jobs = [
-        Job(id=index, platform="BOSS直聘", title=f"岗位{index}", company="晶泰", city="上海")
-        for index in range(1, 402)
+        Job(id=index, platform="BOSS直聘", title=f"岗位{index}", company="晶泰", city="上海") for index in range(1, 402)
     ]
 
     pipeline._write(jobs, {"total_jobs": report.kept}, {"headline": "x"}, report)
