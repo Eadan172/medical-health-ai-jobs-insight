@@ -7,7 +7,8 @@ from jobsinsight.collectors import CollectorContext, build_collector
 from jobsinsight.config import Config, SourceSettings
 from jobsinsight.llm import LLMClient, LLMTransportError, MockProvider
 from jobsinsight.llm.base import LLMProvider, LLMRequest, LLMResponse
-from jobsinsight.pipeline import Pipeline
+from jobsinsight.models import Job
+from jobsinsight.pipeline import Pipeline, RunReport
 
 
 def read(path: Path):
@@ -95,6 +96,36 @@ def test_removed_postings_are_counted_as_deleted(config: Config, tmp_path: Path,
     assert report.diff["deleted_jobs"] == 0
     stored = read(config.data_dir / "jobs.json")
     assert len(stored) >= 2
+    # 与 .github/workflows/update-data.yml「提交数据变更」同一条完整性校验。
+    manifest = read(config.data_dir / "manifest.json")
+    assert manifest["counts"]["valid"] == len(stored), "manifest 与 jobs.json 数量不一致"
+    assert manifest["counts"]["valid"] > report.kept
+
+
+def test_write_manifest_valid_matches_jobs_written_not_round_kept(config: Config):
+    """Reproduce kept=398 vs merged jobs.json=401: manifest follows the file."""
+
+    pipeline = Pipeline(config)
+    report = RunReport(
+        run_id="kept-vs-merged",
+        collected=398,
+        kept=398,
+        dropped_low_relevance=0,
+        status="partial",
+        data_version="abc",
+    )
+    jobs = [
+        Job(id=index, platform="BOSS直聘", title=f"岗位{index}", company="晶泰", city="上海") for index in range(1, 402)
+    ]
+
+    pipeline._write(jobs, {"total_jobs": report.kept}, {"headline": "x"}, report)
+
+    stored = read(config.data_dir / "jobs.json")
+    manifest = read(config.data_dir / "manifest.json")
+    assert report.kept == 398
+    assert len(stored) == 401
+    assert manifest["counts"]["raw"] == 398
+    assert manifest["counts"]["valid"] == len(stored), "manifest 与 jobs.json 数量不一致"
 
 
 def test_run_history_and_state_are_persisted(config: Config):
