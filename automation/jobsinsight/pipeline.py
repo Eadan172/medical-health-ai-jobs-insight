@@ -330,9 +330,12 @@ class Pipeline:
         report: RunReport,
     ) -> list[Path]:
         data_dir = self.config.data_dir
+        # valid 必须等于落盘的 jobs.json 条数。report.kept 只是本轮过滤后的采集量，
+        # 增量合并还会保留上一版里本轮没再采到的岗位；提交步骤按文件长度校验。
+        job_records = [job.as_dict() for job in jobs]
         insight_payload = {**insights, "run_id": report.run_id, "data_version": report.data_version}
         written = [
-            write_json(data_dir / JOBS_FILE, [job.as_dict() for job in jobs]),
+            write_json(data_dir / JOBS_FILE, job_records),
             write_json(data_dir / STATS_FILE, dict(stats)),
         ]
         if self.config.output.write_insights:
@@ -349,7 +352,7 @@ class Pipeline:
             "status": report.status,
             "counts": {
                 "raw": report.collected,
-                "valid": report.kept,
+                "valid": len(job_records),
                 "dropped": report.dropped_low_relevance,
             },
             "sources": report.sources,
