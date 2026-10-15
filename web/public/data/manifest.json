@@ -1,13 +1,13 @@
 {
   "schema_version": 2,
-  "run_id": "20261015T100306Z",
-  "data_version": "50b32054228a0ff9",
-  "generated_at": "2026-10-15T10:04:21+00:00",
+  "run_id": "20261015T100925Z",
+  "data_version": "7f07e1e1cdb2375d",
+  "generated_at": "2026-10-15T10:11:10+00:00",
   "status": "partial",
   "counts": {
-    "raw": 402,
-    "valid": 407,
-    "dropped": 0
+    "raw": 437,
+    "valid": 411,
+    "dropped": 7
   },
   "sources": [
     {
@@ -25,10 +25,11 @@
       "type": "search_discovery",
       "required": false,
       "min_collected": 0,
-      "collected": 4,
-      "items_before_dedupe": 4,
-      "status": "ok",
-      "duration_ms": 61453
+      "collected": 0,
+      "items_before_dedupe": 0,
+      "status": "error",
+      "error": "来源 job-discovery 采集失败：公开搜索未得到可发布岗位（zhipin=unavailable; 51job=unavailable; liepin=unavailable）",
+      "duration_ms": 37328
     },
     {
       "name": "company-careers",
@@ -49,7 +50,7 @@
       "items_before_dedupe": 0,
       "status": "error",
       "error": "来源 boss 采集失败：账号 'boss' 的登录会话可能已过期（未见登录标志，也没有岗位卡片）；请执行 python -m jobsinsight browser-login boss",
-      "duration_ms": 4016
+      "duration_ms": 9859
     },
     {
       "name": "liepin",
@@ -60,38 +61,36 @@
       "items_before_dedupe": 0,
       "status": "error",
       "error": "来源 liepin 采集失败：账号 'liepin' 的登录会话可能已过期（未见登录标志，也没有岗位卡片）；请执行 python -m jobsinsight browser-login liepin",
-      "duration_ms": 4312
+      "duration_ms": 11906
     },
     {
       "name": "job51",
       "type": "browser",
       "required": false,
       "min_collected": 0,
-      "collected": 0,
-      "items_before_dedupe": 0,
-      "status": "error",
-      "error": "来源 job51 采集失败：账号 'job51' 的登录会话可能已过期（未见登录标志，也没有岗位卡片）；请执行 python -m jobsinsight browser-login job51",
-      "duration_ms": 4703
+      "collected": 39,
+      "items_before_dedupe": 80,
+      "status": "ok",
+      "duration_ms": 46094
     }
   ],
   "quality": {
-    "score": 75,
-    "total": 402,
+    "score": 77,
+    "total": 430,
     "missing_company": 0,
-    "missing_salary": 4,
+    "missing_salary": 0,
     "missing_url": 398,
     "missing_publish_date": 0,
     "duplicate_fingerprints": 0,
     "warnings": [
-      "薪资缺失 4/402（1%）",
-      "岗位链接缺失 398/402（99%）",
+      "岗位链接缺失 398/430（93%）",
       "398 条岗位发布日期超过 30 天"
     ]
   },
   "freshness": {
     "newest_publish_date": "2026-10-15",
     "oldest_publish_date": "2026-01-20",
-    "median_age_days": 252,
+    "median_age_days": 251,
     "stale_over_30d": 398,
     "future_dated": 0,
     "missing_publish_date": 0

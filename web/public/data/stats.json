@@ -1,10 +1,10 @@
 {
-  "total_jobs": 407,
+  "total_jobs": 411,
   "last_update": "2026-10-15",
-  "new_jobs_today": 0,
-  "updated_jobs_today": 60,
+  "new_jobs_today": 4,
+  "updated_jobs_today": 0,
   "deleted_jobs_today": 0,
-  "avg_salary": 63.9,
+  "avg_salary": 63.3,
   "platform_stats": {
     "猎聘网": {
       "count": 139,
@@ -15,8 +15,8 @@
       "avg_salary": 65.5
     },
     "51job": {
-      "count": 127,
-      "avg_salary": 61.6
+      "count": 131,
+      "avg_salary": 59.8
     },
     "BOSS直聘": {
       "count": 9,
@@ -33,8 +33,8 @@
       "avg_salary": 66.2
     },
     "上海": {
-      "count": 42,
-      "avg_salary": 75.0
+      "count": 44,
+      "avg_salary": 71.6
     },
     "西安": {
       "count": 42,
@@ -67,6 +67,14 @@
     "未知": {
       "count": 9,
       "avg_salary": 0.0
+    },
+    "上海·徐汇区": {
+      "count": 1,
+      "avg_salary": 3.0
+    },
+    "上海·静安区": {
+      "count": 1,
+      "avg_salary": 2.5
     }
   },
   "skill_stats": {
@@ -75,17 +83,17 @@
     "基因组学": 130,
     "临床知识": 128,
     "生物信息学": 111,
-    "医学影像": 107,
+    "医学影像": 108,
     "分子生物学": 106,
+    "机器学习": 100,
     "TensorFlow": 99,
-    "机器学习": 98,
     "SQL": 92,
-    "NLP": 90,
+    "NLP": 91,
     "计算机视觉": 85,
     "统计建模": 83,
     "Python": 83,
     "PyTorch": 82,
-    "深度学习": 81,
+    "深度学习": 82,
     "R语言": 79,
     "Spark": 77
   },
@@ -95,8 +103,8 @@
       "avg_salary": 24.4
     },
     "1-3年": {
-      "count": 69,
-      "avg_salary": 33.2
+      "count": 73,
+      "avg_salary": 31.5
     },
     "3-5年": {
       "count": 81,
@@ -117,8 +125,8 @@
   },
   "education_stats": {
     "本科": {
-      "count": 134,
-      "avg_salary": 64.9
+      "count": 138,
+      "avg_salary": 63.1
     },
     "硕士": {
       "count": 132,
@@ -139,8 +147,8 @@
       "avg_salary": 95.1
     },
     "中级": {
-      "count": 119,
-      "avg_salary": 40.4
+      "count": 123,
+      "avg_salary": 39.2
     },
     "初级": {
       "count": 69,
@@ -161,10 +169,11 @@
     "临床数据科学": 63,
     "医学影像AI": 47,
     "智能医疗产品": 34,
-    "医疗大模型": 27,
-    "其他": 17
+    "医疗大模型": 28,
+    "其他": 20
   },
   "salary_distribution": {
+    "15K以下": 4,
     "15-25K": 56,
     "25-35K": 69,
     "35-50K": 74,
@@ -173,6 +182,13 @@
     "100K+": 75
   },
   "salary_distribution_detail": {
+    "15K以下": {
+      "count": 4,
+      "top_city": "上海",
+      "top_city_count": 2,
+      "top_title": "AI算法工程师",
+      "top_title_count": 2
+    },
     "15-25K": {
       "count": 56,
       "top_city": "成都",
@@ -216,35 +232,34 @@
       "top_title_count": 8
     }
   },
-  "run_id": "20261015T100306Z",
-  "generated_at": "2026-10-15T10:04:21+00:00",
-  "data_version": "50b32054228a0ff9",
+  "run_id": "20261015T100925Z",
+  "generated_at": "2026-10-15T10:11:10+00:00",
+  "data_version": "7f07e1e1cdb2375d",
   "quality": {
-    "score": 75,
-    "total": 402,
+    "score": 77,
+    "total": 430,
     "missing_company": 0,
-    "missing_salary": 4,
+    "missing_salary": 0,
     "missing_url": 398,
     "missing_publish_date": 0,
     "duplicate_fingerprints": 0,
     "warnings": [
-      "薪资缺失 4/402（1%）",
-      "岗位链接缺失 398/402（99%）",
+      "岗位链接缺失 398/430（93%）",
       "398 条岗位发布日期超过 30 天"
     ]
   },
   "freshness": {
     "newest_publish_date": "2026-10-15",
     "oldest_publish_date": "2026-01-20",
-    "median_age_days": 252,
+    "median_age_days": 251,
     "stale_over_30d": 398,
     "future_dated": 0,
     "missing_publish_date": 0
   },
   "merge": {
-    "new": 0,
-    "updated": 60,
-    "unchanged": 347,
+    "new": 4,
+    "updated": 0,
+    "unchanged": 407,
     "stale": 0,
     "deleted": 0
   }
