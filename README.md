@@ -35,7 +35,7 @@
 | 前端 | 实时 API 优先，静态快照回退 | GitHub Pages 子路径也能正确加载数据 |
 
 > 仓库默认的 LLM 是 **DeepSeek `deepseek-flash`**。设置环境变量 `JOBSINSIGHT_LLM_API_KEY` 后，定时任务和手动运行会调用该模型做富化、洞察，以及已启用的 `html_llm` 来源。没有密钥时不发模型请求，回退到规则解析，示例 fixture 数据仍可离线跑通。  
-> 要持续获取真实招聘数据，请按 [数据源](#-数据源) 配置你有权访问的接口或浏览器账号，并遵守平台条款。GitHub Actions 的 runner 没有本机桌面登录，不会继承 BOSS / 51job / 猎聘的 Cookie 或浏览器会话。
+> 要持续获取真实招聘数据，请按 [数据源](#-数据源) 配置你有权访问的接口或浏览器账号，并遵守平台条款。GitHub Actions 的 runner 没有本机桌面登录，不会继承 BOSS / 猎聘的浏览器会话。51job 使用仓库 Secret `JOB51_COOKIE`，并且 `required = false`，Cookie 失效不会挡住其他来源发布。
 
 ## 数据怎么流动
 
@@ -193,7 +193,7 @@ register_provider("my-gateway", lambda options: MyProvider(**options))
 | `html_llm` | 网页转文本后交给 LLM 抽取 | 没有稳定 JSON 接口的页面 |
 | `browser` | Playwright 持久化登录会话 | 必须登录才能看到岗位列表 |
 
-51job / BOSS 直聘 / 猎聘的搜索地址、参数和 Cookie 会变，**不写死在代码里**。`automation/config.toml` 里有注释示例；默认数据源是 `automation/data/seed_postings.json`。
+51job / BOSS 直聘 / 猎聘的搜索地址、参数和 Cookie 会变，**不写死在代码里**。`automation/config.toml` 已启用 51job（`json_api`，Cookie 为 `${JOB51_COOKIE}`）；BOSS 与猎聘仍是注释示例。默认离线数据仍是 `automation/data/seed_postings.json`。
 
 ### 需要登录时
 
@@ -300,11 +300,11 @@ python -m jobsinsight ingest preview --query "上海 医疗AI"
     → 运行时覆盖（automation/state/overrides.json）
 ```
 
-常用变量：`JOBSINSIGHT_LLM_API_KEY`、`JOBSINSIGHT_LLM_PROVIDER`、`JOBSINSIGHT_LLM_MODEL`、`JOBSINSIGHT_LLM_BASE_URL`、`JOBSINSIGHT_SCHEDULE_MODE`、`JOBSINSIGHT_SCHEDULE_DAILY_TIMES`、`JOBSINSIGHT_SCHEDULE_CRON`、`JOBSINSIGHT_SERVER_PORT`、`JOBSINSIGHT_SERVER_AUTH_TOKEN`。
+常用变量：`JOBSINSIGHT_LLM_API_KEY`、`JOBSINSIGHT_LLM_PROVIDER`、`JOBSINSIGHT_LLM_MODEL`、`JOBSINSIGHT_LLM_BASE_URL`、`JOBSINSIGHT_SCHEDULE_MODE`、`JOBSINSIGHT_SCHEDULE_DAILY_TIMES`、`JOBSINSIGHT_SCHEDULE_CRON`、`JOBSINSIGHT_SERVER_PORT`、`JOBSINSIGHT_SERVER_AUTH_TOKEN`、`JOB51_COOKIE`。
 
 空白的 `JOBSINSIGHT_LLM_PROVIDER` / `JOBSINSIGHT_LLM_MODEL` 会被忽略，避免 GitHub 未设置的 Variable 把 `config.toml` 里的 `deepseek` / `deepseek-flash` 擦掉。`JOBSINSIGHT_LLM_API_KEY` 要配在 Actions secret 里，定时和强制运行才会调用 DeepSeek。
 
-**API Key 和招聘账号不要写进仓库。** Actions runner 也没有开发者本机的浏览器登录，BOSS / 51job / 猎聘这类需要 Cookie 或 Playwright 会话的来源保持关闭。
+**API Key 和招聘账号不要写进仓库。** Actions 通过 Secret `JOB51_COOKIE` 调用 51job，不把 Cookie 写进仓库或日志。BOSS / 猎聘仍需要本机浏览器登录，默认保持关闭。
 
 ---
 

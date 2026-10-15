@@ -60,6 +60,9 @@ jobs:
           JOBSINSIGHT_LLM_API_KEY: ${{ secrets.JOBSINSIGHT_LLM_API_KEY }}
           JOBSINSIGHT_LLM_PROVIDER: ${{ vars.JOBSINSIGHT_LLM_PROVIDER }}
           JOBSINSIGHT_LLM_MODEL: ${{ vars.JOBSINSIGHT_LLM_MODEL }}
+          # Settings → Secrets → Actions: JOB51_COOKIE（已登录的 51job Cookie）。
+          # 只注入环境变量。不要 echo、不要写进日志。
+          JOB51_COOKIE: ${{ secrets.JOB51_COOKIE }}
         run: |
           python -m jobsinsight doctor
           python -m jobsinsight next-runs
