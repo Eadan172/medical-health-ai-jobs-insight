@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
-  "run_id": "20261015T084412Z",
-  "data_version": "74bb5c76f1b4dab5",
-  "generated_at": "2026-10-15T08:47:06+00:00",
-  "status": "success",
+  "run_id": "20261015T091953Z",
+  "data_version": "bf8eb62c391b7073",
+  "generated_at": "2026-10-15T09:22:34+00:00",
+  "status": "partial",
   "counts": {
     "raw": 402,
-    "valid": 406,
+    "valid": 407,
     "dropped": 0
   },
   "sources": [
@@ -18,7 +18,7 @@
       "collected": 398,
       "items_before_dedupe": 420,
       "status": "ok",
-      "duration_ms": 5
+      "duration_ms": 4
     },
     {
       "name": "job-discovery",
@@ -28,7 +28,7 @@
       "collected": 4,
       "items_before_dedupe": 4,
       "status": "ok",
-      "duration_ms": 62011
+      "duration_ms": 60906
     },
     {
       "name": "company-careers",
@@ -39,6 +39,17 @@
       "items_before_dedupe": 0,
       "status": "ok",
       "duration_ms": 1
+    },
+    {
+      "name": "51job",
+      "type": "json_api",
+      "required": false,
+      "min_collected": 0,
+      "collected": 0,
+      "items_before_dedupe": 0,
+      "status": "error",
+      "error": "来源 51job 采集失败：https://we.51job.com/api/job/search-pc?api_key=51job&timestamp=1792056054&keyword=%E5%8C%BB%E7%96%97%20AI&searchType=2&jobArea=000000&sortType=0&pageNum=1&pageSize=20&source=1&pageCode=sou%7Csou%7Csoulb returned an anti-bot HTML page instead of JSON. The cookie may be missing, expired, or rejected for this network.",
+      "duration_ms": 1401
     }
   ],
   "quality": {
