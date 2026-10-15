@@ -38,6 +38,8 @@ class RawPosting:
     partial: bool = False
     discovery_query: str = ""
     detail_fetch_status: str = ""
+    country: str = ""
+    region: str = ""
 
     @property
     def fingerprint(self) -> str:
@@ -96,6 +98,9 @@ class Job:
     source_status: str = "active"
     discovery_query: str = ""
     detail_fetch_status: str = ""
+    country: str = ""
+    region: str = ""
+    salary_text: str = ""
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)

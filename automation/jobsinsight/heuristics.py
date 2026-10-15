@@ -18,8 +18,8 @@ SKILL_KEYWORDS: dict[str, tuple[str, ...]] = {
     "Python": ("python",),
     "PyTorch": ("pytorch", "torch"),
     "TensorFlow": ("tensorflow", "tf2", "keras"),
-    "深度学习": ("深度学习", "deep learning", "神经网络", "transformer"),
-    "机器学习": ("机器学习", "machine learning", "sklearn", "xgboost"),
+    "深度学习": ("深度学习", "deep learning", "deep-learning", "神经网络", "transformer"),
+    "机器学习": ("机器学习", "machine learning", "machine-learning", "sklearn", "xgboost"),
     "NLP": ("nlp", "自然语言", "大模型", "llm", "语言模型"),
     "计算机视觉": ("计算机视觉", "cv", "图像识别", "目标检测"),
     "医学影像": ("医学影像", "影像", "ct", "mri", "dicom", "病理切片"),
@@ -38,9 +38,9 @@ SKILL_KEYWORDS: dict[str, tuple[str, ...]] = {
 CATEGORY_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("AI药物研发", ("药物", "靶点", "化合物", "aidd", "分子")),
     ("医学影像AI", ("影像", "ct", "mri", "病理", "放射")),
-    ("临床数据科学", ("临床", "cro", "真实世界", "rwd", "统计")),
-    ("生物信息", ("基因", "测序", "组学", "生物信息")),
-    ("医疗大模型", ("大模型", "llm", "问诊", "知识图谱", "nlp")),
+    ("临床数据科学", ("临床", "cro", "真实世界", "rwd", "统计", "clinical")),
+    ("生物信息", ("基因", "测序", "组学", "生物信息", "bioinformatic", "genomic")),
+    ("医疗大模型", ("大模型", "llm", "问诊", "知识图谱", "nlp", "machine learning", "deep learning")),
     ("智能医疗产品", ("产品", "运营", "解决方案", "售前")),
 )
 
@@ -187,12 +187,50 @@ def relevance_score(title: str, description: str, skills: Iterable[str]) -> int:
     haystack = f"{title} {description}".lower()
     health_hits = sum(
         1
-        for word in ("医", "药", "临床", "健康", "生物", "基因", "诊断", "病", "护理", "pharma", "clinical", "health")
+        for word in (
+            "医",
+            "药",
+            "临床",
+            "健康",
+            "生物",
+            "基因",
+            "诊断",
+            "病",
+            "护理",
+            "pharma",
+            "clinical",
+            "health",
+            "medical",
+            "medicine",
+            "biotech",
+            "biomedical",
+            "diagnostic",
+            "genomic",
+            "hospital",
+            "patient",
+        )
         if word in haystack
     )
     ai_hits = sum(
         1
-        for word in ("ai", "人工智能", "算法", "模型", "机器学习", "深度学习", "数据", "大模型", "nlp")
+        for word in (
+            "ai",
+            "人工智能",
+            "算法",
+            "模型",
+            "机器学习",
+            "深度学习",
+            "数据",
+            "大模型",
+            "nlp",
+            "machine learning",
+            "deep learning",
+            "artificial intelligence",
+            "data science",
+            "data scientist",
+            "data engineer",
+            "ml engineer",
+        )
         if word in haystack
     )
     # A posting needs both halves of "医药健康 + AI" to score well; skills only

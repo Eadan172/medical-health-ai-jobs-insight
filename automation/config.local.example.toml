@@ -133,6 +133,46 @@ delay_seconds = 3
 settle_ms = 2000
 slow_mo_ms = 100
 
+# 海外公开职位板，不需要 API key。本机 08:00 任务读的是复制出来的 config.local.toml。
+# required = false。公司名单：automation/config/overseas_companies.yaml。
+[[sources]]
+name = "overseas-ats"
+type = "ats"
+enabled = true
+required = false
+platform = "海外ATS"
+limit = 200
+timeout_seconds = 25
+
+[sources.options]
+config = "automation/config/overseas_companies.yaml"
+delay_seconds = 1.0
+per_company_limit = 3
+
+[[sources]]
+name = "remoteok"
+type = "remoteok"
+enabled = true
+required = false
+platform = "Remote OK"
+limit = 25
+timeout_seconds = 25
+
+[sources.options]
+delay_seconds = 0.5
+
+[[sources]]
+name = "weworkremotely"
+type = "wwr"
+enabled = true
+required = false
+platform = "We Work Remotely"
+limit = 25
+timeout_seconds = 25
+
+[sources.options]
+delay_seconds = 0.5
+
 [output]
 data_dir = "web/public/data"
 state_dir = "automation/state"

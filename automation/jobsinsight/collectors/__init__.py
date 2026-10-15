@@ -6,6 +6,9 @@
 * ``json_api``  —— 任意 JSON 接口，字段通过配置映射
 * ``html_llm``  —— 抓取网页并让 LLM 抽取结构化岗位
 * ``browser``   —— 可选 Playwright，使用用户授权的持久化登录会话
+* ``ats``       —— Greenhouse / Lever / Ashby / Workable 公开职位板
+* ``remoteok``  —— Remote OK 公开 API
+* ``wwr``       —— We Work Remotely 官方 RSS
 
 自定义来源可以通过 :func:`register_collector` 注册。
 """
@@ -16,6 +19,7 @@ from . import (  # noqa: F401 - imported for registration
     fixture,
     html_llm,
     json_api,
+    overseas,
     search_discovery,
 )
 from .base import (

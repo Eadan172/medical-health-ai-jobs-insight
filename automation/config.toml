@@ -138,6 +138,46 @@ pages = 2
 delay_seconds = 1.5
 field_map = { source_id = "jobId", title = "jobName", company = "fullCompanyName", city = "jobAreaString", salary_text = "provideSalaryString", experience_text = "workYearString", education_text = "degreeString", url = "jobHref", publish_date = "issueDateString", description = "jobTags", company_scale = "companySizeString" }
 
+# 海外公开职位板，不需要 API key。required = false：单个来源失败不挡住其他来源。
+# 公司名单在 automation/config/overseas_companies.yaml。每家公司最多保留少量 AI/工程岗位。
+[[sources]]
+name = "overseas-ats"
+type = "ats"
+enabled = true
+required = false
+platform = "海外ATS"
+limit = 200
+timeout_seconds = 25
+
+[sources.options]
+config = "automation/config/overseas_companies.yaml"
+delay_seconds = 1.0
+per_company_limit = 3
+
+[[sources]]
+name = "remoteok"
+type = "remoteok"
+enabled = true
+required = false
+platform = "Remote OK"
+limit = 25
+timeout_seconds = 25
+
+[sources.options]
+delay_seconds = 0.5
+
+[[sources]]
+name = "weworkremotely"
+type = "wwr"
+enabled = true
+required = false
+platform = "We Work Remotely"
+limit = 25
+timeout_seconds = 25
+
+[sources.options]
+delay_seconds = 0.5
+
 # [[sources]]
 # name = "liepin-html"
 # type = "html_llm"

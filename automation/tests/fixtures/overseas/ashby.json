@@ -1,0 +1,34 @@
+{
+  "jobs": [
+    {
+      "id": "listed",
+      "title": "ML Engineer, Lab Platform",
+      "isListed": true,
+      "location": "South San Francisco, CA",
+      "isRemote": false,
+      "jobUrl": "https://jobs.ashbyhq.com/insitro/listed",
+      "publishedAt": "2026-09-21T23:40:31.103+00:00",
+      "descriptionPlain": "Build LIMS software for the lab.",
+      "compensation": {
+        "scrapeableCompensationSalarySummary": "$180K – $220K",
+        "compensationTierSummary": "$180,000 – $220,000 • Offers Equity",
+        "compensationTiers": []
+      },
+      "address": {"postalAddress": {"addressCountry": "US", "addressLocality": "South San Francisco"}}
+    },
+    {
+      "id": "hidden",
+      "title": "Machine Learning Engineer",
+      "isListed": false,
+      "jobUrl": "https://jobs.ashbyhq.com/insitro/hidden",
+      "publishedAt": "2026-01-01"
+    },
+    {
+      "id": "sales",
+      "title": "Account Executive",
+      "isListed": true,
+      "jobUrl": "https://jobs.ashbyhq.com/insitro/sales",
+      "location": "Remote"
+    }
+  ]
+}

@@ -323,6 +323,9 @@ def _build_job(index: int, posting: RawPosting, values: Mapping[str, Any], run_d
         source_url=posting.source_url or posting.url,
         discovery_query=posting.discovery_query,
         detail_fetch_status=posting.detail_fetch_status,
+        country=posting.country,
+        region=posting.region,
+        salary_text=posting.salary_text,
     )
 
 
