@@ -37,6 +37,10 @@ jobs:
 
       - name: 端到端跑一次流水线（离线 mock provider）
         working-directory: automation
+        env:
+          # 生产配置默认 deepseek-flash。这条检查保持离线，不使用 Actions secret。
+          JOBSINSIGHT_LLM_PROVIDER: mock
+          JOBSINSIGHT_LLM_MODEL: mock-1
         run: python -m jobsinsight run --dry-run
 
   web:

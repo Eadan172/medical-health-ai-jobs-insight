@@ -158,6 +158,31 @@ def test_schedule_descriptions_and_cron_equivalents():
     assert ScheduleSettings(mode="interval", interval_minutes=30).as_cron() == "*/30 * * * *"
 
 
+def test_shipped_config_uses_deepseek_flash(monkeypatch: pytest.MonkeyPatch):
+    for name in (
+        "JOBSINSIGHT_LLM_BASE_URL",
+        "JOBSINSIGHT_LLM_API_KEY",
+        "LLM_API_KEY",
+        "OPENAI_API_KEY",
+        "ANTHROPIC_API_KEY",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    # Unset Actions variables arrive as empty strings and must not replace the file.
+    monkeypatch.setenv("JOBSINSIGHT_LLM_PROVIDER", "")
+    monkeypatch.setenv("JOBSINSIGHT_LLM_MODEL", "  ")
+
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "config.toml").read_text(encoding="utf-8")
+    config = load_config(root / "config.toml", apply_overrides=False)
+
+    assert 'api_key = "${JOBSINSIGHT_LLM_API_KEY:-}"' in text
+    assert config.llm.provider == "deepseek"
+    assert config.llm.model == "deepseek-flash"
+    assert config.llm.base_url == "https://api.deepseek.com/v1"
+    assert config.llm.api_key == ""
+    assert config.llm.requires_api_key()
+
+
 def test_api_key_falls_back_to_well_known_env_vars(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.delenv("JOBSINSIGHT_LLM_API_KEY", raising=False)
     monkeypatch.setenv("OPENAI_API_KEY", "sk-openai")

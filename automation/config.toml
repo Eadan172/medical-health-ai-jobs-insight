@@ -34,15 +34,21 @@ run_on_start = false           # 启动时立刻跑一次
 # provider 可选：openai / deepseek / moonshot(kimi) / dashscope(qwen) /
 #                zhipu / siliconflow / groq / ollama / openai_compatible /
 #                anthropic(claude) / mock
-# mock 为离线内置实现，不需要网络与 API Key，适合先跑通流程。
+# 定时任务和手动 run 默认调用 DeepSeek。密钥只放环境变量，不要写进本文件。
+# 未设置 JOBSINSIGHT_LLM_API_KEY 时不会发模型请求，富化和洞察回退到规则解析。
+# 离线测试：JOBSINSIGHT_LLM_PROVIDER=mock JOBSINSIGHT_LLM_MODEL=mock-1
+#
+# base_url 用本仓库 OpenAI 兼容客户端的 DeepSeek 地址。客户端请求
+# {base_url}/chat/completions，因此这里是 https://api.deepseek.com/v1
+# （与 provider = "deepseek" 的内置别名相同），不是不带 /v1 的主机名。
 # ---------------------------------------------------------------------------
 [llm]
 enabled = true
-provider = "mock"
-model = "mock-1"
+provider = "deepseek"
+model = "deepseek-flash"
 # api_key 建议放环境变量，不要写进仓库
 api_key = "${JOBSINSIGHT_LLM_API_KEY:-}"
-base_url = ""                  # 自建/代理网关时填，如 http://localhost:11434/v1
+base_url = "https://api.deepseek.com/v1"
 timeout_seconds = 60
 max_retries = 3
 backoff_seconds = 1.5
@@ -55,12 +61,7 @@ enrich_jobs = true             # 用 LLM 规范化岗位字段
 generate_insights = true       # 用 LLM 生成每日洞察
 
 
-# 切到真实模型时，把上面的 provider/model 换成下面任意一组：
-#
-# [llm]
-# provider = "deepseek"
-# model = "deepseek-chat"
-# api_key = "${DEEPSEEK_API_KEY}"
+# 换厂商时改 provider / model / base_url，密钥仍走环境变量：
 #
 # [llm]
 # provider = "moonshot"

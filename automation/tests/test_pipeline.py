@@ -163,6 +163,37 @@ def test_llm_failure_falls_back_to_heuristics(config: Config):
     assert read(config.data_dir / "insights.json")["source"] == "rules"
 
 
+def test_deepseek_without_an_api_key_does_not_call_out(config: Config):
+    config.llm.provider = "deepseek"
+    config.llm.model = "deepseek-flash"
+    config.llm.base_url = "https://api.deepseek.com/v1"
+    config.llm.api_key = ""
+
+    pipeline = Pipeline(config)
+    report = pipeline.run()
+
+    assert pipeline.llm is None
+    assert report.status == "success"
+    assert report.insights_generated is False
+    jobs = read(config.data_dir / "jobs.json")
+    assert all(job["enriched_by"] == "heuristic" for job in jobs)
+    assert read(config.data_dir / "insights.json")["source"] == "rules"
+
+
+def test_deepseek_with_an_api_key_builds_the_remote_client(config: Config):
+    config.llm.provider = "deepseek"
+    config.llm.model = "deepseek-flash"
+    config.llm.base_url = "https://api.deepseek.com/v1"
+    config.llm.api_key = "test-key-not-a-secret"
+
+    client = Pipeline(config).llm
+
+    assert client is not None
+    assert client.provider.model == "deepseek-flash"
+    assert client.provider.base_url == "https://api.deepseek.com/v1"
+    assert client.provider.api_key == "test-key-not-a-secret"
+
+
 def test_llm_can_be_disabled_entirely(config: Config):
     config.llm.enabled = False
     pipeline = Pipeline(config)
