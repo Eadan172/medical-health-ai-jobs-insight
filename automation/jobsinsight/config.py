@@ -3,7 +3,8 @@
 Precedence (later wins):
 
 1. built-in defaults
-2. the config file (``config.toml`` / ``.json`` / ``.yaml``)
+2. the config file. An explicit path wins. Otherwise ``JOBSINSIGHT_CONFIG``,
+   then a gitignored ``config.local.toml`` when one exists, then ``config.toml``.
 3. environment variables (``JOBSINSIGHT_*``, and ``${VAR}`` inside string values)
 4. runtime overrides written by the HTTP API (``state/overrides.json``)
 
@@ -26,6 +27,9 @@ from typing import Any
 from .cron import CronError, daily_times_to_cron, parse_cron, parse_time_of_day
 
 DEFAULT_CONFIG_NAMES = ("config.toml", "config.json", "config.yaml", "config.yml")
+# Gitignored machine config. Present on a Windows PC, absent on GitHub Actions.
+LOCAL_CONFIG_NAMES = ("config.local.toml", "config.local.json", "config.local.yaml", "config.local.yml")
+CONFIG_PATH_ENV = "JOBSINSIGHT_CONFIG"
 ENV_PREFIX = "JOBSINSIGHT_"
 _ENV_PLACEHOLDER = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)(?::-([^}]*))?\}")
 
@@ -297,18 +301,40 @@ class Config:
 
 
 def find_config_file(start: Path | None = None) -> Path | None:
-    """Look for a config file next to the project root, then walk upwards."""
+    """Look for a config file next to the project root, then walk upwards.
+
+    ``config.local.toml`` (and the json/yaml siblings) wins over ``config.toml``
+    in the same directory. The example file ``config.local.example.toml`` is
+    not selected. GitHub Actions checkouts do not contain the local file, so
+    cloud runs keep using ``automation/config.toml``.
+    """
 
     base = (start or Path.cwd()).resolve()
     for directory in (base, *base.parents):
-        for name in DEFAULT_CONFIG_NAMES:
-            candidate = directory / name
-            if candidate.is_file():
-                return candidate
-            nested = directory / "automation" / name
-            if nested.is_file():
-                return nested
+        found = _first_existing_config(directory)
+        if found is not None:
+            return found
     return None
+
+
+def _first_existing_config(directory: Path) -> Path | None:
+    for names in (LOCAL_CONFIG_NAMES, DEFAULT_CONFIG_NAMES):
+        for name in names:
+            for candidate in (directory / name, directory / "automation" / name):
+                if candidate.is_file():
+                    return candidate
+    return None
+
+
+def _select_config_path(path: str | Path | None, project_root: Path | None) -> Path | None:
+    """Explicit path, then ``JOBSINSIGHT_CONFIG``, then discovery."""
+
+    if path:
+        return Path(path).expanduser()
+    env_path = os.environ.get(CONFIG_PATH_ENV, "").strip()
+    if env_path:
+        return Path(env_path).expanduser()
+    return find_config_file(project_root)
 
 
 def read_config_file(path: Path) -> dict[str, Any]:
@@ -337,7 +363,7 @@ def load_config(
     apply_overrides: bool = True,
     validate: bool = True,
 ) -> Config:
-    config_path = Path(path).expanduser() if path else find_config_file(project_root)
+    config_path = _select_config_path(path, project_root)
     if path and not config_path.is_file():  # explicit path must exist
         raise ConfigError(f"config file not found: {config_path}")
 

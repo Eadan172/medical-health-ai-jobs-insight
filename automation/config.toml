@@ -148,8 +148,11 @@ field_map = { source_id = "jobId", title = "jobName", company = "fullCompanyName
 # [sources.options]
 # max_chars = 12000
 
-# 浏览器登录示例。先复制 config/accounts.example.toml 为 accounts.toml，
-# 安装 Playwright 并执行 `python -m jobsinsight browser-login boss`。
+# 浏览器登录不要写进本文件。GitHub Actions 会加载 config.toml，机房 IP 会被
+# 招聘站风控拦住。本机每日运行复制 automation/config.local.example.toml 为
+# automation/config.local.toml（已 gitignore），那里才启用 boss / 猎聘 / 51job
+# 的 browser 来源。先复制 config/accounts.example.toml 为 accounts.toml，
+# 再执行 `python -m jobsinsight browser-login <account>`。
 # [[sources]]
 # name = "boss"
 # type = "browser"

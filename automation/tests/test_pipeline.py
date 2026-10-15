@@ -221,6 +221,47 @@ def test_insights_come_from_the_model_when_it_answers(config: Config):
     assert insights["model"] == "mock-1"
 
 
+def test_optional_browser_without_session_still_publishes(config: Config, seed_file: Path, tmp_path: Path):
+    accounts = tmp_path / "accounts.toml"
+    accounts.write_text(
+        """
+[accounts.boss]
+login_url = "https://www.zhipin.com/web/user/"
+storage_state = "state/browser/boss.json"
+
+[accounts.boss.selectors]
+logged_in = ".nav-figure"
+captcha = ".geetest_panel"
+job_card = ".job-card-wrapper"
+title = ".job-name"
+""",
+        encoding="utf-8",
+    )
+    config.sources = [
+        SourceSettings(
+            name="boss",
+            type="browser",
+            required=False,
+            platform="BOSS直聘",
+            urls=["https://example.test/jobs?query={keyword}&page={page}"],
+            keywords=["医疗AI"],
+            options={"account": "boss", "accounts_file": str(accounts), "pages": 1},
+        ),
+        SourceSettings(name="good", type="fixture", path=str(seed_file)),
+    ]
+
+    report = Pipeline(config).run()
+
+    assert report.status == "partial"
+    assert report.published is True
+    assert report.kept == 2
+    assert any("browser-login" in error for error in report.errors)
+    jobs = read(config.data_dir / "jobs.json")
+    manifest = read(config.data_dir / "manifest.json")
+    assert jobs
+    assert manifest["counts"]["valid"] == len(jobs)
+
+
 def test_a_broken_source_does_not_abort_the_run(config: Config, seed_file: Path):
     config.sources = [
         SourceSettings(name="broken", type="fixture", path="does/not/exist.json"),
