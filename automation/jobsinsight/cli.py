@@ -36,7 +36,11 @@ def build_parser() -> argparse.ArgumentParser:
         prog="jobsinsight",
         description="医药健康 + AI 岗位数据自动化流水线（LLM 富化 + 自定义运行时间）",
     )
-    parser.add_argument("-c", "--config", help="配置文件路径（默认自动查找 config.toml）")
+    parser.add_argument(
+        "-c",
+        "--config",
+        help="配置文件路径（默认 JOBSINSIGHT_CONFIG，其次 config.local.toml，再其次 config.toml）",
+    )
     parser.add_argument("--log-level", help="日志级别，如 DEBUG / INFO / WARNING")
     sub = parser.add_subparsers(dest="command", required=True)
 

@@ -5,15 +5,22 @@
 # 2. 将账号密码放在环境变量里，不建议直接写明文：
 #      set BOSS_USERNAME=你的手机号
 #      set BOSS_PASSWORD=你的密码
+#    猎聘：LIEPIN_USERNAME / LIEPIN_PASSWORD
+#    51job：JOB51_USERNAME / JOB51_PASSWORD
 # 3. 按当前网站页面更新 selectors（招聘网站改版后 CSS selector 可能变化）。
-# 4. 首次执行：
-#      cd automation
-#      pip install -e ".[browser]"
-#      playwright install chromium
-#      python -m jobsinsight browser-login boss
+# 4. 在可见终端里首次登录（input() 等你按 Enter，不要放进没有窗口的计划任务）：
+#      $env:PLAYWRIGHT_BROWSERS_PATH = "$PWD\automation\.venv\ms-playwright"
+#      $env:PYTHONPATH = "$PWD\automation"
+#      & .\automation\.venv\Scripts\python.exe -m jobsinsight browser-login boss
+#      & .\automation\.venv\Scripts\python.exe -m jobsinsight browser-login liepin
+#      & .\automation\.venv\Scripts\python.exe -m jobsinsight browser-login job51
 #
 # accounts.toml、浏览器 Cookie 与 storage_state 已被 .gitignore 排除。
 # 仅用于你有权访问的账号；遇到验证码时程序会停止，不会绕过安全验证。
+#
+# 选择器核对（2026-10-15，拉取了公开页面和它们引用的前端包，没有用无头浏览器把搜索结果渲染出来）：
+# 职位卡片是前端渲染的，首屏 HTML 里没有卡片。下面标了「已核对」的类名出现在
+# 当时线上包或服务端 HTML 里；标了「未核对」的是尽力选择器，页面改版后要改。
 
 [accounts.boss]
 login_url = "https://www.zhipin.com/web/user/"
@@ -22,7 +29,9 @@ password_env = "BOSS_PASSWORD"
 storage_state = "automation/state/browser/boss.json"
 
 [accounts.boss.selectors]
-# 以下是示例，不保证长期有效；请用浏览器开发者工具按实际页面调整。
+# logged_in 已核对：zhipin-geek-spa v6763 的 app~2 包里有 .nav-figure 与 .user-nav。
+# 职位卡片选择器未核对：首屏脚本里没有 job-card-wrapper，列表在懒加载 chunk。
+# captcha 未核对：登录壳只在错误忽略列表里提到 geetest，没有稳定弹层 class。
 username = "input[type='tel'], input[name='phone']"
 password = "input[type='password']"
 submit = "button[type='submit']"
@@ -40,17 +49,60 @@ description = ".job-card-footer, .job-card-body"
 link = "a"
 publish_date = ".job-pub-time"
 
-# 可以继续增加：
-# [accounts.job51]
-# login_url = "https://login.51job.com/login.php"
-# username_env = "JOB51_USERNAME"
-# password_env = "JOB51_PASSWORD"
-# storage_state = "automation/state/browser/job51.json"
-#
-# [accounts.job51.selectors]
-# username = "..."
-# password = "..."
-# submit = "..."
-# captcha = "..."
-# job_card = "..."
-# title = "..."
+[accounts.liepin]
+login_url = "https://www.liepin.com/login"
+username_env = "LIEPIN_USERNAME"
+password_env = "LIEPIN_PASSWORD"
+storage_state = "automation/state/browser/liepin.json"
+
+[accounts.liepin.selectors]
+# 登录表单类名来自同一套 fe-www-pc v6 的 login.css / login.js（login-submit-btn、
+# teno-tel-login-inner-container、teno-pwd-login-inner-container）。
+# /login 文档本身是空的 SPA 壳，这些选择器没有在渲染后的 DOM 里点过，视为未核对渲染结果。
+username = ".teno-tel-login-inner-container input, .login-form-item-tel input"
+password = ".teno-pwd-login-inner-container input[type='password']"
+submit = ".login-submit-btn"
+# 未登录顶栏已核对：搜索页 SSR 有 #header-quick-menu-login。
+# 已登录标志已核对：common.js 在登录后渲染 #header-quick-menu-resume（我的简历）。
+logged_in = "#header-quick-menu-resume"
+login_wall = "#header-quick-menu-login"
+# 验证码脚本已核对为 turing.captcha.qcloud.com/TCaptcha.js。iframe 选择器按该域名编写，弹层 DOM 未核对。
+captcha = "iframe[src*='captcha.qcloud.com'], iframe[src*='turing.captcha']"
+# 卡片类名已核对：搜索页 runtime 加载的 common.js 使用 jobCardPcContainer、jobTitleBox、companyName，
+# 搜索 bootstrap 的曝光 xpath 是 div.job-list-box ... div.jobCardPcContainer。
+job_card = ".job-list-box .jobCardPcContainer"
+title = ".jobTitleBox > .ellipsis-1"
+company = ".companyName"
+city = ".jobTitleBox span.ellipsis-1"
+# 薪资未核对：线上包里只有 CSS module 哈希类，没有稳定 class。这个选择器会先碰到「急聘」等 span。
+salary = ".jobTitleBox > span"
+link = "a[data-nick='job-detail-job-info']"
+description = ".jobDetailBox"
+
+[accounts.job51]
+login_url = "https://login.51job.com/login.php?loginway=0&lang=c"
+username_env = "JOB51_USERNAME"
+password_env = "JOB51_PASSWORD"
+storage_state = "automation/state/browser/job51.json"
+
+[accounts.job51.selectors]
+# 密码登录页是服务端 HTML，已核对：#loginname、#password、#login_btn_withPwd。
+# 不要用 #geetest_challenge：该隐藏域在登录页上一直存在，会把每次采集都当成验证码。
+username = "#loginname"
+password = "#password"
+submit = "#login_btn_withPwd"
+# 已登录已核对：搜索包在 accountId 存在时渲染 a.uname。
+# 未登录墙已核对：app 包在 !isLogin 时渲染 .j_login。
+logged_in = "a.uname"
+login_wall = ".j_login"
+# captcha 未核对：密码页只有隐藏的 geetest 字段，弹层 class 没有出现在 HTML 里。
+captcha = ".geetest_panel, .geetest_popup_wrap, iframe[src*='geetest']"
+# 搜索卡片已核对：we.51job.com/pc/search 的 app-43a4fc3e 包（listType=more）
+# 使用 .joblist-item、.jname、.cname、.sal、.area .shrink-0、.joblist-item-tags。
+job_card = ".joblist-item"
+title = ".jname"
+company = ".cname"
+city = ".joblist-item-jobinfo .area .shrink-0"
+salary = ".sal"
+description = ".joblist-item-tags"
+# 职位 URL 由点击处理函数打开，卡片上没有职位 <a>（a.comp 是公司主页）。不设 link。

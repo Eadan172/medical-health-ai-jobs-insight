@@ -8,7 +8,8 @@ detected, collection stops and asks the user to refresh the session manually.
 from __future__ import annotations
 
 import logging
-from collections.abc import Iterable
+import time
+from collections.abc import Iterable, Sequence
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote, urljoin
@@ -33,11 +34,26 @@ class BrowserCollector(Collector):
         except ConfigError as exc:
             raise CollectorError(str(exc)) from exc
 
-        sync_playwright = _playwright()
         state = storage_path(self.context.project_root, account)
-        postings: list[RawPosting] = []
+        allow_password = bool(options.get("allow_password_login"))
+        if not state.is_file() and not allow_password:
+            raise CollectorError(
+                f"账号 {account.name!r} 没有已保存的登录会话 {state}；"
+                f"先执行 python -m jobsinsight browser-login {account.name}"
+            )
+
         pages = max(1, int(options.get("pages", 1)))
+        page_start = int(options.get("page_start", 1))
+        delay = float(options.get("delay_seconds", 0))
+        urls = iter_search_urls(
+            self.settings.urls,
+            self.settings.keywords,
+            pages=pages,
+            page_start=page_start,
+        )
         slow_mo = max(0, int(options.get("slow_mo_ms", 250)))
+        sync_playwright = _playwright()
+        postings: list[RawPosting] = []
 
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True, slow_mo=slow_mo)
@@ -49,18 +65,16 @@ class BrowserCollector(Collector):
             try:
                 if not state.is_file():
                     self._login(page, account, state)
-                for template in self.settings.urls:
-                    for page_number in range(1, pages + 1):
-                        url = template.format(
-                            page=page_number,
-                            keyword=quote(" ".join(self.settings.keywords)),
-                        )
-                        page.goto(url, wait_until="domcontentloaded", timeout=int(self.settings.timeout_seconds * 1000))
-                        page.wait_for_timeout(int(options.get("settle_ms", 1500)))
-                        self._reject_verification(page, account)
-                        postings.extend(self._extract(page, account, url))
-                        if self.settings.limit and len(postings) >= self.settings.limit:
-                            return postings[: self.settings.limit]
+                for index, url in enumerate(urls):
+                    if delay and index:
+                        time.sleep(delay)
+                    page.goto(url, wait_until="domcontentloaded", timeout=int(self.settings.timeout_seconds * 1000))
+                    page.wait_for_timeout(int(options.get("settle_ms", 1500)))
+                    self._reject_verification(page, account)
+                    self._reject_expired_session(page, account)
+                    postings.extend(self._extract(page, account, url))
+                    if self.settings.limit and len(postings) >= self.settings.limit:
+                        return postings[: self.settings.limit]
                 state.parent.mkdir(parents=True, exist_ok=True)
                 context.storage_state(path=str(state))
             finally:
@@ -97,12 +111,30 @@ class BrowserCollector(Collector):
 
     @staticmethod
     def _reject_verification(page: Any, account: BrowserAccount) -> None:
-        selector = account.selectors.get("captcha")
-        if selector and page.locator(selector).count() and page.locator(selector).first.is_visible():
-            raise CollectorError(
-                f"账号 {account.name!r} 遇到验证码/安全验证；不会自动绕过，"
-                f"请执行 python -m jobsinsight browser-login {account.name}"
-            )
+        reason = session_failure_reason(
+            account_name=account.name,
+            captcha_visible=_locator_visible(page, account.selectors.get("captcha")),
+            login_wall_visible=False,
+            logged_in_visible=None,
+            job_card_count=0,
+        )
+        if reason:
+            raise CollectorError(reason)
+
+    @staticmethod
+    def _reject_expired_session(page: Any, account: BrowserAccount) -> None:
+        selectors = account.selectors
+        logged_in = selectors.get("logged_in")
+        job_card = selectors.get("job_card")
+        reason = session_failure_reason(
+            account_name=account.name,
+            captcha_visible=False,
+            login_wall_visible=_locator_visible(page, selectors.get("login_wall") or selectors.get("logged_out")),
+            logged_in_visible=_locator_visible(page, logged_in) if logged_in else None,
+            job_card_count=page.locator(job_card).count() if job_card else 0,
+        )
+        if reason:
+            raise CollectorError(reason)
 
     def _extract(self, page: Any, account: BrowserAccount, page_url: str) -> list[RawPosting]:
         selectors = account.selectors
@@ -132,6 +164,59 @@ class BrowserCollector(Collector):
                 )
             )
         return results
+
+
+def iter_search_urls(
+    urls: Sequence[str],
+    keywords: Sequence[str],
+    *,
+    pages: int,
+    page_start: int = 1,
+) -> list[str]:
+    """Expand ``{keyword}`` once per keyword and ``{page}`` across ``pages``.
+
+    Templates without ``{keyword}`` are requested once per page. ``page_start``
+    is the first page number (猎聘 ``currentPage`` is 0).
+    """
+
+    if pages < 1:
+        raise CollectorError("pages must be >= 1")
+    if page_start < 0:
+        raise CollectorError("page_start must be >= 0")
+    built: list[str] = []
+    for template in urls:
+        terms = list(keywords) if "{keyword}" in template else [""]
+        if not terms:
+            terms = [""]
+        for keyword in terms:
+            quoted = quote(keyword, safe="") if keyword else ""
+            for page in range(page_start, page_start + pages):
+                built.append(template.format(page=page, keyword=quoted))
+    return built
+
+
+def session_failure_reason(
+    *,
+    account_name: str,
+    captcha_visible: bool,
+    login_wall_visible: bool,
+    logged_in_visible: bool | None,
+    job_card_count: int,
+) -> str | None:
+    """Why a browser source should stop, or None when the page looks usable.
+
+    Captcha and an expired login are source failures. Callers mark the source
+    ``required = false`` so the rest of the run still publishes.
+    """
+
+    relogin = f"请执行 python -m jobsinsight browser-login {account_name}"
+    if captcha_visible:
+        return f"账号 {account_name!r} 遇到验证码/安全验证；不会自动绕过，{relogin}"
+    if login_wall_visible:
+        return f"账号 {account_name!r} 的登录会话已失效（出现登录墙）；{relogin}"
+    if logged_in_visible is False and job_card_count == 0:
+        return f"账号 {account_name!r} 的登录会话可能已过期（未见登录标志，也没有岗位卡片）；{relogin}"
+    return None
 
 
 def save_interactive_session(
@@ -166,6 +251,13 @@ def _playwright():
             "browser 数据源需要 Playwright：pip install '.[browser]' && playwright install chromium"
         ) from exc
     return sync_playwright
+
+
+def _locator_visible(page: Any, selector: str | None) -> bool:
+    if not selector:
+        return False
+    locator = page.locator(selector)
+    return bool(locator.count() and locator.first.is_visible())
 
 
 def _text(card: Any, selector: str | None) -> str:

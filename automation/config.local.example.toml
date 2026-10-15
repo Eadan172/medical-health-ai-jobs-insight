@@ -1,0 +1,150 @@
+# 本机 Playwright 流水线示例。GitHub Actions 不会加载本文件。
+#
+# 复制后使用（真实文件已 gitignore，不要提交）：
+#   copy automation\config.local.example.toml automation\config.local.toml
+#
+# 云端继续用 automation/config.toml：那里的 51job 是 json_api（Cookie），
+# 机房 IP 会被阿里云 WAF 拦住，所以 browser 来源不能写进那个文件。
+# 本文件用已登录的浏览器会话采集 BOSS直聘、猎聘、51job，并保留
+# seed / 公开发现 / 企业招聘页和同一套 LLM 设置。
+#
+# 三个 browser 来源都是 required = false。会话过期或出现验证码时，
+# 该来源记失败，其余来源照常发布。
+#
+# 加载顺序：--config > 环境变量 JOBSINSIGHT_CONFIG > config.local.toml > config.toml。
+
+log_level = "INFO"
+
+[schedule]
+enabled = true
+mode = "daily"
+timezone = "Asia/Shanghai"
+daily_times = ["00:00"]
+cron = "0 0 * * *"
+interval_minutes = 360
+jitter_seconds = 0
+catch_up = true
+run_on_start = false
+
+[llm]
+enabled = true
+provider = "deepseek"
+model = "deepseek-flash"
+api_key = "${JOBSINSIGHT_LLM_API_KEY:-}"
+base_url = "https://api.deepseek.com/v1"
+timeout_seconds = 60
+max_retries = 3
+backoff_seconds = 1.5
+min_interval_seconds = 0
+temperature = 0.2
+max_tokens = 4096
+max_jobs_per_run = 60
+batch_size = 8
+enrich_jobs = true
+generate_insights = true
+
+[[sources]]
+name = "seed"
+type = "fixture"
+enabled = true
+path = "automation/data/seed_postings.json"
+limit = 500
+
+[[sources]]
+name = "job-discovery"
+type = "search_discovery"
+enabled = true
+required = false
+platform = "search"
+limit = 30
+
+[sources.options]
+config = "automation/config/sources.yaml"
+queries = "automation/config/job_queries.yaml"
+max_queries = 2
+detail_limit = 4
+
+[[sources]]
+name = "company-careers"
+type = "company_careers"
+enabled = true
+required = false
+platform = "企业招聘"
+limit = 30
+
+[sources.options]
+config = "automation/config/company_sources.yaml"
+
+# {keyword} 按关键词各搜一次，{page} 从 1 起翻 pages 页。请求之间 sleep delay_seconds。
+[[sources]]
+name = "boss"
+type = "browser"
+enabled = true
+required = false
+platform = "BOSS直聘"
+urls = ["https://www.zhipin.com/web/geek/job?query={keyword}&page={page}"]
+keywords = ["医疗AI", "医疗大模型", "医学影像AI", "AI药物研发"]
+timeout_seconds = 45
+limit = 80
+
+[sources.options]
+account = "boss"
+pages = 2
+delay_seconds = 3
+settle_ms = 2000
+slow_mo_ms = 100
+
+# 猎聘 currentPage 从 0 开始（搜索页脚本默认 currentPage: 0）。
+[[sources]]
+name = "liepin"
+type = "browser"
+enabled = true
+required = false
+platform = "猎聘"
+urls = ["https://www.liepin.com/zhaopin/?key={keyword}&currentPage={page}"]
+keywords = ["医疗AI", "医疗大模型", "医学影像AI", "AI药物研发"]
+timeout_seconds = 45
+limit = 80
+
+[sources.options]
+account = "liepin"
+pages = 2
+page_start = 0
+delay_seconds = 3
+settle_ms = 2000
+slow_mo_ms = 100
+
+# 不用 config.toml 里的 json_api。那个接口在没有浏览器 Cookie 时返回 WAF 页。
+[[sources]]
+name = "job51"
+type = "browser"
+enabled = true
+required = false
+platform = "51job"
+urls = ["https://we.51job.com/pc/search?keyword={keyword}&searchType=2&pageNum={page}"]
+keywords = ["医疗AI", "医疗大模型", "医学影像AI", "AI药物研发"]
+timeout_seconds = 45
+limit = 80
+
+[sources.options]
+account = "job51"
+pages = 2
+delay_seconds = 3
+settle_ms = 2000
+slow_mo_ms = 100
+
+[output]
+data_dir = "web/public/data"
+state_dir = "automation/state"
+keep_runs = 50
+min_relevance = 30
+max_jobs = 1000
+write_insights = true
+min_quality_score = 0
+
+[server]
+host = "127.0.0.1"
+port = 8787
+auth_token = "${JOBSINSIGHT_API_TOKEN:-}"
+cors_origin = "*"
+serve_web_dist = true

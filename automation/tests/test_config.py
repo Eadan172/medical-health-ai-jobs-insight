@@ -243,3 +243,90 @@ def test_invalid_source_minimum_and_quality_gate_are_rejected():
         Config(sources=[SourceSettings(name="bad", min_collected=-1)]).validate()
     with pytest.raises(ConfigError, match="min_quality_score"):
         Config(output=OutputSettings(min_quality_score=101)).validate()
+
+
+def test_local_config_file_is_preferred_over_shared_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.delenv("JOBSINSIGHT_CONFIG", raising=False)
+    write_config(tmp_path, '[llm]\nmodel = "from-shared"\n')
+    write_config(tmp_path, '[llm]\nmodel = "from-local"\n', "config.local.toml")
+
+    config = load_config(project_root=tmp_path)
+
+    assert config.config_path is not None
+    assert config.config_path.name == "config.local.toml"
+    assert config.llm.model == "from-local"
+
+
+def test_example_local_config_name_is_not_autoloaded(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.delenv("JOBSINSIGHT_CONFIG", raising=False)
+    write_config(tmp_path, '[llm]\nmodel = "from-shared"\n')
+    (tmp_path / "config.local.example.toml").write_text('[llm]\nmodel = "from-example"\n', encoding="utf-8")
+
+    config = load_config(project_root=tmp_path)
+
+    assert config.llm.model == "from-shared"
+
+
+def test_explicit_config_path_beats_local_file_and_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    shared = write_config(tmp_path, '[llm]\nmodel = "shared"\n')
+    write_config(tmp_path, '[llm]\nmodel = "local"\n', "config.local.toml")
+    monkeypatch.setenv("JOBSINSIGHT_CONFIG", str(tmp_path / "config.local.toml"))
+
+    config = load_config(shared)
+
+    assert config.llm.model == "shared"
+
+
+def test_jobsinsight_config_env_overrides_discovery(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    write_config(tmp_path, '[llm]\nmodel = "shared"\n')
+    custom = tmp_path / "custom.toml"
+    custom.write_text('[llm]\nmodel = "custom"\n', encoding="utf-8")
+    monkeypatch.setenv("JOBSINSIGHT_CONFIG", str(custom))
+
+    config = load_config(project_root=tmp_path)
+
+    assert config.llm.model == "custom"
+    assert config.config_path == custom
+
+
+def test_blank_jobsinsight_config_env_is_ignored(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    write_config(tmp_path, '[llm]\nmodel = "shared"\n')
+    monkeypatch.setenv("JOBSINSIGHT_CONFIG", "   ")
+
+    config = load_config(project_root=tmp_path)
+
+    assert config.llm.model == "shared"
+
+
+def test_local_example_enables_browser_sources_and_ci_config_does_not(monkeypatch: pytest.MonkeyPatch):
+    for name in (
+        "JOBSINSIGHT_CONFIG",
+        "JOBSINSIGHT_LLM_PROVIDER",
+        "JOBSINSIGHT_LLM_MODEL",
+        "JOBSINSIGHT_LLM_BASE_URL",
+        "JOBSINSIGHT_LLM_API_KEY",
+        "LLM_API_KEY",
+        "OPENAI_API_KEY",
+        "ANTHROPIC_API_KEY",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    root = Path(__file__).resolve().parents[1]
+    repo = root.parent
+    ci = load_config(root / "config.toml", apply_overrides=False)
+    local = load_config(root / "config.local.example.toml", apply_overrides=False)
+    gitignore = (repo / ".gitignore").read_text(encoding="utf-8")
+
+    assert all(source.type != "browser" or not source.enabled for source in ci.sources)
+    assert not any(source.type == "browser" and source.enabled for source in ci.enabled_sources)
+    browsers = [source for source in local.enabled_sources if source.type == "browser"]
+    assert [source.name for source in browsers] == ["boss", "liepin", "job51"]
+    assert all(source.required is False for source in browsers)
+    assert all(source.options.get("pages") == 2 for source in browsers)
+    assert all(float(source.options.get("delay_seconds", 0)) >= 1 for source in browsers)
+    assert all("{keyword}" in url and "{page}" in url for source in browsers for url in source.urls)
+    assert next(source for source in browsers if source.name == "liepin").options["page_start"] == 0
+    assert {source.name for source in local.enabled_sources} >= {"seed", "job-discovery", "company-careers"}
+    assert all(source.name != "51job" or source.type != "json_api" for source in local.sources)
+    assert local.llm.provider == ci.llm.provider == "deepseek"
+    assert local.llm.model == ci.llm.model == "deepseek-flash"
+    assert "automation/config.local.toml" in gitignore

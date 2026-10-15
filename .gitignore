@@ -17,6 +17,11 @@ automation/state/matches/
 # 私密招聘网站凭据；仅提交 accounts.example.toml。
 automation/config/accounts.toml
 automation/config/*.local.toml
+# 本机流水线配置（启用 Playwright）。云端 CI 只用 automation/config.toml。
+automation/config.local.toml
+automation/config.local.json
+automation/config.local.yaml
+automation/config.local.yml
 
 .DS_Store
 .env

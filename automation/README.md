@@ -87,18 +87,44 @@ register_collector("my-source", MyCollector)
 
 ### 需要登录的动态招聘页面
 
+GitHub Actions 只读 `automation/config.toml`。那个文件可以有 51job 的 `json_api`，
+但不要启用 `browser`：云端 IP 会被风控拦住。本机用 gitignore 的 `config.local.toml`。
+
 ```bash
 cp config/accounts.example.toml config/accounts.toml
+cp config.local.example.toml config.local.toml
 pip install -e ".[browser]"
 playwright install chromium
-# 设置示例文件中指定的账号/密码环境变量后：
 python -m jobsinsight browser-login boss
-python -m jobsinsight doctor
 ```
 
-在 `config.toml` 中启用 `type = "browser"` 的来源并设置搜索 URL。selector 在私密
-`accounts.toml` 中按网站实际页面维护；密码和 storage state 不入库。验证码必须人工
-完成，采集器不会尝试绕过风控。
+Windows 上不要动 conda，用 `automation\.venv`。在**有窗口的终端**里登录三个账号
+（`browser-login` 用 `input()` 等 Enter），再手动跑一次，最后注册每天的用户级计划任务：
+
+```powershell
+copy automation\config\accounts.example.toml automation\config\accounts.toml
+copy automation\config.local.example.toml automation\config.local.toml
+
+$env:PLAYWRIGHT_BROWSERS_PATH = "$PWD\automation\.venv\ms-playwright"
+$env:PYTHONPATH = "$PWD\automation"
+& .\automation\.venv\Scripts\python.exe -m jobsinsight browser-login boss
+& .\automation\.venv\Scripts\python.exe -m jobsinsight browser-login liepin
+& .\automation\.venv\Scripts\python.exe -m jobsinsight browser-login job51
+
+powershell -NoProfile -ExecutionPolicy Bypass -File .\automation\scripts\run-local.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\automation\scripts\register-daily-task.ps1 -At 08:00
+```
+
+`run-local.ps1` 会 `git pull --ff-only origin main`，用 `.venv` 的 Python 和
+`config.local.toml` 跑流水线，再按 Actions 的同一条规则检查
+`jobs.json` 非空且 `manifest.counts.valid == len(jobs)`。通过后只提交并推送
+`web/public/data`。计划任务是当前用户、`RunLevel Limited`，不需要管理员，
+并且要在你已登录 Windows 时才会跑。
+
+三个 browser 来源都是 `required = false`。会话文件缺失、登录墙或验证码只让该来源
+失败，seed 和其他来源仍会发布。selector 写在 `accounts.example.toml`，里面注明了
+哪些是对着线上包核对过的、哪些还没在渲染后的页面上确认。密码和 storage state 不入库。
+验证码必须人工完成，采集器不会尝试绕过风控。
 
 生产部署可执行 `python -m jobsinsight doctor --strict`，此时包括“仍使用 mock”或
 “只有 fixture 来源”在内的警告也会返回非零退出码。运行服务后还可读取

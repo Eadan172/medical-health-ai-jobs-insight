@@ -40,6 +40,19 @@ def test_missing_private_accounts_file_has_actionable_error(tmp_path: Path):
         load_accounts(tmp_path)
 
 
+def test_example_accounts_define_boss_liepin_and_job51():
+    repo = Path(__file__).resolve().parents[2]
+    accounts = load_accounts(repo, "automation/config/accounts.example.toml")
+
+    assert set(accounts) >= {"boss", "liepin", "job51"}
+    for name in ("liepin", "job51"):
+        account = accounts[name]
+        assert account.login_url.startswith("https://")
+        assert account.storage_state.endswith(f"{name}.json")
+        for key in ("username", "password", "submit", "logged_in", "captcha", "job_card", "title", "company"):
+            assert account.selectors.get(key), key
+
+
 def test_unknown_account_is_rejected(tmp_path: Path):
     path = tmp_path / "accounts.toml"
     path.write_text('[accounts.demo]\nlogin_url = "https://example.test/login"\n', encoding="utf-8")

@@ -193,7 +193,9 @@ register_provider("my-gateway", lambda options: MyProvider(**options))
 | `html_llm` | 网页转文本后交给 LLM 抽取 | 没有稳定 JSON 接口的页面 |
 | `browser` | Playwright 持久化登录会话 | 必须登录才能看到岗位列表 |
 
-51job / BOSS 直聘 / 猎聘的搜索地址、参数和 Cookie 会变，**不写死在代码里**。`automation/config.toml` 已启用 51job（`json_api`，Cookie 为 `${JOB51_COOKIE}`）；BOSS 与猎聘仍是注释示例。默认离线数据仍是 `automation/data/seed_postings.json`。
+51job / BOSS 直聘 / 猎聘的搜索地址、参数和 Cookie 会变，**不写死在代码里**。`automation/config.toml` 已启用 51job（`json_api`，Cookie 为 `${JOB51_COOKIE}`），给 GitHub Actions 用；BOSS 与猎聘的 browser 示例保持注释。默认离线数据仍是 `automation/data/seed_postings.json`。
+
+本机 Windows 不要改 `config.toml`。复制 `automation/config.local.example.toml` 为 gitignore 的 `automation/config.local.toml`，用已登录的 Playwright 会话采集 BOSS直聘、猎聘和 51job。命令、计划任务和选择器核对见 [automation/README.md](automation/README.md)。
 
 ### 需要登录时
 
@@ -203,7 +205,7 @@ cp automation/config/accounts.example.toml automation/config/accounts.toml
 python -m jobsinsight browser-login boss
 ```
 
-`accounts.toml`、Cookie 和 `storage_state` 均被 `.gitignore` 忽略。遇到验证码时程序会停止，需要人工登录；不会规避风控，请只用于你有权访问的账号。
+`accounts.toml`、`config.local.toml`、Cookie 和 `storage_state` 均被 `.gitignore` 忽略。遇到验证码时该 browser 来源失败（`required = false`），不会挡住其他来源发布，也不会规避风控。请只用于你有权访问的账号。
 
 生产来源建议同时设置：
 
@@ -295,16 +297,16 @@ python -m jobsinsight ingest preview --query "上海 医疗AI"
 
 ```
 内置默认值
-    → 配置文件（config.toml / .json / .yaml）
+    → 配置文件（--config，否则 JOBSINSIGHT_CONFIG，否则 config.local.toml，否则 config.toml）
     → 环境变量（JOBSINSIGHT_* 以及 ${VAR} / ${VAR:-默认值}）
     → 运行时覆盖（automation/state/overrides.json）
 ```
 
-常用变量：`JOBSINSIGHT_LLM_API_KEY`、`JOBSINSIGHT_LLM_PROVIDER`、`JOBSINSIGHT_LLM_MODEL`、`JOBSINSIGHT_LLM_BASE_URL`、`JOBSINSIGHT_SCHEDULE_MODE`、`JOBSINSIGHT_SCHEDULE_DAILY_TIMES`、`JOBSINSIGHT_SCHEDULE_CRON`、`JOBSINSIGHT_SERVER_PORT`、`JOBSINSIGHT_SERVER_AUTH_TOKEN`、`JOB51_COOKIE`。
+常用变量：`JOBSINSIGHT_CONFIG`、`JOBSINSIGHT_LLM_API_KEY`、`JOBSINSIGHT_LLM_PROVIDER`、`JOBSINSIGHT_LLM_MODEL`、`JOBSINSIGHT_LLM_BASE_URL`、`JOBSINSIGHT_SCHEDULE_MODE`、`JOBSINSIGHT_SCHEDULE_DAILY_TIMES`、`JOBSINSIGHT_SCHEDULE_CRON`、`JOBSINSIGHT_SERVER_PORT`、`JOBSINSIGHT_SERVER_AUTH_TOKEN`、`JOB51_COOKIE`。
 
 空白的 `JOBSINSIGHT_LLM_PROVIDER` / `JOBSINSIGHT_LLM_MODEL` 会被忽略，避免 GitHub 未设置的 Variable 把 `config.toml` 里的 `deepseek` / `deepseek-flash` 擦掉。`JOBSINSIGHT_LLM_API_KEY` 要配在 Actions secret 里，定时和强制运行才会调用 DeepSeek。
 
-**API Key 和招聘账号不要写进仓库。** Actions 通过 Secret `JOB51_COOKIE` 调用 51job，不把 Cookie 写进仓库或日志。BOSS / 猎聘仍需要本机浏览器登录，默认保持关闭。
+**API Key 和招聘账号不要写进仓库。** Actions 通过 Secret `JOB51_COOKIE` 调用 51job 的 `json_api`，不把 Cookie 写进仓库或日志，也不加载 `config.local.toml`。BOSS、猎聘和本机 51job 浏览器会话只在 gitignore 的本地配置里启用。
 
 ---
 
@@ -343,7 +345,9 @@ npm run lint && npm run build
 
 ```
 automation/                 Python 自动化后端（核心零依赖）
-├── config.toml             运行时间、LLM、数据源、产出、接口
+├── config.toml             云端运行时间、LLM、数据源（含 51job json_api）
+├── config.local.example.toml  本机 browser 来源示例（真实 config.local.toml 不入库）
+├── scripts/                Windows 本机每日运行与计划任务
 ├── config/                 私密账号示例（真实 accounts.toml 不入库）
 ├── data/                   示例岗位 JSON
 ├── jobsinsight/
