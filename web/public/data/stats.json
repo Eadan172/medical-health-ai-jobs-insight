@@ -1,8 +1,8 @@
 {
-  "total_jobs": 404,
-  "last_update": "2026-10-14",
-  "new_jobs_today": 3,
-  "updated_jobs_today": 0,
+  "total_jobs": 406,
+  "last_update": "2026-10-15",
+  "new_jobs_today": 2,
+  "updated_jobs_today": 60,
   "deleted_jobs_today": 0,
   "avg_salary": 63.9,
   "platform_stats": {
@@ -19,7 +19,7 @@
       "avg_salary": 61.6
     },
     "BOSS直聘": {
-      "count": 6,
+      "count": 8,
       "avg_salary": 0.0
     }
   },
@@ -65,29 +65,35 @@
       "avg_salary": 77.2
     },
     "未知": {
-      "count": 6,
+      "count": 8,
       "avg_salary": 0.0
     }
   },
   "skill_stats": {
-    "数据分析": 176,
-    "药物研发": 132,
-    "基因组学": 130,
-    "临床知识": 128,
-    "生物信息学": 111,
-    "分子生物学": 106,
-    "医学影像": 106,
+    "数据分析": 163,
+    "药物研发": 127,
+    "基因组学": 124,
+    "临床知识": 119,
+    "生物信息学": 104,
+    "医学影像": 104,
+    "分子生物学": 103,
+    "机器学习": 99,
     "TensorFlow": 99,
-    "机器学习": 98,
     "SQL": 92,
-    "NLP": 89,
-    "计算机视觉": 85,
+    "NLP": 86,
     "统计建模": 83,
     "Python": 83,
+    "计算机视觉": 82,
     "PyTorch": 82,
     "深度学习": 81,
-    "R语言": 79,
-    "Spark": 77
+    "R语言": 78,
+    "Spark": 76,
+    "需求分析": 6,
+    "项目管理": 6,
+    "活性预测": 6,
+    "病历分析": 6,
+    "知识图谱": 6,
+    "序列比对": 6
   },
   "experience_stats": {
     "应届": {
@@ -111,7 +117,7 @@
       "avg_salary": 131.8
     },
     "未知": {
-      "count": 6,
+      "count": 8,
       "avg_salary": 0.0
     }
   },
@@ -129,17 +135,17 @@
       "avg_salary": 60.6
     },
     "未知": {
-      "count": 6,
+      "count": 8,
       "avg_salary": 0.0
     }
   },
   "job_level_stats": {
     "高级": {
-      "count": 170,
-      "avg_salary": 95.1
+      "count": 165,
+      "avg_salary": 93.7
     },
     "中级": {
-      "count": 118,
+      "count": 119,
       "avg_salary": 40.4
     },
     "初级": {
@@ -147,22 +153,22 @@
       "avg_salary": 24.4
     },
     "专家": {
-      "count": 27,
-      "avg_salary": 72.9
+      "count": 28,
+      "avg_salary": 74.1
     },
     "资深专家": {
-      "count": 20,
-      "avg_salary": 59.7
+      "count": 25,
+      "avg_salary": 78.1
     }
   },
   "category_stats": {
-    "AI药物研发": 152,
-    "生物信息": 66,
-    "临床数据科学": 63,
-    "医学影像AI": 46,
-    "智能医疗产品": 34,
-    "医疗大模型": 27,
-    "其他": 16
+    "AI药物研发": 150,
+    "生物信息": 64,
+    "临床数据科学": 62,
+    "医学影像AI": 47,
+    "智能医疗产品": 39,
+    "医疗大模型": 26,
+    "其他": 18
   },
   "salary_distribution": {
     "15-25K": 56,
@@ -216,25 +222,25 @@
       "top_title_count": 8
     }
   },
-  "run_id": "20261014T200111Z",
-  "generated_at": "2026-10-14T20:02:11+00:00",
-  "data_version": "a13424a6cebadd71",
+  "run_id": "20261015T084412Z",
+  "generated_at": "2026-10-15T08:46:47+00:00",
+  "data_version": "74bb5c76f1b4dab5",
   "quality": {
     "score": 75,
-    "total": 401,
+    "total": 402,
     "missing_company": 0,
-    "missing_salary": 3,
+    "missing_salary": 4,
     "missing_url": 398,
     "missing_publish_date": 0,
     "duplicate_fingerprints": 0,
     "warnings": [
-      "薪资缺失 3/401（1%）",
-      "岗位链接缺失 398/401（99%）",
+      "薪资缺失 4/402（1%）",
+      "岗位链接缺失 398/402（99%）",
       "398 条岗位发布日期超过 30 天"
     ]
   },
   "freshness": {
-    "newest_publish_date": "2026-10-14",
+    "newest_publish_date": "2026-10-15",
     "oldest_publish_date": "2026-01-20",
     "median_age_days": 252,
     "stale_over_30d": 398,
@@ -242,9 +248,9 @@
     "missing_publish_date": 0
   },
   "merge": {
-    "new": 3,
-    "updated": 0,
-    "unchanged": 401,
+    "new": 2,
+    "updated": 60,
+    "unchanged": 344,
     "stale": 0,
     "deleted": 0
   }
