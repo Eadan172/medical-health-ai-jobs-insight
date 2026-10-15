@@ -76,16 +76,32 @@ class Pipeline:
     @property
     def llm(self) -> LLMClient | None:
         """Lazily build the client so a run with ``llm.enabled = false`` never
-        touches provider configuration."""
+        touches provider configuration.
+
+        A provider that needs an API key and does not have one also stays
+        unset, so enrich and insights use heuristics instead of calling out.
+        """
 
         if not self._llm_built:
             self._llm_built = True
             if self.config.llm.enabled:
-                try:
-                    self._llm_client = build_client(self.config.llm)
-                except LLMError as exc:
-                    LOGGER.warning("LLM 初始化失败（%s），本次运行使用规则解析", exc)
+                settings = self.config.llm
+                # A real provider with no key must not open a socket. Scheduled
+                # runs call DeepSeek only after JOBSINSIGHT_LLM_API_KEY is set;
+                # otherwise enrich/insights stay on the heuristic path.
+                if settings.requires_api_key() and not settings.api_key.strip():
+                    LOGGER.warning(
+                        "%s/%s 未配置 API Key，本次运行使用规则解析",
+                        settings.provider,
+                        settings.model,
+                    )
                     self._llm_client = None
+                else:
+                    try:
+                        self._llm_client = build_client(settings)
+                    except LLMError as exc:
+                        LOGGER.warning("LLM 初始化失败（%s），本次运行使用规则解析", exc)
+                        self._llm_client = None
         return self._llm_client
 
     # ------------------------------------------------------------------- run

@@ -28,14 +28,14 @@
 | 模块 | 能力 | 说明 |
 | --- | --- | --- |
 | 调度 | 每天定点 / cron / 间隔 / 手动 | 本地守护进程与 GitHub Actions 共用同一套时间规则 |
-| LLM | OpenAI 兼容 / Anthropic / Ollama / mock | 失败自动回退规则解析，不会让整次运行中断 |
+| LLM | DeepSeek `deepseek-flash`（OpenAI 兼容） | 有 `JOBSINSIGHT_LLM_API_KEY` 才请求模型；失败回退规则解析 |
 | 采集 | 本地 JSON / JSON API / 网页+LLM / 浏览器 | 浏览器模式使用你授权的登录会话，不绕过验证码 |
 | 发布 | 必需来源 · 最低采集量 · 相关度 · 质量分 | 不达标时保留上一版有效数据 |
 | 观测 | 数据版本 · 来源健康 · 新鲜度 · `doctor` | 前端状态条和 `/api/health` 都能看到 |
 | 前端 | 实时 API 优先，静态快照回退 | GitHub Pages 子路径也能正确加载数据 |
 
-> 仓库默认启用 **fixture 示例数据 + mock LLM**，无需账号即可跑通全流程。  
-> 要持续获取真实招聘数据，请按 [数据源](#-数据源) 配置你有权访问的接口或浏览器账号，并遵守平台条款。
+> 仓库默认的 LLM 是 **DeepSeek `deepseek-flash`**。设置环境变量 `JOBSINSIGHT_LLM_API_KEY` 后，定时任务和手动运行会调用该模型做富化、洞察，以及已启用的 `html_llm` 来源。没有密钥时不发模型请求，回退到规则解析，示例 fixture 数据仍可离线跑通。  
+> 要持续获取真实招聘数据，请按 [数据源](#-数据源) 配置你有权访问的接口或浏览器账号，并遵守平台条款。GitHub Actions 的 runner 没有本机桌面登录，不会继承 BOSS / 51job / 猎聘的 Cookie 或浏览器会话。
 
 ## 数据怎么流动
 
@@ -65,7 +65,7 @@ flowchart LR
 ```bash
 cd automation
 python -m jobsinsight doctor   # 检查配置、来源、目录和已有数据
-python -m jobsinsight run      # 默认 mock，不需要 API Key
+python -m jobsinsight run      # 有 JOBSINSIGHT_LLM_API_KEY 时调用 DeepSeek；否则规则解析
 python -m jobsinsight next-runs
 ```
 
@@ -95,8 +95,9 @@ python -m jobsinsight schedule
 # HTTP 接口 + 可选调度器，同时托管构建好的前端
 python -m jobsinsight serve      # http://127.0.0.1:8787
 
-# 调度器 + 接口 + 前端一起跑
-LLM_PROVIDER=deepseek LLM_MODEL=deepseek-chat LLM_API_KEY=sk-xxx docker compose up -d
+# 调度器 + 接口 + 前端一起跑。密钥只放环境变量，不要写进仓库。
+# 不设 LLM_PROVIDER / LLM_MODEL 时使用 config.toml 的 deepseek / deepseek-flash。
+LLM_API_KEY=sk-xxx docker compose up -d
 ```
 
 </details>
@@ -137,13 +138,22 @@ GitHub Actions 的 cron 是 UTC 且写死在 YAML 里，所以工作流用较粗
 
 ## LLM 调用接口
 
-换 `provider` / `model` / `api_key` 即可切换厂商：
+生产配置在 `automation/config.toml`。换 `provider` / `model` / `base_url` 即可切换厂商，`api_key` 保持占位符，由环境变量填入：
 
 ```toml
 [llm]
 provider = "deepseek"        # openai / moonshot / dashscope / zhipu / siliconflow / groq / ollama / anthropic / mock
-model = "deepseek-chat"
-api_key = "${DEEPSEEK_API_KEY}"
+model = "deepseek-flash"
+api_key = "${JOBSINSIGHT_LLM_API_KEY:-}"
+base_url = "https://api.deepseek.com/v1"   # 客户端会请求 {base_url}/chat/completions
+```
+
+GitHub Actions（`.github/workflows/update-data.yml`）把 secret `JOBSINSIGHT_LLM_API_KEY` 注入同名环境变量。配上这个 secret 后，定时运行和手动 `workflow_dispatch` 都会用 `deepseek-flash` 做富化、洞察，以及任何已启用的 `html_llm` 来源。Repository variables `JOBSINSIGHT_LLM_PROVIDER` / `JOBSINSIGHT_LLM_MODEL` 只在你要换模型时设置；留空不会覆盖 `config.toml`。没有密钥时不会请求 DeepSeek。
+
+离线复现测试时显式切回 mock，不要改生产配置：
+
+```bash
+JOBSINSIGHT_LLM_PROVIDER=mock JOBSINSIGHT_LLM_MODEL=mock-1 python -m jobsinsight run --dry-run
 ```
 
 | Provider | 适用场景 |
@@ -290,9 +300,11 @@ python -m jobsinsight ingest preview --query "上海 医疗AI"
     → 运行时覆盖（automation/state/overrides.json）
 ```
 
-常用变量：`JOBSINSIGHT_LLM_API_KEY`、`JOBSINSIGHT_LLM_PROVIDER`、`JOBSINSIGHT_LLM_MODEL`、`JOBSINSIGHT_SCHEDULE_MODE`、`JOBSINSIGHT_SCHEDULE_DAILY_TIMES`、`JOBSINSIGHT_SCHEDULE_CRON`、`JOBSINSIGHT_SERVER_PORT`、`JOBSINSIGHT_SERVER_AUTH_TOKEN`。
+常用变量：`JOBSINSIGHT_LLM_API_KEY`、`JOBSINSIGHT_LLM_PROVIDER`、`JOBSINSIGHT_LLM_MODEL`、`JOBSINSIGHT_LLM_BASE_URL`、`JOBSINSIGHT_SCHEDULE_MODE`、`JOBSINSIGHT_SCHEDULE_DAILY_TIMES`、`JOBSINSIGHT_SCHEDULE_CRON`、`JOBSINSIGHT_SERVER_PORT`、`JOBSINSIGHT_SERVER_AUTH_TOKEN`。
 
-**API Key 和招聘账号不要写进仓库。**
+空白的 `JOBSINSIGHT_LLM_PROVIDER` / `JOBSINSIGHT_LLM_MODEL` 会被忽略，避免 GitHub 未设置的 Variable 把 `config.toml` 里的 `deepseek` / `deepseek-flash` 擦掉。`JOBSINSIGHT_LLM_API_KEY` 要配在 Actions secret 里，定时和强制运行才会调用 DeepSeek。
+
+**API Key 和招聘账号不要写进仓库。** Actions runner 也没有开发者本机的浏览器登录，BOSS / 51job / 猎聘这类需要 Cookie 或 Playwright 会话的来源保持关闭。
 
 ---
 
@@ -300,7 +312,7 @@ python -m jobsinsight ingest preview --query "上海 医疗AI"
 
 1. 真实来源设置 `required = true` 和合理的 `min_collected`，避免登录过期时发布空数据。
 2. 设置 `output.min_quality_score`：先观察实际质量分，再逐步提高门槛。
-3. 把 API Key、账号密码和 `server.auth_token` 放到 Secret 或环境变量。
+3. 把 `JOBSINSIGHT_LLM_API_KEY`、账号密码和 `server.auth_token` 放到 Secret 或环境变量。GitHub Actions 使用同名 secret。
 4. 首次部署执行 `python -m jobsinsight run`，确认 `manifest.json` 和来源健康记录已生成。
 5. 执行 `python -m jobsinsight doctor --strict`；生产环境应处理完全部警告。
 6. 用 `/api/health` 监控数据年龄，用 `/api/doctor` 查看具体故障。

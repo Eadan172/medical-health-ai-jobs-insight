@@ -13,8 +13,10 @@ services:
       JOBSINSIGHT_SCHEDULE_TIMEZONE: Asia/Shanghai
       JOBSINSIGHT_SCHEDULE_RUN_ON_START: "false"
       # ---- LLM ----
-      JOBSINSIGHT_LLM_PROVIDER: ${LLM_PROVIDER:-mock}
-      JOBSINSIGHT_LLM_MODEL: ${LLM_MODEL:-mock-1}
+      # 留空时沿用 automation/config.toml（deepseek / deepseek-flash）。
+      # 只有显式设置 LLM_PROVIDER / LLM_MODEL 才覆盖。密钥不要写进镜像。
+      JOBSINSIGHT_LLM_PROVIDER: ${LLM_PROVIDER:-}
+      JOBSINSIGHT_LLM_MODEL: ${LLM_MODEL:-}
       JOBSINSIGHT_LLM_API_KEY: ${LLM_API_KEY:-}
       # 写接口的访问令牌，留空表示不校验
       JOBSINSIGHT_API_TOKEN: ${API_TOKEN:-}

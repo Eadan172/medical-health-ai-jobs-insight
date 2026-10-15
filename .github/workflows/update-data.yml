@@ -50,13 +50,16 @@ jobs:
       - name: 执行流水线
         working-directory: automation
         env:
-          # 在仓库 Settings → Secrets and variables → Actions 里配置，
-          # 不配置也能跑：会自动退回规则解析。
+          # Settings → Secrets and variables → Actions:
+          #   secret  JOBSINSIGHT_LLM_API_KEY   有值才会调用 DeepSeek
+          #   variable JOBSINSIGHT_LLM_PROVIDER / JOBSINSIGHT_LLM_MODEL
+          # 未设置的 Variable 在 Actions 里是空字符串。配置层会忽略空白，
+          # 从而保留 automation/config.toml 的 deepseek / deepseek-flash。
+          # 不要在这里回退到 mock，否则密钥配了也仍走离线模型。
+          # 没有密钥时流水线不发模型请求，富化和洞察回退到规则解析。
           JOBSINSIGHT_LLM_API_KEY: ${{ secrets.JOBSINSIGHT_LLM_API_KEY }}
-          # GitHub 对未设置的 Variable 返回空字符串；显式给默认值，
-          # 避免空值覆盖 config.toml 里的 mock/mock-1。
-          JOBSINSIGHT_LLM_PROVIDER: ${{ vars.JOBSINSIGHT_LLM_PROVIDER || 'mock' }}
-          JOBSINSIGHT_LLM_MODEL: ${{ vars.JOBSINSIGHT_LLM_MODEL || 'mock-1' }}
+          JOBSINSIGHT_LLM_PROVIDER: ${{ vars.JOBSINSIGHT_LLM_PROVIDER }}
+          JOBSINSIGHT_LLM_MODEL: ${{ vars.JOBSINSIGHT_LLM_MODEL }}
         run: |
           python -m jobsinsight doctor
           python -m jobsinsight next-runs

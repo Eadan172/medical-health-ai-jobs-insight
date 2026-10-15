@@ -30,6 +30,8 @@ python -m jobsinsight --help
 2. **富化**：`Enricher` 把原始岗位按 `batch_size` 分批交给 LLM，要求返回规范化字段。
    每个字段都会校验（枚举必须在词表内、薪资必须是合理区间），不合格就用
    `heuristics.py` 的规则结果。LLM 未启用、没配 Key 或调用失败时，全量走规则解析。
+   生产配置的 provider 是 `deepseek`、模型是 `deepseek-flash`；只有
+   `JOBSINSIGHT_LLM_API_KEY` 有值时才会请求 `https://api.deepseek.com/v1`。
 3. **过滤**：丢掉 `relevance < output.min_relevance` 的岗位（默认 30），
    把明显与「医药健康 + AI」无关的岗位挡在外面。
 4. **聚合**：`analysis.build_stats()` 生成前端需要的全部统计，
