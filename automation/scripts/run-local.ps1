@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
   Pull main, run the jobs pipeline with the gitignored local config, and push data only if it validates.
@@ -43,6 +43,8 @@ try { Start-Transcript -Path (Join-Path $LogDir "local-run.log") -Append | Out-N
 $env:PLAYWRIGHT_BROWSERS_PATH = $Browsers
 $env:PYTHONPATH = Join-Path $RepoRoot "automation"
 $env:JOBSINSIGHT_CONFIG = $LocalConfig
+if (-not $env:JOBSINSIGHT_BROWSER_CHANNEL) { $env:JOBSINSIGHT_BROWSER_CHANNEL = 'chrome' }
+if (-not $env:JOBSINSIGHT_USER_AGENT) { $env:JOBSINSIGHT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36' }
 
 Write-Host "Repo: $RepoRoot"
 Write-Host "Python: $VenvPython"
@@ -59,24 +61,28 @@ if ($branch -ne "main") {
 git -C $RepoRoot pull --ff-only origin main
 Assert-Exit "git pull"
 
-& $VenvPython -m jobsinsight run --config $LocalConfig --trigger local-windows
-Assert-Exit "jobsinsight run"
-
-& $VenvPython $Validator $RepoRoot
-Assert-Exit "publish validation"
-
-$porcelain = @(git -C $RepoRoot status --porcelain -- web/public/data)
-Assert-Exit "git status"
-if (-not $porcelain) {
-    Write-Host "No changes under web/public/data. Nothing to commit."
-    exit 0
+$Reporter = Join-Path $PSScriptRoot "send_report.py"
+$RunLog = Join-Path $LogDir "last-run.json.log"
+foreach ($n in 'MAIL163_SMTP_USER','MAIL163_SMTP_AUTH_CODE','JOBSINSIGHT_REPORT_TO') {
+    if (-not (Get-Item "env:$n" -ErrorAction SilentlyContinue)) {
+        $v = [Environment]::GetEnvironmentVariable($n, 'User'); if ($v) { Set-Item "env:$n" $v }
+    }
 }
-
-git -C $RepoRoot add -- web/public/data
-Assert-Exit "git add"
-$when = Get-Date -Format "yyyy-MM-dd HH:mm"
-git -C $RepoRoot commit -m "chore(data): local job data update $when" -- web/public/data
-Assert-Exit "git commit"
-git -C $RepoRoot push origin main
-Assert-Exit "git push"
-Write-Host "Pushed web/public/data."
+$env:PYTHONIOENCODING = "utf-8"
+# Data is NOT pushed. The run writes web/public/data locally, the report is mailed, then the data files are restored.
+$prevEap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+& $VenvPython -m jobsinsight --config $LocalConfig run --trigger local-windows 2>&1 | ForEach-Object { "$_" } | Tee-Object -FilePath $RunLog | Out-Host
+$runExit = $LASTEXITCODE; $ErrorActionPreference = $prevEap
+$fatal = ""
+if ($runExit -ne 0) { $fatal = "jobsinsight run 退出码 $runExit，详见 $RunLog" }
+else {
+    & $VenvPython $Validator $RepoRoot
+    if ($LASTEXITCODE -ne 0) { $fatal = "数据校验失败（publish validation）" }
+}
+& $VenvPython $Reporter $RunLog $fatal
+$mailExit = $LASTEXITCODE
+git -C $RepoRoot checkout -- web/public/data
+git -C $RepoRoot clean -fdq -- web/public/data
+if ($mailExit -ne 0) { Exit-Run "report mail failed" $mailExit }
+if ($fatal) { exit 1 }
+exit 0
