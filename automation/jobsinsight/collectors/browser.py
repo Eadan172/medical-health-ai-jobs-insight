@@ -6,9 +6,9 @@ detected, collection stops and asks the user to refresh the session manually.
 """
 
 from __future__ import annotations
-import os
 
 import logging
+import os
 import time
 from collections.abc import Iterable, Sequence
 from pathlib import Path
@@ -57,7 +57,12 @@ class BrowserCollector(Collector):
         postings: list[RawPosting] = []
 
         with sync_playwright() as playwright:
-            browser = playwright.chromium.launch(headless=True, slow_mo=slow_mo, channel=(os.environ.get("JOBSINSIGHT_BROWSER_CHANNEL") or None), args=["--disable-blink-features=AutomationControlled"])
+            browser = playwright.chromium.launch(
+                headless=True,
+                slow_mo=slow_mo,
+                channel=(os.environ.get("JOBSINSIGHT_BROWSER_CHANNEL") or None),
+                args=["--disable-blink-features=AutomationControlled"],
+            )
             context_options: dict[str, Any] = {}
             if state.is_file():
                 context_options["storage_state"] = str(state)
@@ -233,7 +238,11 @@ def save_interactive_session(
     state = storage_path(project_root, account)
     sync_playwright = _playwright()
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=False, channel=(os.environ.get("JOBSINSIGHT_BROWSER_CHANNEL") or None), args=["--disable-blink-features=AutomationControlled"])
+        browser = playwright.chromium.launch(
+            headless=False,
+            channel=(os.environ.get("JOBSINSIGHT_BROWSER_CHANNEL") or None),
+            args=["--disable-blink-features=AutomationControlled"],
+        )
         context = browser.new_context()
         page = context.new_page()
         page.goto(account.login_url, wait_until="domcontentloaded")
