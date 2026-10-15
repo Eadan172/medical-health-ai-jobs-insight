@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-15T09:22:34+00:00",
-  "provider": "deepseek",
-  "model": "deepseek-flash",
+  "generated_at": "2026-10-15T10:04:21+00:00",
+  "provider": "disabled",
+  "model": "",
   "schedule": {
     "mode": "daily",
     "description": "每天 00:00 (Asia/Shanghai)",
@@ -10,18 +10,18 @@
   },
   "run": {
     "total_jobs": 407,
-    "new_jobs": 1,
+    "new_jobs": 0,
     "updated_jobs": 60,
     "deleted_jobs": 0,
-    "unchanged_jobs": 346
+    "unchanged_jobs": 347
   },
   "source": "rules",
   "headline": "共 407 个医药健康+AI 岗位，南京需求最集中",
-  "summary": "本次共收录 407 个岗位，其中今日新增 1 个。整体均薪约 63.9K/月。该摘要由统计规则生成；在配置里启用真实 LLM 后，会替换为模型撰写的分析。",
+  "summary": "本次共收录 407 个岗位，其中今日新增 0 个。整体均薪约 63.9K/月。该摘要由统计规则生成；在配置里启用真实 LLM 后，会替换为模型撰写的分析。",
   "highlights": [
     "南京岗位最多，50 个，均薪 62.6K",
     "深圳薪资最高，均薪 77.2K",
-    "最高频技能是数据分析，出现在 164 个岗位中",
+    "最高频技能是数据分析，出现在 176 个岗位中",
     "资深岗位均薪是应届的 5.4 倍"
   ],
   "hot_skills": [
@@ -29,12 +29,12 @@
     "药物研发",
     "基因组学",
     "临床知识",
-    "医学影像"
+    "生物信息学"
   ],
   "advice": [
     "优先补齐高频技能：数据分析、药物研发、基因组学",
     "岗位机会集中在南京、武汉、上海"
   ],
-  "run_id": "20261015T091953Z",
-  "data_version": "bf8eb62c391b7073"
+  "run_id": "20261015T100306Z",
+  "data_version": "50b32054228a0ff9"
 }

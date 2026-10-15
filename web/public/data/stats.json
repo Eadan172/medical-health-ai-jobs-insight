@@ -1,7 +1,7 @@
 {
   "total_jobs": 407,
   "last_update": "2026-10-15",
-  "new_jobs_today": 1,
+  "new_jobs_today": 0,
   "updated_jobs_today": 60,
   "deleted_jobs_today": 0,
   "avg_salary": 63.9,
@@ -70,30 +70,24 @@
     }
   },
   "skill_stats": {
-    "数据分析": 164,
-    "药物研发": 127,
-    "基因组学": 122,
-    "临床知识": 119,
-    "医学影像": 104,
-    "生物信息学": 104,
-    "分子生物学": 101,
+    "数据分析": 176,
+    "药物研发": 133,
+    "基因组学": 130,
+    "临床知识": 128,
+    "生物信息学": 111,
+    "医学影像": 107,
+    "分子生物学": 106,
     "TensorFlow": 99,
     "机器学习": 98,
     "SQL": 92,
-    "NLP": 85,
+    "NLP": 90,
+    "计算机视觉": 85,
     "统计建模": 83,
     "Python": 83,
     "PyTorch": 82,
     "深度学习": 81,
-    "计算机视觉": 80,
     "R语言": 79,
-    "Spark": 77,
-    "项目管理": 6,
-    "需求分析": 6,
-    "活性预测": 6,
-    "医学文本处理": 6,
-    "知识图谱": 6,
-    "病历分析": 6
+    "Spark": 77
   },
   "experience_stats": {
     "应届": {
@@ -141,12 +135,12 @@
   },
   "job_level_stats": {
     "高级": {
-      "count": 162,
-      "avg_salary": 94.3
+      "count": 172,
+      "avg_salary": 95.1
     },
     "中级": {
-      "count": 122,
-      "avg_salary": 40.5
+      "count": 119,
+      "avg_salary": 40.4
     },
     "初级": {
       "count": 69,
@@ -154,21 +148,21 @@
     },
     "专家": {
       "count": 27,
-      "avg_salary": 71.3
+      "avg_salary": 72.9
     },
     "资深专家": {
-      "count": 27,
-      "avg_salary": 81.5
+      "count": 20,
+      "avg_salary": 59.7
     }
   },
   "category_stats": {
-    "AI药物研发": 149,
+    "AI药物研发": 153,
     "生物信息": 66,
-    "临床数据科学": 65,
+    "临床数据科学": 63,
     "医学影像AI": 47,
-    "智能医疗产品": 38,
-    "医疗大模型": 26,
-    "其他": 16
+    "智能医疗产品": 34,
+    "医疗大模型": 27,
+    "其他": 17
   },
   "salary_distribution": {
     "15-25K": 56,
@@ -222,9 +216,9 @@
       "top_title_count": 8
     }
   },
-  "run_id": "20261015T091953Z",
-  "generated_at": "2026-10-15T09:22:16+00:00",
-  "data_version": "bf8eb62c391b7073",
+  "run_id": "20261015T100306Z",
+  "generated_at": "2026-10-15T10:04:21+00:00",
+  "data_version": "50b32054228a0ff9",
   "quality": {
     "score": 75,
     "total": 402,
@@ -248,9 +242,9 @@
     "missing_publish_date": 0
   },
   "merge": {
-    "new": 1,
+    "new": 0,
     "updated": 60,
-    "unchanged": 346,
+    "unchanged": 347,
     "stale": 0,
     "deleted": 0
   }
