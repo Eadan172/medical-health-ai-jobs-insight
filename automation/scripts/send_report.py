@@ -27,14 +27,8 @@ if run_log and run_log.exists():
     text = "\n" + text.replace("\r\n", "\n")
     start = text.rfind("\n{\n")
     if start >= 0:
-        depth = 0
-        for i, ch in enumerate(text[start + 1 :], start + 1):
-            depth += ch == "{"
-            depth -= ch == "}"
-            if depth == 0:
-                with contextlib.suppress(Exception):
-                    summary = json.loads(text[start + 1 : i + 1])
-                break
+        with contextlib.suppress(Exception):
+            summary = json.JSONDecoder().raw_decode(text[start + 1 :])[0]
 errors = list(summary.get("errors", []))
 if fatal:
     errors.insert(0, fatal)
