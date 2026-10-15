@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>We Work Remotely</title>
+    <item>
+      <title>Egear : Senior Google Ads Media Buyer</title>
+      <region>Anywhere in the World</region>
+      <country></country>
+      <state>Florida</state>
+      <skills>Google Analytics, Paid Social Media Advertising, Google Ads</skills>
+      <category>All Other Remote</category>
+      <link>https://weworkremotely.com/remote-jobs/drop-ads</link>
+      <pubDate>Wed, 14 Oct 2026 01:00:00 +0000</pubDate>
+      <description>We run DTC ecommerce offers across health and smart devices and mention AI studio in the benefits copy.</description>
+    </item>
+    <item>
+      <title>Helix : Clinical Machine Learning Engineer</title>
+      <region>USA</region>
+      <country>United States</country>
+      <state>Massachusetts</state>
+      <skills>Python, PyTorch</skills>
+      <category>Programming</category>
+      <link>https://weworkremotely.com/remote-jobs/keep-ml</link>
+      <pubDate>Tue, 13 Oct 2026 01:00:00 +0000</pubDate>
+      <description>Health insurance, 401k, and a wellness stipend.</description>
+    </item>
+  </channel>
+</rss>

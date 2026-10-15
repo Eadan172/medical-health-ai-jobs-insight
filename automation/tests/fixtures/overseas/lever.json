@@ -1,0 +1,22 @@
+[
+  {
+    "id": "abc",
+    "text": "Machine Learning Scientist",
+    "categories": {"commitment": "Full-time", "location": "Hyderabad", "team": "ML"},
+    "country": "IN",
+    "workplaceType": "onsite",
+    "hostedUrl": "https://jobs.lever.co/enveda/abc",
+    "createdAt": 1786354852969,
+    "additionalPlain": "The target base salary for this position ranges from $137,300 to $166,000 plus equity.",
+    "descriptionPlain": "Health insurance and wellness benefits are listed here and must not decide the match."
+  },
+  {
+    "id": "def",
+    "text": "Sales Development Representative",
+    "categories": {"location": "Boston"},
+    "country": "US",
+    "hostedUrl": "https://jobs.lever.co/enveda/def",
+    "createdAt": 1780000000000,
+    "descriptionPlain": "machine learning health clinical"
+  }
+]

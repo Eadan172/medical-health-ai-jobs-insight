@@ -1,0 +1,43 @@
+{
+  "jobs": [
+    {
+      "id": 101,
+      "title": "Machine Learning Engineer",
+      "absolute_url": "https://job-boards.greenhouse.io/recursionpharmaceuticals/jobs/101",
+      "first_published": "2026-10-01T12:00:00-04:00",
+      "location": {"name": "Salt Lake City, Utah"},
+      "content": "&lt;p&gt;Build clinical machine learning models for drug discovery.&lt;/p&gt;"
+    },
+    {
+      "id": 102,
+      "title": "Account Executive",
+      "absolute_url": "https://job-boards.greenhouse.io/recursionpharmaceuticals/jobs/102",
+      "location": {"name": "Remote"},
+      "content": "&lt;p&gt;Sell the platform.&lt;/p&gt;"
+    },
+    {
+      "id": 103,
+      "title": "Senior Software Engineer",
+      "absolute_url": "https://job-boards.greenhouse.io/recursionpharmaceuticals/jobs/103",
+      "updated_at": "2026-09-02T00:00:00Z",
+      "location": {"name": "London, United Kingdom"},
+      "content": "&lt;p&gt;Platform services.&lt;/p&gt;"
+    },
+    {
+      "id": 104,
+      "title": "Research Scientist, Computational Biology",
+      "absolute_url": "https://job-boards.greenhouse.io/recursionpharmaceuticals/jobs/104",
+      "first_published": "2026-08-15",
+      "location": {"name": "Remote - US"},
+      "content": ""
+    },
+    {
+      "id": 105,
+      "title": "Data Scientist",
+      "absolute_url": "https://job-boards.greenhouse.io/recursionpharmaceuticals/jobs/105",
+      "first_published": "2026-07-01",
+      "location": {"name": "New York, NY"},
+      "content": "&lt;div&gt;Statistical modeling.&lt;/div&gt;"
+    }
+  ]
+}

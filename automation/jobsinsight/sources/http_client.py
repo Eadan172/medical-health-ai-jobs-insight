@@ -64,8 +64,9 @@ class HttpClient:
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
             "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 jobsinsight"
         ),
+        max_bytes: int = 200_000,
     ) -> None:
-        self.transport = transport or urllib_transport
+        self.transport = transport or _bounded_transport(max_bytes)
         self.timeout = timeout
         self.max_retries = max_retries
         self._sleep = sleep
@@ -98,13 +99,32 @@ class HttpClient:
             attempt += 1
 
 
+def _bounded_transport(max_bytes: int) -> Transport:
+    def transport(method: str, url: str, headers: dict[str, str], body: bytes | None, timeout: float) -> HttpResponse:
+        return _read_response(method, url, headers, body, timeout, max_bytes=max_bytes)
+
+    return transport
+
+
 def urllib_transport(
     method: str, url: str, headers: dict[str, str], body: bytes | None, timeout: float
+) -> HttpResponse:
+    return _read_response(method, url, headers, body, timeout, max_bytes=200_000)
+
+
+def _read_response(
+    method: str,
+    url: str,
+    headers: dict[str, str],
+    body: bytes | None,
+    timeout: float,
+    *,
+    max_bytes: int,
 ) -> HttpResponse:
     request = urllib.request.Request(url, data=body, headers=headers, method=method)
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
-            raw = response.read(200_000)
+            raw = response.read(max_bytes)
             return HttpResponse(
                 url=url,
                 status=response.status,

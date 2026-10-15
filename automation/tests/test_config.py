@@ -325,7 +325,21 @@ def test_local_example_enables_browser_sources_and_ci_config_does_not(monkeypatc
     assert all(float(source.options.get("delay_seconds", 0)) >= 1 for source in browsers)
     assert all("{keyword}" in url and "{page}" in url for source in browsers for url in source.urls)
     assert next(source for source in browsers if source.name == "liepin").options["page_start"] == 0
-    assert {source.name for source in local.enabled_sources} >= {"seed", "job-discovery", "company-careers"}
+    assert {source.name for source in local.enabled_sources} >= {
+        "seed",
+        "job-discovery",
+        "company-careers",
+        "overseas-ats",
+        "remoteok",
+        "weworkremotely",
+    }
+    overseas_names = {"overseas-ats", "remoteok", "weworkremotely"}
+    for source in [*local.sources, *ci.sources]:
+        if source.name in overseas_names:
+            assert source.enabled is True
+            assert source.required is False
+            assert float(source.options.get("delay_seconds", 0)) > 0
+            assert source.timeout_seconds > 0
     assert all(source.name != "51job" or source.type != "json_api" for source in local.sources)
     assert local.llm.provider == ci.llm.provider == "deepseek"
     assert local.llm.model == ci.llm.model == "deepseek-flash"

@@ -1,0 +1,21 @@
+{
+  "name": "Lunit",
+  "jobs": [
+    {
+      "title": "Machine Learning Engineer",
+      "shortcode": "ABC123",
+      "url": "https://apply.workable.com/j/ABC123",
+      "published_on": "2026-05-08",
+      "country": "Japan",
+      "city": "Tokyo",
+      "telecommuting": false
+    },
+    {
+      "title": "Marketing Manager",
+      "shortcode": "ZZZ",
+      "url": "https://apply.workable.com/j/ZZZ",
+      "country": "South Korea",
+      "city": "Seoul"
+    }
+  ]
+}

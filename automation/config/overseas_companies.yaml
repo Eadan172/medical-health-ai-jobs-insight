@@ -1,0 +1,252 @@
+# 海外公司公开 ATS 职位板（无需 API key）
+#
+# 调研同事可以按同样的格式追加公司。每家公司一行映射，只认这四个字段：
+#   name    展示用公司名
+#   ats     greenhouse | lever | ashby | workable
+#   token   职位板标识。Greenhouse board token、Lever site、Ashby board name、Workable subdomain
+#   sector  行业短词，例如 AI制药、临床AI、医学影像AI、数字健康
+#
+# 公开接口：
+#   greenhouse  https://boards-api.greenhouse.io/v1/boards/{token}/jobs?content=true
+#   lever       https://api.lever.co/v0/postings/{token}?mode=json
+#   ashby       https://api.ashbyhq.com/posting-api/job-board/{token}?includeCompensation=true
+#   workable    https://apply.workable.com/api/v1/widget/accounts/{token}
+#
+# 一家公司只保留一行。Doctolib 只用 Greenhouse（token: doctolib），不要再加 Lever / Ashby / Workable。
+# 采集器按标题优先留下 AI / ML / 数据 / 科研 / 工程岗位，并限制每家公司的条数。
+# 名单来源：2026-10-15 公开接口实测，HTTP 200 且有岗位。
+
+companies:
+  - name: "Recursion"
+    ats: greenhouse
+    token: "recursionpharmaceuticals"
+    sector: "AI制药"
+  - name: "Insitro"
+    ats: ashby
+    token: "insitro"
+    sector: "AI制药"
+  - name: "Isomorphic Labs"
+    ats: greenhouse
+    token: "isomorphiclabs"
+    sector: "AI制药"
+  - name: "Abridge"
+    ats: ashby
+    token: "abridge"
+    sector: "临床AI"
+  - name: "PathAI"
+    ats: greenhouse
+    token: "pathai"
+    sector: "数字病理AI"
+  - name: "Aidoc"
+    ats: greenhouse
+    token: "aidocmedical"
+    sector: "医学影像AI"
+  - name: "Owkin"
+    ats: ashby
+    token: "owkin"
+    sector: "AI制药/病理"
+  - name: "Cleerly"
+    ats: greenhouse
+    token: "cleerlyhealth"
+    sector: "医学影像AI"
+  - name: "Generate Biomedicines"
+    ats: greenhouse
+    token: "generatebiomedicines"
+    sector: "AI制药"
+  - name: "Xaira Therapeutics"
+    ats: greenhouse
+    token: "xairatherapeutics"
+    sector: "AI制药"
+  - name: "Iambic Therapeutics"
+    ats: ashby
+    token: "iambic-therapeutics"
+    sector: "AI制药"
+  - name: "Inceptive"
+    ats: greenhouse
+    token: "inceptive"
+    sector: "AI制药"
+  - name: "Chai Discovery"
+    ats: ashby
+    token: "chaidiscovery"
+    sector: "AI制药"
+  - name: "Enveda"
+    ats: lever
+    token: "enveda"
+    sector: "AI制药"
+  - name: "Valo Health"
+    ats: greenhouse
+    token: "valohealth"
+    sector: "AI制药"
+  - name: "Relation Therapeutics"
+    ats: ashby
+    token: "relationrx"
+    sector: "AI制药"
+  - name: "Ambience Healthcare"
+    ats: ashby
+    token: "ambiencehealthcare"
+    sector: "临床AI"
+  - name: "Suki"
+    ats: greenhouse
+    token: "suki"
+    sector: "临床AI"
+  - name: "Nabla"
+    ats: ashby
+    token: "nabla"
+    sector: "临床AI"
+  - name: "Tandem Health"
+    ats: ashby
+    token: "tandem-health"
+    sector: "临床AI"
+  - name: "OpenEvidence"
+    ats: ashby
+    token: "openevidence"
+    sector: "临床AI"
+  - name: "Qventus"
+    ats: greenhouse
+    token: "qventus"
+    sector: "临床AI运营"
+  - name: "Komodo Health"
+    ats: greenhouse
+    token: "komodohealth"
+    sector: "医疗数据AI"
+  - name: "Flatiron Health"
+    ats: greenhouse
+    token: "flatironhealth"
+    sector: "肿瘤数据"
+  - name: "Truveta"
+    ats: greenhouse
+    token: "truveta"
+    sector: "医疗数据"
+  - name: "Rad AI"
+    ats: ashby
+    token: "radai"
+    sector: "医学影像AI"
+  - name: "Lunit"
+    ats: workable
+    token: "lunit"
+    sector: "医学影像AI"
+  - name: "Butterfly Network"
+    ats: greenhouse
+    token: "butterflynetwork"
+    sector: "医学影像"
+  - name: "HeartFlow"
+    ats: greenhouse
+    token: "heartflowinc"
+    sector: "医学影像AI"
+  # Doctolib 只保留 Greenhouse，不要再加第二行。
+  - name: "Doctolib"
+    ats: greenhouse
+    token: "doctolib"
+    sector: "数字健康"
+  - name: "Alan"
+    ats: ashby
+    token: "alan"
+    sector: "数字健康"
+  - name: "Oura"
+    ats: greenhouse
+    token: "oura"
+    sector: "数字健康"
+  - name: "Whoop"
+    ats: ashby
+    token: "whoop"
+    sector: "数字健康"
+  - name: "Color Health"
+    ats: ashby
+    token: "color-health"
+    sector: "数字健康"
+  - name: "Hinge Health"
+    ats: ashby
+    token: "hinge-health"
+    sector: "数字健康"
+  - name: "Sword Health"
+    ats: greenhouse
+    token: "swordhealth"
+    sector: "数字健康"
+  - name: "Headway"
+    ats: ashby
+    token: "headway"
+    sector: "数字健康"
+  - name: "Zocdoc"
+    ats: greenhouse
+    token: "zocdoc"
+    sector: "数字健康"
+  - name: "Oscar Health"
+    ats: greenhouse
+    token: "oscar"
+    sector: "数字健康"
+  - name: "Ro"
+    ats: lever
+    token: "ro"
+    sector: "数字健康"
+  - name: "Commure"
+    ats: ashby
+    token: "commure"
+    sector: "临床AI"
+  - name: "Nuna"
+    ats: ashby
+    token: "nuna"
+    sector: "医疗数据"
+  - name: "Healx"
+    ats: lever
+    token: "healx"
+    sector: "AI制药"
+  - name: "Cradle"
+    ats: ashby
+    token: "cradlebio"
+    sector: "AI制药"
+  - name: "Latent Labs"
+    ats: ashby
+    token: "latentlabs"
+    sector: "AI制药"
+  - name: "Biofourmis"
+    ats: greenhouse
+    token: "biofourmis"
+    sector: "数字健康"
+  - name: "Freenome"
+    ats: greenhouse
+    token: "freenome"
+    sector: "AI诊断"
+  - name: "Absci"
+    ats: ashby
+    token: "absci"
+    sector: "AI制药"
+  - name: "Dyno Therapeutics"
+    ats: greenhouse
+    token: "dynotherapeutics"
+    sector: "AI制药"
+  - name: "Profluent"
+    ats: greenhouse
+    token: "profluent"
+    sector: "AI制药"
+  - name: "Arcadia"
+    ats: lever
+    token: "arcadia"
+    sector: "医疗数据"
+  - name: "Notable"
+    ats: ashby
+    token: "notable"
+    sector: "临床AI"
+  - name: "Akasa"
+    ats: ashby
+    token: "akasa"
+    sector: "临床AI"
+  - name: "Infinitus"
+    ats: ashby
+    token: "infinitus"
+    sector: "临床AI"
+  - name: "Cohere Health"
+    ats: greenhouse
+    token: "coherehealth"
+    sector: "临床AI"
+  - name: "Iterative Health"
+    ats: greenhouse
+    token: "iterativehealth"
+    sector: "医学影像AI"
+  - name: "Eko Health"
+    ats: lever
+    token: "ekohealth"
+    sector: "临床AI"
+  - name: "Accurx"
+    ats: ashby
+    token: "accurx"
+    sector: "数字健康"

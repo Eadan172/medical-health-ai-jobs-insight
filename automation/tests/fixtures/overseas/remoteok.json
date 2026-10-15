@@ -1,0 +1,44 @@
+[
+  {"last_updated": 1, "legal": "link back to the job posting"},
+  {
+    "id": "1",
+    "position": "Account Executive",
+    "company": "Benefits Co",
+    "tags": ["sales"],
+    "description": "We provide health insurance, clinical wellness, and machine learning lunch talks.",
+    "url": "https://remoteok.com/remote-jobs/should-drop",
+    "date": "2026-10-14T00:00:00+00:00",
+    "salary_min": 50000,
+    "salary_max": 80000
+  },
+  {
+    "id": "2",
+    "position": "Machine Learning Engineer",
+    "company": "Helix Remote",
+    "tags": ["healthcare", "python"],
+    "description": "health insurance 401k dental wellness stipend",
+    "url": "https://remoteok.com/remote-jobs/keep-ml",
+    "date": "2026-10-12T00:00:00+00:00",
+    "salary_min": 150000,
+    "salary_max": 190000,
+    "location": ""
+  },
+  {
+    "id": "4",
+    "position": "Business Development",
+    "company": "Tag Soup Co",
+    "tags": ["saas", "sales", "marketing", "medical", "data science", "golang", "finance", "ops", "exec", "dev", "recruiter", "ads", "excel"],
+    "description": "Benefits include health insurance.",
+    "url": "https://remoteok.com/remote-jobs/drop-tag-soup",
+    "date": "2026-10-11T00:00:00+00:00"
+  },
+  {
+    "id": "3",
+    "position": "Backend Engineer",
+    "company": "Generic",
+    "tags": ["python"],
+    "description": "Join our digital health company building clinical AI models.",
+    "url": "https://remoteok.com/remote-jobs/drop-backend",
+    "date": "2026-10-13T00:00:00+00:00"
+  }
+]
