@@ -116,22 +116,27 @@ limit = 30
 [sources.options]
 config = "automation/config/company_sources.yaml"
 
-# 真实平台示例：填入你有权访问的搜索接口与 Cookie 后启用。
-# [[sources]]
-# name = "51job"
-# type = "json_api"
-# enabled = false
-# platform = "51job"
-# urls = ["https://we.51job.com/api/job/search-pc?keyword={keyword}&pageNum={page}"]
-# keywords = ["医疗 AI", "药物研发 算法"]
-# limit = 200
-# headers = { Cookie = "${JOB51_COOKIE}" }
-#
-# [sources.options]
-# items_path = "resultbody.job.items"
-# pages = 3
-# delay_seconds = 1.5
-# field_map = { title = "jobName", company = "fullCompanyName", city = "jobAreaString", salary_text = "provideSalaryString", url = "jobHref", publish_date = "issueDateString", description = "jobTags" }
+# 51job 搜索。Cookie 只从环境变量 JOB51_COOKIE 注入，不要把值写进仓库。
+# required = false：Cookie 过期或机房 IP 被拦截时只记来源失败，不挡住其他来源发布。
+# 未携带有效浏览器 Cookie 时，该接口返回阿里云 WAF 的 HTML 挑战页而不是 JSON。
+# 列表字段按公开响应 resultbody.job.items 映射；若键名变成 job.item，采集器会回退。
+[[sources]]
+name = "51job"
+type = "json_api"
+enabled = true
+required = false
+platform = "51job"
+urls = ["https://we.51job.com/api/job/search-pc?api_key=51job&timestamp={timestamp}&keyword={keyword}&searchType=2&jobArea=000000&sortType=0&pageNum={page}&pageSize=20&source=1&pageCode=sou%7Csou%7Csoulb"]
+keywords = ["医疗 AI", "医疗大模型", "医学影像 算法", "AI 制药", "药物研发 算法"]
+limit = 200
+timeout_seconds = 20
+headers = { Cookie = "${JOB51_COOKIE}", Referer = "https://we.51job.com/pc/search" }
+
+[sources.options]
+items_path = "resultbody.job.items"
+pages = 2
+delay_seconds = 1.5
+field_map = { source_id = "jobId", title = "jobName", company = "fullCompanyName", city = "jobAreaString", salary_text = "provideSalaryString", experience_text = "workYearString", education_text = "degreeString", url = "jobHref", publish_date = "issueDateString", description = "jobTags", company_scale = "companySizeString" }
 
 # [[sources]]
 # name = "liepin-html"

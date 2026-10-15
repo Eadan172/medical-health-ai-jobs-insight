@@ -126,10 +126,50 @@ def test_missing_explicit_config_file_is_an_error(tmp_path: Path):
 def test_redaction_hides_secrets():
     config = Config(llm=LLMSettings(api_key="sk-secret"))
     config.server.auth_token = "tok"
+    config.sources = [
+        SourceSettings(name="51job", headers={"Cookie": "do-not-print", "Referer": "https://we.51job.com/"})
+    ]
     redacted = config.as_dict()
+    rendered = json.dumps(redacted)
     assert redacted["llm"]["api_key"] == "***"
     assert redacted["server"]["auth_token"] == "***"
+    assert redacted["sources"][0]["headers"] == {"Cookie": "***", "Referer": "***"}
+    assert "do-not-print" not in rendered
     assert config.as_dict(redact=False)["llm"]["api_key"] == "sk-secret"
+
+
+def test_shipped_config_enables_51job_without_committing_a_cookie():
+    root = Path(__file__).resolve().parents[2]
+    config_path = root / "automation" / "config.toml"
+    workflow = (root / ".github" / "workflows" / "update-data.yml").read_text(encoding="utf-8")
+    raw = config_path.read_text(encoding="utf-8")
+
+    assert 'Cookie = "${JOB51_COOKIE}"' in raw
+    assert "acw_" not in raw
+    assert '\nname = "boss"' not in raw
+    assert '\nname = "liepin-html"' not in raw
+    assert "JOB51_COOKIE: ${{ secrets.JOB51_COOKIE }}" in workflow
+
+    config = load_config(config_path)
+    source = next(item for item in config.sources if item.name == "51job")
+    enabled = {item.name for item in config.enabled_sources}
+
+    assert source.enabled is True
+    assert source.required is False
+    assert source.type == "json_api"
+    assert source.platform == "51job"
+    assert source.keywords == ["医疗 AI", "医疗大模型", "医学影像 算法", "AI 制药", "药物研发 算法"]
+    assert source.options["items_path"] == "resultbody.job.items"
+    assert source.options["pages"] == 2
+    assert source.options["delay_seconds"] == 1.5
+    assert source.options["field_map"]["company"] == "fullCompanyName"
+    assert source.options["field_map"]["salary_text"] == "provideSalaryString"
+    assert source.options["field_map"]["description"] == "jobTags"
+    assert "{keyword}" in source.urls[0] and "{page}" in source.urls[0] and "{timestamp}" in source.urls[0]
+    assert "sign=" not in source.urls[0]
+    assert "51job" in enabled
+    assert "boss" not in enabled
+    assert "liepin-html" not in enabled
 
 
 @pytest.mark.parametrize(
