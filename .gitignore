@@ -26,3 +26,7 @@ automation/config.local.yml
 .DS_Store
 .env
 .env.local
+
+# 连通性检查写出的本地结果，不含密钥，也不入库。
+connectivity_result_*.csv
+connectivity_result_*.json

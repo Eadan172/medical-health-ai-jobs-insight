@@ -1,7 +1,11 @@
 # jobsinsight
 
 医药健康 + AI 岗位数据的自动化后端：按用户设定的时间采集岗位、调用 LLM 规范化与分析、
-产出前端消费的 JSON。**只用标准库**，Python 3.11+ 直接跑，不需要 `pip install`。
+产出前端消费的 JSON，并可由 Windows 计划任务发 HTML 日报。
+
+本机安装、API Key、163 邮件和每天 21:00 的计划任务见仓库根目录 [README](../README.md)。
+请使用 `automation/.venv` 里的 Python 3.12。不要激活或修改 conda，也不要往全局环境里装包。
+核心流水线本身只用标准库；浏览器采集才需要 `pip install -e ".[browser,yaml]"`（Windows 再加 `tzdata`）。
 
 ```bash
 python -m jobsinsight --help
@@ -90,36 +94,25 @@ register_collector("my-source", MyCollector)
 GitHub Actions 只读 `automation/config.toml`。那个文件可以有 51job 的 `json_api`，
 但不要启用 `browser`：云端 IP 会被风控拦住。本机用 gitignore 的 `config.local.toml`。
 
-```bash
-cp config/accounts.example.toml config/accounts.toml
-cp config.local.example.toml config.local.toml
-pip install -e ".[browser]"
-playwright install chromium
-python -m jobsinsight browser-login boss
-```
-
-Windows 上不要动 conda，用 `automation\.venv`。在**有窗口的终端**里登录三个账号
-（`browser-login` 用 `input()` 等 Enter），再手动跑一次，最后注册每天的用户级计划任务：
+安装用根目录 README 里的 `automation/scripts/setup.ps1` 或 `setup.sh`。
+不要在 conda 或系统 Python 里执行 `pip install`。登录必须在有窗口的终端里进行
+（`browser-login` 用 `input()` 等 Enter），账号名是 `boss`、`liepin`、`job51`：
 
 ```powershell
-copy automation\config\accounts.example.toml automation\config\accounts.toml
-copy automation\config.local.example.toml automation\config.local.toml
-
 $env:PLAYWRIGHT_BROWSERS_PATH = "$PWD\automation\.venv\ms-playwright"
-$env:PYTHONPATH = "$PWD\automation"
 & .\automation\.venv\Scripts\python.exe -m jobsinsight browser-login boss
 & .\automation\.venv\Scripts\python.exe -m jobsinsight browser-login liepin
 & .\automation\.venv\Scripts\python.exe -m jobsinsight browser-login job51
 
 powershell -NoProfile -ExecutionPolicy Bypass -File .\automation\scripts\run-local.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File .\automation\scripts\register-daily-task.ps1 -At 08:00
+powershell -NoProfile -ExecutionPolicy Bypass -File .\automation\scripts\register-daily-task.ps1 -At 21:00
 ```
 
-`run-local.ps1` 会 `git pull --ff-only origin main`，用 `.venv` 的 Python 和
-`config.local.toml` 跑流水线，再按 Actions 的同一条规则检查
-`jobs.json` 非空且 `manifest.counts.valid == len(jobs)`。通过后只提交并推送
-`web/public/data`。计划任务是当前用户、`RunLevel Limited`，不需要管理员，
-并且要在你已登录 Windows 时才会跑。
+`run-local.ps1` 会 `git pull --ff-only origin main`（当前分支必须是 `main`），
+用 `.venv` 的 Python 和 `config.local.toml` 跑流水线，再检查
+`jobs.json` 非空且 `manifest.counts.valid == len(jobs)`，然后用 163 SMTP 发 HTML 日报。
+邮件发出后会把 `web/public/data` 还原成仓库里的版本，不提交、不推送。
+计划任务是当前用户、`RunLevel Limited`，不需要管理员，并且只在该用户已登录时才会跑。
 
 三个 browser 来源都是 `required = false`。会话文件缺失、登录墙或验证码只让该来源
 失败，seed 和其他来源仍会发布。selector 写在 `accounts.example.toml`，里面注明了
@@ -132,10 +125,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\automation\scripts\registe
 
 ## 测试
 
+在 `automation` 目录里用 `.venv` 安装开发依赖。不要装进 conda 或系统 Python：
+
 ```bash
-pip install pytest ruff       # 仅开发需要
-python -m pytest
-python -m ruff check . && python -m ruff format --check .
+cd automation
+.venv/bin/python -m pip install -e ".[dev]"    # Windows：.venv\Scripts\python.exe
+.venv/bin/python -m pytest
+.venv/bin/python -m ruff check .
+.venv/bin/python -m ruff format --check .
 ```
 
 覆盖范围：cron 解析与边界、调度与错过窗口补跑、配置层叠（文件/环境变量/运行时覆盖）、
