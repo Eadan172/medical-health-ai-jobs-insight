@@ -179,8 +179,20 @@ def _timestamp(value: object) -> dt.datetime | None:
         return None
 
 
+def load_mail_env(repo: Path) -> None:
+    """Fill unset variables from ``.env`` / ``.env.local``. Process env wins."""
+
+    automation = repo / "automation"
+    if str(automation) not in sys.path:
+        sys.path.insert(0, str(automation))
+    from jobsinsight.env import load_environment
+
+    load_environment(repo)
+
+
 def main() -> None:
     repo = Path(__file__).resolve().parents[2]
+    load_mail_env(repo)
     run_log = Path(sys.argv[1]) if len(sys.argv) > 1 else None
     fatal = sys.argv[2] if len(sys.argv) > 2 else ""
     to = os.environ.get("JOBSINSIGHT_REPORT_TO", "syidan00@outlook.com")
