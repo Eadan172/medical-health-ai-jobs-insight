@@ -100,6 +100,7 @@ def test_fixture_response_maps_51job_fields(monkeypatch: pytest.MonkeyPatch):
     assert "药物研发" not in decoded[0]
     posting = postings[0]
     assert posting.platform == "51job"
+    assert posting.source_type == "51job"
     assert posting.source_id == "159384721"
     assert posting.title == "医学影像算法工程师"
     assert posting.company == "联影智能"

@@ -32,7 +32,10 @@ def test_parse_salary(text: str, expected: tuple[int, int]):
         ("3-5年", "3-5年"),
         ("5-8年经验", "5-10年"),
         ("12年以上", "10年以上"),
-        ("", "1-3年"),
+        ("8+ years", "5-10年"),
+        ("5-10 years of experience", "5-10年"),
+        ("", ""),
+        ("Lead the platform", ""),
     ],
 )
 def test_parse_experience(text: str, expected: str):
@@ -42,7 +45,10 @@ def test_parse_experience(text: str, expected: str):
 def test_parse_education_prefers_the_highest_mentioned_level():
     assert heuristics.parse_education("硕士及以上，博士优先") == "博士"
     assert heuristics.parse_education("研究生学历") == "硕士"
-    assert heuristics.parse_education("学历不限") == "本科"
+    assert heuristics.parse_education("学历不限") == ""
+    assert heuristics.parse_education("") == ""
+    assert heuristics.parse_education("PhD or equivalent") == "博士"
+    assert heuristics.parse_education("Master's degree") == "硕士"
 
 
 def test_infer_job_level_from_title_then_experience():
@@ -66,6 +72,18 @@ def test_infer_category():
     assert heuristics.infer_category("AI药物研发工程师", "靶点预测") == "AI药物研发"
     assert heuristics.infer_category("影像算法工程师", "CT 分割") == "医学影像AI"
     assert heuristics.infer_category("行政专员", "接待") == "其他"
+    # "ct" inside director/function/product/infrastructure must not become 医学影像AI.
+    assert (
+        heuristics.infer_category(
+            "Senior Staff Data Engineer - Data & ML Platform",
+            "Own the data platform, ML infrastructure, and production functions.",
+        )
+        == "其他"
+    )
+    assert heuristics.infer_category("Data Scientist", "machine learning for claims and product analytics") == "其他"
+    assert heuristics.infer_category("Senior AI Engineer", "Build ambient documentation software at Suki") == "其他"
+    assert heuristics.infer_category("MLOps Engineer", "Deploy models and operate the platform") == "其他"
+    assert heuristics.infer_category("Senior Machine Learning Scientist, Imaging", "CT and MRI models") == "医学影像AI"
 
 
 def test_relevance_separates_on_topic_from_off_topic_postings():
@@ -73,6 +91,31 @@ def test_relevance_separates_on_topic_from_off_topic_postings():
     off_topic = heuristics.relevance_score("前台行政", "负责接待与文档整理", [])
     assert on_topic >= 60
     assert off_topic < 30
+
+
+def test_usd_annual_is_not_stored_as_monthly_cny():
+    quote = heuristics.parse_salary_quote("$240K - $360K")
+    assert quote is not None
+    assert (quote.currency, quote.period) == ("USD", "year")
+    assert (quote.low, quote.high) == (240, 360)
+    assert heuristics.parse_salary("$240K - $360K") == (0, 0)
+    assert heuristics.parse_salary("$240,000–$360,000/年") == (0, 0)
+    assert heuristics.parse_salary("2-4万/月") == (20, 40)
+
+
+def test_unparsed_senior_title_does_not_invent_experience_or_degree():
+    posting = RawPosting(
+        title="Staff Machine Learning Scientist",
+        company="Freenome",
+        city="Remote",
+        description="Own model development and the production platform.",
+        salary_text="$240K - $360K",
+    )
+    result = heuristics.normalise(posting)
+    assert result["experience"] == ""
+    assert result["education"] == ""
+    assert result["category"] == "其他"
+    assert result["salary_min"] == 0
 
 
 def test_scale_bucket():

@@ -25,6 +25,16 @@ def is_overseas(job: dict) -> bool:
     return str(job.get("source_type") or "") in OVERSEAS_SOURCE_TYPES
 
 
+def _keep_real(job: dict) -> bool:
+    """Sample rows have an empty source_type. Company and listing pages are not jobs."""
+
+    if not job.get("source_type"):
+        return False
+    from jobsinsight.sources.urlutil import is_publishable_record
+
+    return is_publishable_record(job)
+
+
 def parse_run_summary(raw: bytes) -> dict:
     text = raw.decode("utf-16") if raw[:2] in (b"\xff\xfe", b"\xfe\xff") else raw.decode("utf-8-sig", errors="replace")
     text = "\n" + text.replace("\r\n", "\n")
@@ -43,12 +53,9 @@ def build_report(
 ) -> tuple[str, str]:
     """Return ``(subject, html)``. Jobs with an empty source_type are sample rows, not real postings."""
 
-    real = [job for job in jobs if job.get("source_type")]
-    new = [
-        job
-        for job in real
-        if (_timestamp(job.get("first_seen_at")) or now - dt.timedelta(days=99)) > now - dt.timedelta(hours=26)
-    ]
+    real = [job for job in jobs if _keep_real(job)]
+    started = _timestamp(summary.get("started_at"))
+    new = [job for job in real if _is_new(job, now=now, started=started)]
     new.sort(key=lambda job: -float(job.get("relevance") or 0))
     overseas = [job for job in real if is_overseas(job)]
     overseas_new = [job for job in new if is_overseas(job)]
@@ -147,7 +154,7 @@ def table(rows: list[dict]) -> str:
             f"<td>{html.escape(str(job.get('company', '')))}</td>"
             f"<td>{html.escape(str(job.get('city', '')))}</td>"
             f"<td>{salary}</td>"
-            f"<td>{html.escape(str(job.get('experience', '')))}/{html.escape(str(job.get('education', '')))}</td>"
+            f"<td>{html.escape(_requirement(job.get('experience')))}/{html.escape(_requirement(job.get('education')))}</td>"
             f"<td>{html.escape(str(job.get('category', '')))}</td>"
             f"<td>{html.escape(str(job.get('platform', '')))}</td>"
             f"<td>{html.escape(str(job.get('publish_date', '')))}</td>"
@@ -162,14 +169,73 @@ def counts(rows: list[dict], key: str, limit: int = 10) -> str:
 
 
 def salary_stats(rows: list[dict]) -> str:
-    values = sorted(
-        (float(job["salary_min"]) + float(job["salary_max"])) / 2
-        for job in rows
-        if job.get("salary_min") and job.get("salary_max")
-    )
-    if not values:
+    """Median per currency and pay period. USD annual ranges are not labeled as monthly CNY."""
+
+    from jobsinsight.heuristics import parse_salary_quote
+
+    grouped: dict[tuple[str, str, str], list[float]] = {}
+    for job in rows:
+        quote = parse_salary_quote(str(job.get("salary_text") or ""))
+        if quote is not None:
+            key = (quote.currency, quote.period, quote.unit)
+            grouped.setdefault(key, []).append(quote.midpoint)
+            continue
+        # Numeric fields are the legacy monthly-CNY-in-thousands store. Ignore them
+        # when salary_text already described another currency.
+        if job.get("salary_min") and job.get("salary_max") and not str(job.get("salary_text") or "").strip():
+            midpoint = (float(job["salary_min"]) + float(job["salary_max"])) / 2
+            grouped.setdefault(("CNY", "month", "k"), []).append(midpoint)
+    if not grouped:
         return "无数据"
-    return f"中位数约 {values[len(values) // 2]:.0f}k/月（{len(values)} 条有薪资）"
+    order = [("CNY", "month", "k"), ("CNY", "year", "wan"), ("USD", "year", "k"), ("USD", "month", "k")]
+    labels = {
+        ("CNY", "month", "k"): "人民币/月",
+        ("CNY", "year", "wan"): "人民币/年",
+        ("USD", "year", "k"): "美元/年",
+        ("USD", "month", "k"): "美元/月",
+    }
+    parts: list[str] = []
+    seen: set[tuple[str, str, str]] = set()
+    for key in [*order, *sorted(grouped)]:
+        if key in seen or key not in grouped:
+            continue
+        seen.add(key)
+        values = sorted(grouped[key])
+        median = values[len(values) // 2]
+        unit = "万" if key[2] == "wan" else "k"
+        label = labels.get(key, "/".join(key))
+        parts.append(f"{label}中位数约 {median:.0f}{unit}（{len(values)} 条）")
+    return "；".join(parts)
+
+
+def _requirement(value: object) -> str:
+    text = str(value or "").strip()
+    return text or "未知"
+
+
+def _is_new(job: dict, *, now: dt.datetime, started: dt.datetime | None) -> bool:
+    """A job is new when this run is the first time it was seen.
+
+    ``started_at`` from the run log is the boundary. A second run the same day
+    keeps the earlier ``first_seen_at`` and therefore reports no new jobs.
+    Without a run start, fall back to the previous 26-hour window.
+    """
+
+    seen = _timestamp(job.get("first_seen_at"))
+    if seen is None:
+        return False
+    if started is not None:
+        if started.tzinfo is None:
+            started = started.replace(tzinfo=dt.UTC)
+        if seen.tzinfo is None:
+            seen = seen.replace(tzinfo=dt.UTC)
+        # first_seen is stamped during the run, after started_at. A later run
+        # the same day keeps the earlier stamp and is not "new".
+        return seen >= started
+    anchor = now if now.tzinfo else now.replace(tzinfo=dt.UTC)
+    if seen.tzinfo is None:
+        seen = seen.replace(tzinfo=dt.UTC)
+    return seen > anchor - dt.timedelta(hours=26)
 
 
 def _timestamp(value: object) -> dt.datetime | None:

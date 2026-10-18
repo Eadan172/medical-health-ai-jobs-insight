@@ -20,11 +20,12 @@ from . import analysis
 from .collectors import CollectorContext, CollectorError, build_collector
 from .config import Config
 from .enrich import Enricher
-from .job_store import merge_jobs, should_preserve_previous
+from .job_store import combine_existing_jobs, merge_jobs, should_preserve_previous
 from .llm import LLMClient, LLMError, build_client
 from .models import Job, RawPosting, RunDiff
 from .quality import assess_jobs
 from .scheduler import next_run_after
+from .sources.urlutil import is_publishable_record
 from .store import StateStore, utc_now_iso, write_json
 
 LOGGER = logging.getLogger(__name__)
@@ -177,7 +178,9 @@ class Pipeline:
             delete_after=self.config.output.delete_after_misses,
             allow_misses=limit is None and not replace_with_limit,
         )
-        final_jobs = merged.jobs
+        final_jobs = [job for job in merged.jobs if is_publishable_record(job)]
+        for index, job in enumerate(final_jobs, start=1):
+            job.id = index
         active_jobs = [job for job in final_jobs if job.status != "deleted"]
         previous = self.store.load_snapshot()
         diff = analysis.diff_jobs(previous, active_jobs)
@@ -213,10 +216,10 @@ class Pipeline:
     def _existing_jobs(self) -> list[Job]:
         from .store import read_json
 
-        raw = read_json(self.config.data_dir / JOBS_FILE, []) or []
-        if not isinstance(raw, list):
-            return []
-        return [Job.from_dict(item) for item in raw if isinstance(item, dict) and item.get("title")]
+        committed = _jobs_from_payload(read_json(self.config.data_dir / JOBS_FILE, []) or [])
+        # The snapshot lives in automation/state, which run-local.ps1 does not restore.
+        catalog = _jobs_from_payload(self.store.load_snapshot())
+        return combine_existing_jobs(committed, catalog)
 
     def _merge_reports(self, source_reports: list[dict[str, Any]]) -> list[dict[str, Any]]:
         from .sources.health import load_health
@@ -408,6 +411,12 @@ class Pipeline:
             report.duration_seconds,
         )
         return report
+
+
+def _jobs_from_payload(raw: Any) -> list[Job]:
+    if not isinstance(raw, list):
+        return []
+    return [Job.from_dict(item) for item in raw if isinstance(item, dict) and item.get("title")]
 
 
 def _iso_or_empty(moment: datetime | None) -> str:
