@@ -80,7 +80,7 @@ def is_job_posting_url(url: str) -> bool:
             or "/web/geek/job" in path
         )
     elif (_on_host(host, "51job.com") and "/pc/search" in path) or (
-        _on_host(host, "liepin.com") and path.startswith("/zhaopin")
+        _on_host(host, "liepin.com") and (path.startswith("/zhaopin") or path.startswith("/company"))
     ):
         blocked = True
     return not blocked
@@ -96,20 +96,61 @@ def looks_like_non_job_title(title: str) -> bool:
     return bool(_LISTING_TITLE.search(title or ""))
 
 
+_UNKNOWN_COMPANY = {"", "未知", "未知公司"}
+_UNKNOWN_CITY = {"", "未知", "未知城市"}
+_DISCOVERY_METHODS = {"search_engine", "public_page"}
+_LIEPIN_PLATFORMS = {"liepin", "猎聘", "猎聘网"}
+
+
 def is_publishable_record(record: object) -> bool:
     """Drop company/listing pages. A real posting may still lack a URL."""
 
-    if isinstance(record, Mapping):
-        title = str(record.get("title") or "")
-        url = str(record.get("source_url") or record.get("url") or "")
-    else:
-        title = str(getattr(record, "title", "") or "")
-        url = str(getattr(record, "source_url", "") or getattr(record, "url", "") or "")
+    title, url, company, city, platform, source_type, discovery_method = _record_bits(record)
+    # 猎聘搜索结果经常是公司主页，公司名和城市都是空的。浏览器登录后抓到的职位不走这里。
+    if _liepin_discovery_without_place(url, company, city, platform, source_type, discovery_method):
+        return False
     if url and not is_job_posting_url(url):
         return False
     if _DETAIL_PATH.search(urlparse(url).path):
         return True
     return not looks_like_non_job_title(title)
+
+
+def _record_bits(record: object) -> tuple[str, str, str, str, str, str, str]:
+    if isinstance(record, Mapping):
+        title = str(record.get("title") or "")
+        url = str(record.get("source_url") or record.get("url") or "")
+        company = str(record.get("company") or "")
+        city = str(record.get("city") or "")
+        platform = str(record.get("platform") or "")
+        source_type = str(record.get("source_type") or "")
+        discovery_method = str(record.get("discovery_method") or "")
+    else:
+        title = str(getattr(record, "title", "") or "")
+        url = str(getattr(record, "source_url", "") or getattr(record, "url", "") or "")
+        company = str(getattr(record, "company", "") or "")
+        city = str(getattr(record, "city", "") or "")
+        platform = str(getattr(record, "platform", "") or "")
+        source_type = str(getattr(record, "source_type", "") or "")
+        discovery_method = str(getattr(record, "discovery_method", "") or "")
+    return title, url, company, city, platform, source_type, discovery_method
+
+
+def _liepin_discovery_without_place(
+    url: str, company: str, city: str, platform: str, source_type: str, discovery_method: str
+) -> bool:
+    if discovery_method not in _DISCOVERY_METHODS:
+        return False
+    host = host_of(url) if url else ""
+    liepin = (
+        source_type.casefold() in _LIEPIN_PLATFORMS
+        or platform.casefold() in _LIEPIN_PLATFORMS
+        or platform in _LIEPIN_PLATFORMS
+        or _on_host(host, "liepin.com")
+    )
+    if not liepin:
+        return False
+    return company.strip() in _UNKNOWN_COMPANY or city.strip() in _UNKNOWN_CITY
 
 
 def cache_key(value: str) -> str:

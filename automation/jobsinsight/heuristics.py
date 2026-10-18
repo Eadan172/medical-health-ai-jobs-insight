@@ -49,6 +49,8 @@ _SALARY_MONTHLY = re.compile(r"(\d+(?:\.\d+)?)\s*[-~到至]\s*(\d+(?:\.\d+)?)\s*
 _SALARY_YEARLY = re.compile(r"(\d+(?:\.\d+)?)\s*[-~到至]\s*(\d+(?:\.\d+)?)\s*[wW万]")
 _SALARY_SINGLE = re.compile(r"(\d+(?:\.\d+)?)\s*[kK千]")
 _MONTH_COUNT = re.compile(r"(\d{1,2})\s*薪")
+# 51job list cards write 「3.5-5万」 or 「3-4万·15薪」 for a monthly salary and omit 「/月」.
+_CNY_ANNUAL = re.compile(r"年薪|/年|每年|(?<=[万wW])年")
 _USD_K = re.compile(r"\$(\d+(?:\.\d+)?)[kK](?:[-~–—到至]\$?(\d+(?:\.\d+)?)[kK])?")
 _USD_FULL = re.compile(r"\$([\d,]{4,})(?:[-~–—到至]\$?([\d,]{4,}))?")
 _YEARS = re.compile(r"(?<!\d)(\d{1,2})\s*[-~到至]?\s*(\d{1,2})?\s*年")
@@ -72,6 +74,8 @@ class SalaryQuote:
 
     ``low`` / ``high`` use ``unit``: ``k`` is thousands, ``wan`` is 万.
     USD amounts are not converted into CNY, and a year is not rewritten as a month.
+    ``pay_months`` is the ``·N薪`` count when the text states one. It does not
+    rescale a monthly amount; ``0`` means the text did not say.
     """
 
     low: float
@@ -79,6 +83,7 @@ class SalaryQuote:
     currency: str  # CNY | USD
     period: str  # month | year
     unit: str  # k | wan
+    pay_months: int = 0
 
     @property
     def midpoint(self) -> float:
@@ -99,9 +104,10 @@ def parse_salary_quote(text: str) -> SalaryQuote | None:
 def parse_salary(text: str) -> tuple[int, int]:
     """Return a ``(min, max)`` monthly salary in thousands of CNY.
 
-    Handles ``25-40K``, ``30-60万/年`` (with an optional ``·14薪``), ``2-4万/月``
-    and single values such as ``40K``. USD ranges and unparseable input yield
-    ``(0, 0)`` so they are not stored as monthly CNY.
+    Handles ``25-40K``, ``3.5-5万`` and ``3-4万·15薪`` as monthly, ``2-4万/月``,
+    and ``30-60万/年`` / ``年薪`` as annual (an optional ``·14薪`` divides the
+    yearly total). USD ranges and unparseable input yield ``(0, 0)`` so they
+    are not stored as monthly CNY.
     """
 
     quote = parse_salary_quote(text)
@@ -139,24 +145,35 @@ def _parse_usd(compact: str) -> SalaryQuote | None:
 
 
 def _parse_cny(original: str, compact: str) -> SalaryQuote | None:
+    pay_months = _pay_months(compact)
     match = _SALARY_MONTHLY.search(compact)
     if match:
         low, high = float(match.group(1)), float(match.group(2))
-        return SalaryQuote(low, high, "CNY", "month", "k")
+        return SalaryQuote(low, high, "CNY", "month", "k", pay_months)
 
     match = _SALARY_YEARLY.search(compact)
     if match:
         low, high = float(match.group(1)), float(match.group(2))
-        # 「2-4万/月」 is monthly; 「30-60万/年」 and 「36-48万·12薪」 stay annual.
-        if "月" in compact and "年" not in original and "年" not in compact:
-            return SalaryQuote(low * 10, high * 10, "CNY", "month", "k")
-        return SalaryQuote(low, high, "CNY", "year", "wan")
+        # 「3.5-5万」 and 「3-4万·15薪」 are monthly. Only 「/年」 or 「年薪」 is a yearly total.
+        if _CNY_ANNUAL.search(compact) or _CNY_ANNUAL.search(original):
+            return SalaryQuote(low, high, "CNY", "year", "wan", pay_months)
+        return SalaryQuote(low * 10, high * 10, "CNY", "month", "k", pay_months)
 
     match = _SALARY_SINGLE.search(compact)
     if match:
         value = float(match.group(1))
-        return SalaryQuote(value, value, "CNY", "month", "k")
+        return SalaryQuote(value, value, "CNY", "month", "k", pay_months)
     return None
+
+
+def _pay_months(compact: str) -> int:
+    match = _MONTH_COUNT.search(compact)
+    if not match:
+        return 0
+    months = int(match.group(1))
+    if months < 12 or months > 24:
+        return 0
+    return months
 
 
 def parse_experience(text: str) -> str:
