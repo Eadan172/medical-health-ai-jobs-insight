@@ -113,6 +113,7 @@ class JsonApiCollector(Collector):
             values[target] = _stringify(_dig(item, source, default=""))
         posting = RawPosting.from_dict(values)
         posting.platform = self.settings.platform or self.settings.name
+        posting.source_type = str((self.settings.options or {}).get("source_type") or self.settings.name or "json_api")
         if not posting.source_id:
             posting.source_id = posting.url or f"{posting.company}-{posting.title}"
         return posting

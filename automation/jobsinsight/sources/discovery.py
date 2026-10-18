@@ -9,7 +9,7 @@ from ..models import RawPosting
 from .detail import fetch_public_detail
 from .http_client import HttpClient, RateLimiter, classify_access
 from .search_provider import SearchHit, SearchProvider
-from .urlutil import fingerprint_job, matches_domain, normalize_url
+from .urlutil import fingerprint_job, is_publishable_record, matches_domain, normalize_url
 
 SITE_LABELS = {"zhipin.com": "BOSS直聘", "51job.com": "51job", "liepin.com": "猎聘网"}
 DIRECT_PROBES = {
@@ -180,18 +180,22 @@ def _from_hit(hit: SearchHit, source: str, domains: list[str]) -> RawPosting | N
     if not title:
         return None
     domain = domains[0] if domains else source
-    return RawPosting(
-        source_id=normalize_url(hit.url),
+    url = normalize_url(hit.url)
+    posting = RawPosting(
+        source_id=url,
         platform=SITE_LABELS.get(domain, source),
         title=title,
-        url=normalize_url(hit.url),
+        url=url,
         description=hit.snippet.strip(),
         source_type=source,
         discovery_method="search_engine",
-        source_url=normalize_url(hit.url),
+        source_url=url,
         retrieved_at=datetime.now(UTC).replace(microsecond=0).isoformat(),
         partial=True,
     )
+    if not is_publishable_record(posting):
+        return None
+    return posting
 
 
 def _from_detail(hit: SearchHit, source: str, detail: dict[str, object]) -> RawPosting | None:
@@ -200,7 +204,7 @@ def _from_detail(hit: SearchHit, source: str, detail: dict[str, object]) -> RawP
         return None
     domain = next((name for name in SITE_LABELS if name in str(detail.get("url") or hit.url)), source)
     evidenced = bool(detail.get("description")) and len(str(detail.get("description"))) > 120
-    return RawPosting(
+    posting = RawPosting(
         source_id=str(detail.get("url") or hit.url),
         platform=SITE_LABELS.get(domain, source),
         title=title,
@@ -215,6 +219,9 @@ def _from_detail(hit: SearchHit, source: str, detail: dict[str, object]) -> RawP
         retrieved_at=datetime.now(UTC).replace(microsecond=0).isoformat(),
         partial=not evidenced,
     )
+    if not is_publishable_record(posting):
+        return None
+    return posting
 
 
 def _elapsed(started: datetime) -> int:

@@ -81,6 +81,8 @@ else {
 }
 & $VenvPython $Reporter $RunLog $fatal
 $mailExit = $LASTEXITCODE
+# 岗位正文在 web/public/data，发信后还原，避免把抓取结果提交或推送。
+# automation/state/jobs_snapshot.json 不入库，但必须留在本机：里面记着 first_seen，用来判断「今日新增」。
 git -C $RepoRoot checkout -- web/public/data
 git -C $RepoRoot clean -fdq -- web/public/data
 if ($mailExit -ne 0) { Exit-Run "report mail failed" $mailExit }

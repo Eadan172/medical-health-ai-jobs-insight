@@ -1,0 +1,118 @@
+{
+  "postings": [
+    {
+      "title": "Senior Staff Data Engineer - Data & ML Platform",
+      "company": "Hinge Health",
+      "city": "San Francisco-HQ · Remote, United States",
+      "platform": "Ashby",
+      "source_type": "ashby",
+      "region": "海外",
+      "url": "https://jobs.ashbyhq.com/hinge-health/ca8b6c73-f88e-4e4c-b782-ece3ca3ad4e7",
+      "salary_text": "$240K - $360K",
+      "description": "Own the data platform, ML infrastructure, and production functions for a healthcare product.",
+      "first_seen_at": "2026-10-17T13:02:00+00:00"
+    },
+    {
+      "title": "Data Scientist",
+      "company": "Cohere Health",
+      "city": "United States",
+      "platform": "Greenhouse",
+      "source_type": "greenhouse",
+      "region": "海外",
+      "url": "https://job-boards.greenhouse.io/coherehealth/jobs/7741414003",
+      "salary_text": "$180K – $220K",
+      "description": "Analyze claims and build models. machine learning, product experiments, and infrastructure.",
+      "first_seen_at": "2026-10-17T13:02:00+00:00"
+    },
+    {
+      "title": "Senior MLOps Engineer",
+      "company": "Oura",
+      "city": "Remote - United States",
+      "platform": "Greenhouse",
+      "source_type": "greenhouse",
+      "region": "海外",
+      "url": "https://job-boards.greenhouse.io/oura/jobs/4354880009",
+      "description": "Deploy models and operate the MLOps platform.",
+      "first_seen_at": "2026-10-17T13:02:00+00:00"
+    },
+    {
+      "title": "Senior AI Engineer",
+      "company": "Suki",
+      "city": "Redwood City, CA",
+      "platform": "Greenhouse",
+      "source_type": "greenhouse",
+      "region": "海外",
+      "url": "https://www.suki.ai/open-positions?gh_jid=6555187003",
+      "description": "Build ambient documentation software. Python services for a healthcare company.",
+      "first_seen_at": "2026-10-17T13:02:00+00:00"
+    },
+    {
+      "title": "Senior Machine Learning Scientist, Imaging",
+      "company": "Insitro",
+      "city": "South San Francisco, CA",
+      "platform": "Ashby",
+      "source_type": "ashby",
+      "region": "海外",
+      "url": "https://jobs.ashbyhq.com/insitro/2cbd914b-7156-494d-8e15-772ed63d88d3",
+      "description": "8+ years and a PhD. Develop CT and MRI imaging models.",
+      "first_seen_at": "2026-10-17T13:02:00+00:00"
+    },
+    {
+      "title": "医学影像算法工程师",
+      "company": "联影智能",
+      "city": "上海",
+      "platform": "51job",
+      "source_type": "51job",
+      "region": "国内",
+      "url": "https://jobs.51job.com/shanghai/159384721.html",
+      "salary_text": "40-60K",
+      "experience_text": "5-8年经验",
+      "education_text": "硕士及以上",
+      "description": "负责 CT/MRI 影像分割，熟悉 PyTorch。",
+      "first_seen_at": "2026-10-17T13:02:00+00:00"
+    },
+    {
+      "title": "Senior AI Researcher",
+      "company": "Recursion",
+      "city": "Salt Lake City, Utah",
+      "platform": "Greenhouse",
+      "source_type": "greenhouse",
+      "region": "海外",
+      "url": "https://job-boards.greenhouse.io/recursionpharmaceuticals/jobs/8188707",
+      "description": "Drug discovery models. 10+ years and a PhD.",
+      "first_seen_at": "2026-10-16T13:00:00+00:00"
+    }
+  ],
+  "noise": [
+    {
+      "title": "「上海联影医疗高新技术研究院有限公司招聘」-boss直聘",
+      "company": "未知公司",
+      "city": "未知",
+      "platform": "BOSS直聘",
+      "source_type": "zhipin",
+      "url": "https://m.zhipin.com/companys/7b421830effa58d61HV82Nu5ElI~.html",
+      "first_seen_at": "2026-10-17T13:02:00+00:00",
+      "relevance": 80,
+      "category": "医学影像AI"
+    },
+    {
+      "title": "「医疗人工智能招聘信息」-boss直聘",
+      "company": "未知公司",
+      "city": "未知",
+      "platform": "BOSS直聘",
+      "source_type": "zhipin",
+      "url": "https://www.zhipin.com/zhaopin/a0af30c4427a2f301n173dm-FA~~",
+      "first_seen_at": "2026-10-17T13:02:00+00:00",
+      "relevance": 70,
+      "category": "智能医疗产品"
+    },
+    {
+      "title": "样例岗位",
+      "company": "样例公司",
+      "source_type": "",
+      "city": "上海",
+      "relevance": 99,
+      "first_seen_at": "2026-10-17T13:02:00+00:00"
+    }
+  ]
+}

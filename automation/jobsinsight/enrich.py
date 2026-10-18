@@ -300,8 +300,8 @@ def _build_job(index: int, posting: RawPosting, values: Mapping[str, Any], run_d
         city=posting.city.strip() or "未知",
         salary_min=int(values.get("salary_min") or 0),
         salary_max=int(values.get("salary_max") or 0),
-        experience=_or_default(values.get("experience"), "1-3年", keep_blank=posting.partial),
-        education=_or_default(values.get("education"), "本科", keep_blank=posting.partial),
+        experience=str(values.get("experience") or ""),
+        education=str(values.get("education") or ""),
         job_level=str(values.get("job_level") or "中级"),
         summary=str(values.get("summary") or ""),
         skills=list(values.get("skills") or []),
@@ -327,15 +327,6 @@ def _build_job(index: int, posting: RawPosting, values: Mapping[str, Any], run_d
         region=posting.region,
         salary_text=posting.salary_text,
     )
-
-
-def _or_default(value: Any, default: str, *, keep_blank: bool) -> str:
-    if value is None:
-        return "" if keep_blank else default
-    text = str(value)
-    if not text and not keep_blank:
-        return default
-    return text
 
 
 def _strip_unevidenced(posting: RawPosting, values: dict[str, Any]) -> dict[str, Any]:

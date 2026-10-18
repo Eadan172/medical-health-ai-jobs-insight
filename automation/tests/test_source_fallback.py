@@ -54,6 +54,19 @@ def test_all_sources_unavailable_returns_no_jobs():
     assert report.status in {"unavailable", "blocked"}
 
 
+def test_boss_company_and_keyword_listing_pages_are_rejected():
+    company = SearchHit(
+        title="「杭州智诊科技有限公司招聘」-boss直聘",
+        url="https://m.zhipin.com/companys/3eb2c7d14d7c483d03V42du4ElI~.html",
+    )
+    listing = SearchHit(
+        title="「杭州医疗算法工程师招聘信息」-boss直聘",
+        url="https://www.zhipin.com/zhaopin/71824a2fda47284b0nR43t24GQ~~",
+    )
+    assert _from_hit(company, "zhipin", ["zhipin.com"]) is None
+    assert _from_hit(listing, "zhipin", ["zhipin.com"]) is None
+
+
 def test_partial_job_accepted_and_blank_title_rejected():
     hit = SearchHit(title="生物信息工程师", url="https://www.51job.com/job/9", snippet="")
     posting = _from_hit(hit, "51job", ["51job.com"])

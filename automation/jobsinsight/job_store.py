@@ -12,6 +12,7 @@ from typing import Any
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 from .models import Job
+from .sources.urlutil import is_job_posting_url
 
 UNSAFE_SOURCE_STATUSES = {
     "blocked",
@@ -84,7 +85,8 @@ def normalize_title(title: str) -> str:
 
 def job_identity(job: Job) -> str:
     url = canonicalize_job_url(job.source_url or job.url)
-    if url:
+    # A search or company page is shared by every card on it, so it cannot identify a job.
+    if url and is_job_posting_url(url):
         return "url:" + url.casefold()
     company = normalize_company(job.company if job.company != "未知公司" else "")
     title = normalize_title(job.title)
@@ -93,6 +95,32 @@ def job_identity(job: Job) -> str:
     if platform or company or title:
         return "text:" + "|".join((platform, company, title, city))
     return "salary:" + "|".join((company, title, city, f"{job.salary_min}-{job.salary_max}"))
+
+
+def combine_existing_jobs(committed: list[Job], catalog: list[Job]) -> list[Job]:
+    """Union the git checkout with the local catalog.
+
+    ``run-local.ps1`` restores ``web/public/data`` after each mail, which drops
+    ``first_seen_at``. The catalog under ``automation/state/`` is gitignored and
+    is the copy that remembers which jobs were already seen. Jobs that exist
+    only in a freshly pulled seed file are still included.
+    """
+
+    if not catalog:
+        return list(committed)
+    by_identity: dict[str, Job] = {}
+    order: list[str] = []
+    for job in catalog:
+        identity = job_identity(job)
+        if identity not in by_identity:
+            order.append(identity)
+        by_identity[identity] = job
+    for job in committed:
+        identity = job_identity(job)
+        if identity not in by_identity:
+            order.append(identity)
+            by_identity[identity] = job
+    return [by_identity[key] for key in order]
 
 
 def healthy_sources(source_reports: list[dict[str, Any]]) -> set[str]:

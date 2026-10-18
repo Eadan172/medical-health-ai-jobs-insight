@@ -7,6 +7,7 @@ detected, collection stops and asks the user to refresh the session manually.
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import time
@@ -18,7 +19,10 @@ from urllib.parse import quote, urljoin
 from ..accounts import DEFAULT_ACCOUNTS_FILE, BrowserAccount, get_account, storage_path
 from ..config import ConfigError
 from ..models import RawPosting
+from ..sources.urlutil import is_job_posting_url
 from .base import Collector, CollectorError, register_collector
+
+_SOURCE_TYPES = {"boss": "zhipin", "liepin": "liepin", "job51": "51job", "51job": "51job"}
 
 LOGGER = logging.getLogger(__name__)
 
@@ -53,6 +57,7 @@ class BrowserCollector(Collector):
             page_start=page_start,
         )
         slow_mo = max(0, int(options.get("slow_mo_ms", 250)))
+        source_type = str(options.get("source_type") or _SOURCE_TYPES.get(account.name) or account.name or "browser")
         sync_playwright = _playwright()
         postings: list[RawPosting] = []
 
@@ -80,7 +85,7 @@ class BrowserCollector(Collector):
                     page.wait_for_timeout(int(options.get("settle_ms", 1500)))
                     self._reject_verification(page, account)
                     self._reject_expired_session(page, account)
-                    postings.extend(self._extract(page, account, url))
+                    postings.extend(self._extract(page, account, url, source_type))
                     if self.settings.limit and len(postings) >= self.settings.limit:
                         return postings[: self.settings.limit]
                 state.parent.mkdir(parents=True, exist_ok=True)
@@ -144,7 +149,7 @@ class BrowserCollector(Collector):
         if reason:
             raise CollectorError(reason)
 
-    def _extract(self, page: Any, account: BrowserAccount, page_url: str) -> list[RawPosting]:
+    def _extract(self, page: Any, account: BrowserAccount, page_url: str, source_type: str) -> list[RawPosting]:
         selectors = account.selectors
         if not selectors.get("job_card") or not selectors.get("title"):
             raise CollectorError(f"账号 {account.name!r} 至少需要 job_card 和 title selector")
@@ -152,25 +157,26 @@ class BrowserCollector(Collector):
         results: list[RawPosting] = []
         for index in range(cards.count()):
             card = cards.nth(index)
-            title = _text(card, selectors.get("title"))
-            if not title:
-                continue
-            link = _attribute(card, selectors.get("link"), "href")
-            results.append(
-                RawPosting(
-                    source_id=_attribute(card, selectors.get("source_id"), "data-id") or link or f"{page_url}#{index}",
-                    platform=self.settings.platform or self.settings.name,
-                    title=title,
-                    company=_text(card, selectors.get("company")),
-                    city=_text(card, selectors.get("city")),
-                    url=urljoin(page_url, link),
-                    salary_text=_text(card, selectors.get("salary")),
-                    experience_text=_text(card, selectors.get("experience")),
-                    education_text=_text(card, selectors.get("education")),
-                    description=_text(card, selectors.get("description")),
-                    publish_date=_text(card, selectors.get("publish_date")),
-                )
+            sensors = _attribute(card, "[sensorsdata]", "sensorsdata") or _own_attribute(card, "sensorsdata")
+            posting = posting_from_card(
+                platform=self.settings.platform or self.settings.name,
+                source_type=source_type,
+                page_url=page_url,
+                title=_text(card, selectors.get("title")),
+                company=_text(card, selectors.get("company")),
+                city=_text(card, selectors.get("city")),
+                salary_text=_text(card, selectors.get("salary")),
+                experience_text=_text(card, selectors.get("experience")),
+                education_text=_text(card, selectors.get("education")),
+                description=_text(card, selectors.get("description")),
+                publish_date=_text(card, selectors.get("publish_date")),
+                link=_attribute(card, selectors.get("link"), "href"),
+                source_id=_attribute(card, selectors.get("source_id"), "data-id"),
+                sensorsdata=sensors,
+                index=index,
             )
+            if posting is not None:
+                results.append(posting)
         return results
 
 
@@ -272,11 +278,110 @@ def _locator_visible(page: Any, selector: str | None) -> bool:
     return bool(locator.count() and locator.first.is_visible())
 
 
+def posting_from_card(
+    *,
+    platform: str,
+    source_type: str,
+    page_url: str,
+    title: str,
+    company: str = "",
+    city: str = "",
+    salary_text: str = "",
+    experience_text: str = "",
+    education_text: str = "",
+    description: str = "",
+    publish_date: str = "",
+    link: str = "",
+    source_id: str = "",
+    sensorsdata: str = "",
+    index: int = 0,
+) -> RawPosting | None:
+    """Build one card.
+
+    51job search cards share the results URL and often have no ``<a>``. Using that
+    URL as the job identity collapses a whole page into one row, and an empty
+    ``source_type`` makes the daily report treat the row as sample data.
+    ``sensorsdata`` carries the per-job id and, when present, the real href.
+    """
+
+    payload = _sensors(sensorsdata)
+    title = (title or _sensor_text(payload, "jobTitle", "jobName")).strip()
+    if not title:
+        return None
+    company = company or _sensor_text(payload, "companyName", "fullCompanyName")
+    city = city or _sensor_text(payload, "jobArea", "jobAreaString")
+    salary_text = salary_text or _sensor_text(payload, "jobSalary", "provideSalaryString", "salary")
+    experience_text = experience_text or _sensor_text(payload, "jobYear", "workYearString")
+    education_text = education_text or _sensor_text(payload, "jobDegree", "degreeString")
+    publish_date = publish_date or _sensor_text(payload, "issueDate", "issueDateString")
+    job_url = _concrete_url(page_url, link) or _concrete_url(
+        page_url, _sensor_text(payload, "jobHref", "jobUrl", "pageUrl")
+    )
+    if not job_url:
+        job_id = _sensor_text(payload, "jobId", "jobid")
+        if job_id.isdigit():
+            job_url = f"https://jobs.51job.com/all/{job_id}.html"
+    identity = source_id or _sensor_text(payload, "jobId", "jobid") or job_url
+    if not identity:
+        identity = "|".join((platform, company, title, city, str(index)))
+    return RawPosting(
+        source_id=identity,
+        platform=platform,
+        title=title,
+        company=company.strip(),
+        city=city.strip(),
+        url=job_url,
+        salary_text=salary_text.strip(),
+        experience_text=experience_text.strip(),
+        education_text=education_text.strip(),
+        description=description.strip(),
+        publish_date=publish_date.strip(),
+        source_type=source_type,
+        source_url=job_url,
+    )
+
+
+def _sensors(raw: str) -> dict[str, Any]:
+    text = (raw or "").strip()
+    if not text:
+        return {}
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError:
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def _sensor_text(payload: dict[str, Any], *keys: str) -> str:
+    for key in keys:
+        value = payload.get(key)
+        if value is None:
+            continue
+        text = str(value).strip()
+        if text:
+            return text
+    return ""
+
+
+def _concrete_url(page_url: str, link: str) -> str:
+    if not link:
+        return ""
+    absolute = urljoin(page_url, link)
+    return absolute if is_job_posting_url(absolute) else ""
+
+
 def _text(card: Any, selector: str | None) -> str:
     if not selector:
         return ""
     locator = card.locator(selector).first
     return (locator.text_content() or "").strip() if locator.count() else ""
+
+
+def _own_attribute(card: Any, name: str) -> str:
+    try:
+        return (card.get_attribute(name) or "").strip()
+    except Exception:
+        return ""
 
 
 def _attribute(card: Any, selector: str | None, name: str) -> str:
