@@ -126,6 +126,112 @@ def test_annual_cny_is_labeled_by_year_not_folded_into_monthly():
     assert "k/月" not in body
 
 
+def test_51job_bare_wan_is_monthly_and_explicit_year_stays_annual():
+    report = _report_module()
+    started = "2026-10-18T13:00:00+00:00"
+    now = datetime(2026, 10, 18, 13, 10, tzinfo=UTC)
+
+    def job(salary: str, url: str) -> dict:
+        return {
+            "title": "算法工程师",
+            "company": "甲公司",
+            "city": "上海",
+            "platform": "51job",
+            "source_type": "51job",
+            "url": url,
+            "salary_text": salary,
+            "relevance": 80,
+            "first_seen_at": "2026-10-18T13:02:00+00:00",
+        }
+
+    _subject, monthly = report.build_report(
+        [
+            job("3.5-5万", "https://jobs.51job.com/shanghai/160000011.html"),
+            job("3-4万·15薪", "https://jobs.51job.com/shanghai/160000012.html"),
+        ],
+        {"started_at": started, "sources": []},
+        [],
+        now=now,
+        today="2026-10-18",
+    )
+    assert "人民币/月" in monthly
+    assert "人民币/年" not in monthly
+
+    _subject, noted = report.build_report(
+        [job("3-4万·15薪", "https://jobs.51job.com/shanghai/160000012.html")],
+        {"started_at": started, "sources": []},
+        [],
+        now=now,
+        today="2026-10-18",
+    )
+    assert "人民币/月中位数约 35k·15薪（1 条）" in noted
+    assert "人民币/年" not in noted
+
+    _subject, yearly = report.build_report(
+        [job("年薪30-60万", "https://jobs.51job.com/shanghai/160000013.html")],
+        {"started_at": started, "sources": []},
+        [],
+        now=now,
+        today="2026-10-18",
+    )
+    assert "人民币/年中位数约 45万（1 条）" in yearly
+    assert "k/月" not in yearly
+
+
+def test_liepin_company_pages_and_unknown_place_stay_out_of_the_report():
+    report = _report_module()
+    started = "2026-10-18T13:00:00+00:00"
+    jobs = [
+        {
+            "title": "某医疗科技有限公司",
+            "company": "未知公司",
+            "city": "未知",
+            "platform": "猎聘网",
+            "source_type": "liepin",
+            "discovery_method": "search_engine",
+            "url": "https://m.liepin.com/company/12541563",
+            "salary_text": "80-120元",
+            "relevance": 40,
+            "first_seen_at": "2026-10-18T13:02:00+00:00",
+        },
+        {
+            "title": "医疗算法工程师",
+            "company": "未知公司",
+            "city": "未知城市",
+            "platform": "猎聘网",
+            "source_type": "liepin",
+            "discovery_method": "public_page",
+            "url": "https://www.liepin.com/s/medical-ai",
+            "relevance": 50,
+            "first_seen_at": "2026-10-18T13:02:00+00:00",
+        },
+        {
+            "title": "医疗AI算法工程师",
+            "company": "联影智能",
+            "city": "上海",
+            "platform": "猎聘网",
+            "source_type": "liepin",
+            "discovery_method": "search_engine",
+            "url": "https://www.liepin.com/job/1978123456.shtml",
+            "salary_text": "40-60K",
+            "relevance": 80,
+            "first_seen_at": "2026-10-18T13:02:00+00:00",
+        },
+    ]
+    _subject, body = report.build_report(
+        jobs,
+        {"started_at": started, "sources": []},
+        [],
+        now=datetime(2026, 10, 18, 13, 10, tzinfo=UTC),
+        today="2026-10-18",
+    )
+    assert "新增 1 条" in _subject
+    assert "联影智能" in body
+    assert "12541563" not in body
+    assert "未知公司" not in body
+    assert "80-120元" not in body
+
+
 def test_same_day_second_run_reports_no_new_jobs():
     report = _report_module()
     jobs = _jobs_from_fixture()

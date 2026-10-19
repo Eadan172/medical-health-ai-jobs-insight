@@ -1,6 +1,7 @@
 from jobsinsight.sources.discovery import _from_hit, discover_site
 from jobsinsight.sources.http_client import HttpClient, HttpResponse
 from jobsinsight.sources.search_provider import SearchHit, SearchOutcome
+from jobsinsight.sources.urlutil import is_publishable_record
 
 
 class ScriptedSearch:
@@ -52,6 +53,63 @@ def test_all_sources_unavailable_returns_no_jobs():
     )
     assert report.jobs == []
     assert report.status in {"unavailable", "blocked"}
+
+
+def test_liepin_company_pages_and_unknown_place_are_rejected():
+    company = SearchHit(
+        title="某医疗科技有限公司",
+        url="https://m.liepin.com/company/12541563",
+        snippet="80-120元",
+    )
+    unknown = SearchHit(
+        title="医疗AI算法工程师",
+        url="https://www.liepin.com/s/medical-ai",
+    )
+    assert _from_hit(company, "liepin", ["liepin.com"]) is None
+    assert _from_hit(unknown, "liepin", ["liepin.com"]) is None
+    assert (
+        is_publishable_record(
+            {
+                "title": "医疗AI算法工程师",
+                "company": "未知公司",
+                "city": "未知城市",
+                "url": "https://www.liepin.com/job/1978123456.shtml",
+                "platform": "猎聘网",
+                "source_type": "liepin",
+                "discovery_method": "search_engine",
+                "salary_text": "80-120元",
+            }
+        )
+        is False
+    )
+    assert (
+        is_publishable_record(
+            {
+                "title": "医疗AI算法工程师",
+                "company": "联影智能",
+                "city": "上海",
+                "url": "https://www.liepin.com/job/1978123456.shtml",
+                "platform": "猎聘网",
+                "source_type": "liepin",
+                "discovery_method": "search_engine",
+            }
+        )
+        is True
+    )
+    # 浏览器登录采集的职位没有 discovery_method，公司暂时未知时仍保留详情页。
+    assert (
+        is_publishable_record(
+            {
+                "title": "医疗AI算法工程师",
+                "company": "未知公司",
+                "city": "未知",
+                "url": "https://www.liepin.com/job/1978000001.shtml",
+                "platform": "猎聘网",
+                "source_type": "liepin",
+            }
+        )
+        is True
+    )
 
 
 def test_boss_company_and_keyword_listing_pages_are_rejected():

@@ -14,7 +14,9 @@ from jobsinsight.models import RawPosting
         ("30~45k/月", (30, 45)),
         ("40K", (40, 40)),
         ("30-60万/年", (25, 50)),
-        ("36-48万·12薪", (30, 40)),
+        ("3.5-5万", (35, 50)),
+        ("3-4万·15薪", (30, 40)),
+        ("36-48万·12薪", (360, 480)),
         ("薪资面议", (0, 0)),
         ("", (0, 0)),
     ],
@@ -91,6 +93,32 @@ def test_relevance_separates_on_topic_from_off_topic_postings():
     off_topic = heuristics.relevance_score("前台行政", "负责接待与文档整理", [])
     assert on_topic >= 60
     assert off_topic < 30
+
+
+def test_bare_wan_and_pay_count_are_monthly_but_explicit_year_stays_annual():
+    bare = heuristics.parse_salary_quote("3.5-5万")
+    assert bare is not None
+    assert (bare.currency, bare.period, bare.unit) == ("CNY", "month", "k")
+    assert (bare.low, bare.high) == (35, 50)
+    assert bare.pay_months == 0
+
+    paid = heuristics.parse_salary_quote("3-4万·15薪")
+    assert paid is not None
+    assert (paid.currency, paid.period, paid.unit) == ("CNY", "month", "k")
+    assert (paid.low, paid.high) == (30, 40)
+    assert paid.pay_months == 15
+    assert heuristics.parse_salary("3-4万·15薪") == (30, 40)
+
+    per_year = heuristics.parse_salary_quote("30-60万/年")
+    assert per_year is not None
+    assert (per_year.currency, per_year.period, per_year.unit) == ("CNY", "year", "wan")
+    assert (per_year.low, per_year.high) == (30, 60)
+
+    named = heuristics.parse_salary_quote("年薪40-80万")
+    assert named is not None
+    assert (named.currency, named.period, named.unit) == ("CNY", "year", "wan")
+    assert (named.low, named.high) == (40, 80)
+    assert heuristics.parse_salary("年薪40-80万") == (33, 67)
 
 
 def test_usd_annual_is_not_stored_as_monthly_cny():

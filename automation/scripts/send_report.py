@@ -173,18 +173,18 @@ def salary_stats(rows: list[dict]) -> str:
 
     from jobsinsight.heuristics import parse_salary_quote
 
-    grouped: dict[tuple[str, str, str], list[float]] = {}
+    grouped: dict[tuple[str, str, str], list[tuple[float, int]]] = {}
     for job in rows:
         quote = parse_salary_quote(str(job.get("salary_text") or ""))
         if quote is not None:
             key = (quote.currency, quote.period, quote.unit)
-            grouped.setdefault(key, []).append(quote.midpoint)
+            grouped.setdefault(key, []).append((quote.midpoint, quote.pay_months))
             continue
         # Numeric fields are the legacy monthly-CNY-in-thousands store. Ignore them
         # when salary_text already described another currency.
         if job.get("salary_min") and job.get("salary_max") and not str(job.get("salary_text") or "").strip():
             midpoint = (float(job["salary_min"]) + float(job["salary_max"])) / 2
-            grouped.setdefault(("CNY", "month", "k"), []).append(midpoint)
+            grouped.setdefault(("CNY", "month", "k"), []).append((midpoint, 0))
     if not grouped:
         return "无数据"
     order = [("CNY", "month", "k"), ("CNY", "year", "wan"), ("USD", "year", "k"), ("USD", "month", "k")]
@@ -201,10 +201,13 @@ def salary_stats(rows: list[dict]) -> str:
             continue
         seen.add(key)
         values = sorted(grouped[key])
-        median = values[len(values) // 2]
+        median = values[len(values) // 2][0]
+        pay_counts = {months for _mid, months in values}
+        months = next(iter(pay_counts))
+        note = f"·{months}薪" if len(pay_counts) == 1 and months else ""
         unit = "万" if key[2] == "wan" else "k"
         label = labels.get(key, "/".join(key))
-        parts.append(f"{label}中位数约 {median:.0f}{unit}（{len(values)} 条）")
+        parts.append(f"{label}中位数约 {median:.0f}{unit}{note}（{len(values)} 条）")
     return "；".join(parts)
 
 
