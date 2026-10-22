@@ -13,6 +13,7 @@ from typing import Any
 STATE_FILE = "state.json"
 HISTORY_FILE = "runs.json"
 SNAPSHOT_FILE = "jobs_snapshot.json"
+CADD_REPORT_STATE_FILE = "cadd_report_state.json"
 SOURCES_HEALTH_FILE = "sources_health.json"
 
 
@@ -66,6 +67,10 @@ class StateStore:
         return self.state_dir / SNAPSHOT_FILE
 
     @property
+    def cadd_report_state_path(self) -> Path:
+        return self.state_dir / CADD_REPORT_STATE_FILE
+
+    @property
     def sources_health_path(self) -> Path:
         return self.state_dir / SOURCES_HEALTH_FILE
 
@@ -112,6 +117,21 @@ class StateStore:
 
     def save_snapshot(self, jobs: list[Mapping[str, Any]]) -> None:
         write_json(self.snapshot_path, [dict(job) for job in jobs])
+
+    def load_cadd_report_state(self) -> dict[str, Any]:
+        """Last mailed CADD counts. Missing until the first report is sent."""
+
+        payload = read_json(self.cadd_report_state_path, {}) or {}
+        return payload if isinstance(payload, dict) else {}
+
+    def save_cadd_report_state(self, *, master_eligible: int, cumulative: int) -> dict[str, Any]:
+        payload = {
+            "master_eligible": master_eligible,
+            "cumulative": cumulative,
+            "recorded_at": utc_now_iso(),
+        }
+        write_json(self.cadd_report_state_path, payload)
+        return payload
 
     # --------------------------------------------------------- source health
 

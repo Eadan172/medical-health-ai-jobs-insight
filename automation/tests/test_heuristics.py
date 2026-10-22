@@ -95,6 +95,15 @@ def test_infer_category():
     assert heuristics.infer_category("化学分析员", "实验室样品分析") == "其他"
 
 
+def test_cadd_focus_reuses_category_and_phrases():
+    assert heuristics.matches_cadd_focus({"title": "计算化学研究员", "category": "其他"})
+    assert heuristics.matches_cadd_focus({"title": "CADD Scientist"})
+    assert heuristics.matches_cadd_focus({"title": "算法工程师", "category": "AI制药"})
+    assert heuristics.matches_cadd_focus({"title": "算法工程师", "summary": "计算机辅助药物设计"})
+    assert not heuristics.matches_cadd_focus({"title": "需求对接专员", "description": "负责客户对接与需求整理"})
+    assert not heuristics.matches_cadd_focus({"title": "caddy operator", "description": "golf club"})
+
+
 def test_relevance_separates_on_topic_from_off_topic_postings():
     on_topic = heuristics.relevance_score("医学影像算法工程师", "使用深度学习完成 CT 病灶检测", ["PyTorch", "医学影像"])
     off_topic = heuristics.relevance_score("前台行政", "负责接待与文档整理", [])

@@ -9,7 +9,7 @@ close to the real output shape.
 from __future__ import annotations
 
 import re
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 
 from .models import EXPERIENCE_BUCKETS, RawPosting
@@ -303,6 +303,36 @@ def _keyword_in(text: str, keyword: str) -> bool:
     if re.fullmatch(r"[a-z0-9][a-z0-9 .+_-]*[a-z0-9]", lowered):
         return re.search(rf"(?<![a-z0-9]){re.escape(lowered)}(?![a-z0-9])", text) is not None
     return lowered in text if keyword.isascii() else keyword in text
+
+
+def matches_cadd_focus(record: object) -> bool:
+    """Jobs in the AI药物研发 bucket, plus titles that use the CADD phrases.
+
+    The phrases are the same ones ``infer_category`` uses. Short pieces such as
+    化学 / 模拟 / 对接 are not enough, so 需求对接 stays out.
+    """
+
+    if not isinstance(record, Mapping):
+        return False
+    category = str(record.get("category") or "").strip()
+    if category in {"AI药物研发", "AI制药"}:
+        return True
+    skills = record.get("skills") or []
+    if isinstance(skills, str):
+        skill_text = skills
+    elif isinstance(skills, Iterable):
+        skill_text = " ".join(str(item) for item in skills)
+    else:
+        skill_text = str(skills)
+    haystack = " ".join(
+        (
+            str(record.get("title") or ""),
+            str(record.get("summary") or ""),
+            str(record.get("description") or ""),
+            skill_text,
+        )
+    ).lower()
+    return any(_keyword_in(haystack, term) for term in (*_CADD_RELEVANCE, "ai药物研发", "ai制药"))
 
 
 def infer_category(*texts: str) -> str:
