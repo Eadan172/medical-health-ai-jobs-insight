@@ -9,7 +9,9 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 import urllib.parse
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Protocol
 
@@ -160,15 +162,97 @@ def provider_catalog(environ: dict[str, str] | None = None) -> list[dict[str, ob
     ]
 
 
-def choose_provider(client: HttpClient, environ: dict[str, str] | None = None) -> SearchProvider | None:
+def provider_chain(client: HttpClient, environ: dict[str, str] | None = None) -> list[SearchProvider]:
+    """Paid providers first, then DuckDuckGo. A missing key skips that provider."""
+
     env = environ if environ is not None else os.environ
+    chain: list[SearchProvider] = []
     if env.get("SERPER_API_KEY"):
-        return SerperProvider(env["SERPER_API_KEY"], client)
+        chain.append(SerperProvider(env["SERPER_API_KEY"], client))
     if env.get("BING_SEARCH_API_KEY"):
-        return BingProvider(env["BING_SEARCH_API_KEY"], client)
+        chain.append(BingProvider(env["BING_SEARCH_API_KEY"], client))
     if env.get("GOOGLE_CSE_API_KEY") and env.get("GOOGLE_CSE_ID"):
-        return GoogleCSEProvider(env["GOOGLE_CSE_API_KEY"], env["GOOGLE_CSE_ID"], client)
-    return DDGSProvider(client)
+        chain.append(GoogleCSEProvider(env["GOOGLE_CSE_API_KEY"], env["GOOGLE_CSE_ID"], client))
+    chain.append(DDGSProvider(client))
+    return chain
+
+
+def choose_provider(client: HttpClient, environ: dict[str, str] | None = None) -> SearchProvider | None:
+    chain = provider_chain(client, environ)
+    return chain[0] if chain else None
+
+
+def search_with_retries(
+    provider: SearchProvider,
+    query: str,
+    *,
+    limit: int = 10,
+    sleep: Callable[[float], None] = time.sleep,
+    attempts: int = 3,
+) -> tuple[SearchOutcome, int]:
+    """Retry a challenge, a network error, or HTTP 429. A login wall is not retried.
+
+    DuckDuckGo's HTML endpoint sometimes answers HTTP 202 with an anomaly page and
+    returns normal results on the next request. ``attempts`` includes the first try.
+    """
+
+    outcome = provider.search(query, limit=limit)
+    tries = 1
+    while tries < _attempt_budget(outcome.status, attempts) and not outcome.hits:
+        sleep(2 ** (tries - 1))
+        outcome = provider.search(query, limit=limit)
+        tries += 1
+    return outcome, tries
+
+
+def _attempt_budget(status: str, attempts: int) -> int:
+    """A fast challenge page can be tried again. A timeout is only tried once more."""
+
+    if status == "security_challenge":
+        return attempts
+    if status in {"unavailable", "degraded"}:
+        return min(attempts, 2)
+    return 1
+
+
+class ChainedSearch:
+    """One search call: retry the current provider, then try the next configured one."""
+
+    def __init__(
+        self,
+        providers: list[SearchProvider],
+        *,
+        sleep: Callable[[float], None] = time.sleep,
+        attempts: int = 3,
+    ) -> None:
+        self.providers = providers
+        self._sleep = sleep
+        self.attempts = attempts
+        self.name = providers[0].name if providers else "none"
+
+    def search(self, query: str, *, limit: int = 10) -> SearchOutcome:
+        if not self.providers:
+            return SearchOutcome("none", status="unavailable", error="no search provider")
+        errors: list[str] = []
+        last = SearchOutcome(self.name, status="unavailable", error="no search provider")
+        for provider in self.providers:
+            outcome, tries = search_with_retries(
+                provider, query, limit=limit, sleep=self._sleep, attempts=self.attempts
+            )
+            if outcome.status == "healthy" and outcome.hits:
+                self.name = provider.name
+                return outcome
+            errors.append(_failure_text(provider.name, outcome, tries))
+            last = outcome
+        return SearchOutcome(
+            provider=last.provider, hits=[], status=last.status or "unavailable", error="; ".join(errors)
+        )
+
+
+def _failure_text(name: str, outcome: SearchOutcome, tries: int) -> str:
+    reason = (outcome.error or outcome.status or "failed").strip()
+    suffix = f"，已重试 {tries} 次" if tries > 1 else ""
+    return f"{name}: {outcome.status} {reason}{suffix}".strip()
 
 
 def _from_json(

@@ -69,14 +69,15 @@ def discover_site(
     limiter = RateLimiter(per_minute)
     started = datetime.now(UTC)
     probe = DIRECT_PROBES.get(source)
+    probe_note = ""
     if probe:
         direct = client.request("GET", probe, limiter=limiter)
         verdict = classify_access(direct)
         if verdict.status != "healthy":
             report.blocked_count += 1
-            report.last_error = f"direct {verdict.status}: {verdict.reason}"
+            probe_note = f"直连 {verdict.status}: {verdict.reason}"
             report.fallback = "search"
-            report.status = verdict.status
+            report.last_error = probe_note
     seen: set[str] = set()
     hits: list[SearchHit] = []
     provider_error = ""
@@ -85,13 +86,14 @@ def discover_site(
         outcome = provider.search(query, limit=10)
         if outcome.status != "healthy":
             provider_error = outcome.error or outcome.status
-            report.status = (
-                outcome.status
-                if outcome.status in {"blocked", "auth_required", "security_challenge"}
-                else "unavailable"
-            )
+            report.status = outcome.status or "unavailable"
             continue
-        report.fallback = outcome.provider
+        report.fallback = outcome.provider or report.fallback
+        if not outcome.hits:
+            provider_error = outcome.error or "no public results"
+            if report.status in {"", "unavailable"}:
+                report.status = "empty_content"
+            continue
         for hit in outcome.hits:
             url = normalize_url(hit.url)
             if not matches_domain(url, domains) or url in seen:
@@ -105,9 +107,11 @@ def discover_site(
 
     report.discovered = len(hits)
     if not hits:
-        report.last_error = provider_error or "no public job URLs"
-        if report.status == "unavailable" or not report.status:
-            report.status = "unavailable" if provider_error else "degraded"
+        report.last_error = _join_notes(probe_note, provider_error) or "没有搜到站内职位链接"
+        if provider_error and report.status in {"", "unavailable"}:
+            report.status = "unavailable"
+        elif not provider_error and report.status in {"", "unavailable"}:
+            report.status = "degraded"
         report.latency_ms = _elapsed(started)
         return report
 
@@ -162,6 +166,7 @@ def discover_site(
         report.status = "degraded"
     else:
         report.status = "blocked" if report.blocked_count else "unavailable"
+        report.last_error = _join_notes(report.last_error, f"搜到 {report.discovered} 条链接，没有可发布的职位页")
     report.latency_ms = _elapsed(started)
     return report
 
@@ -226,3 +231,7 @@ def _from_detail(hit: SearchHit, source: str, detail: dict[str, object]) -> RawP
 
 def _elapsed(started: datetime) -> int:
     return int((datetime.now(UTC) - started).total_seconds() * 1000)
+
+
+def _join_notes(*parts: object) -> str:
+    return "；".join(str(part).strip() for part in parts if str(part or "").strip())
