@@ -379,6 +379,36 @@ def test_51job_cards_keep_separate_identities_and_source_type():
     assert len(merged.jobs) == 2
 
 
+def test_previously_seen_51job_rows_are_not_new_domestic_jobs():
+    """A later run of the same 51job cards keeps first_seen, so the mail shows 0 new."""
+
+    report = _report_module()
+    jobs = [
+        {
+            "title": f"医学影像算法工程师{index}",
+            "company": "联影智能",
+            "city": "上海",
+            "platform": "51job",
+            "source_type": "51job",
+            "url": f"https://jobs.51job.com/shanghai/160000{index:03d}.html",
+            "salary_text": "3-4万",
+            "relevance": 80,
+            "first_seen_at": "2026-10-20T13:02:00+00:00",
+        }
+        for index in range(38)
+    ]
+    subject, body = report.build_report(
+        jobs,
+        {"started_at": "2026-10-21T13:00:00+00:00", "sources": []},
+        [],
+        now=datetime(2026, 10, 21, 13, 10, tzinfo=UTC),
+        today="2026-10-21",
+    )
+    assert "新增 0 条" in subject
+    assert "国内 0" in body
+    assert "今天没有抓到新的国内岗位" in body
+
+
 def test_company_and_listing_pages_are_not_discovered_as_jobs():
     company = SearchHit(
         title="「冰洲石生物科技（上海）有限公司招聘」-boss直聘",

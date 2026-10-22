@@ -9,7 +9,7 @@ from .catalog import build_search_queries, enabled_sites, load_catalog
 from .discovery import discover_site
 from .health import load_health, save_health
 from .http_client import HttpClient
-from .search_provider import choose_provider
+from .search_provider import ChainedSearch, provider_chain
 
 
 def test_sources(config: Config, *, source: str = "", test_all: bool = False, max_queries: int = 2) -> dict[str, Any]:
@@ -20,7 +20,7 @@ def test_sources(config: Config, *, source: str = "", test_all: bool = False, ma
     if source and not test_all:
         sites = [item for item in sites if item["name"] == source]
     client = HttpClient()
-    provider = choose_provider(client)
+    provider = ChainedSearch(provider_chain(client), sleep=client._sleep)
     reports = []
     for site in sites:
         report = discover_site(

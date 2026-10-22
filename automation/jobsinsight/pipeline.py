@@ -268,6 +268,7 @@ class Pipeline:
             try:
                 collector = build_collector(source, context)
                 collected = list(collector.collect())
+                note = str(getattr(collector, "source_note", "") or "")
             except CollectorError as exc:
                 entry["error"] = f"来源 {source.name} 采集失败：{exc}"
                 LOGGER.warning("%s", entry["error"])
@@ -301,6 +302,8 @@ class Pipeline:
                 added += 1
             entry["collected"] = added
             entry["status"] = "ok"
+            if note:
+                entry["note"] = note
             entry["duration_ms"] = round((time.monotonic() - source_started) * 1000)
             reports.append(entry)
 

@@ -163,12 +163,27 @@ def classify_access(response: HttpResponse) -> AccessVerdict:
         return AccessVerdict("degraded", "HTTP 429")
     lowered = response.body.lower()
     markers = (
-        ("security_challenge", ("captcha", "验证码", "aliyun_waf", "_waf_", "环境存在异常", "security check")),
+        (
+            "security_challenge",
+            (
+                "anomaly-modal",
+                "anomaly.js",
+                "captcha",
+                "验证码",
+                "aliyun_waf",
+                "_waf_",
+                "环境存在异常",
+                "security check",
+            ),
+        ),
         ("auth_required", ("请登录", "登录后", "login required", "sign in to continue")),
     )
     for status, needles in markers:
-        if any(needle in lowered or needle in response.body for needle in needles):
-            return AccessVerdict(status, "response asked for a challenge or login")
+        for needle in needles:
+            if needle in lowered or needle in response.body:
+                if status == "security_challenge":
+                    return AccessVerdict(status, f"response asked for a challenge or login ({needle})")
+                return AccessVerdict(status, "response asked for a challenge or login")
     if not response.body.strip():
         return AccessVerdict("empty_content", "empty body")
     return AccessVerdict("healthy")

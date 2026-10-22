@@ -96,7 +96,7 @@ def build_report(
             + "".join(
                 f"<li>{html.escape(str(source.get('name')))}：{html.escape(str(source.get('status', '')))} "
                 f"{'采集 ' + str(source.get('collected', 0)) + ' 条'} "
-                f"{html.escape(str(source.get('error', '') or ''))}</li>"
+                f"{html.escape(str(source.get('error') or source.get('note') or ''))}</li>"
                 for source in summary["sources"]
             )
             + "</ul>"

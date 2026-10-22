@@ -14,7 +14,7 @@ from ..sources.catalog import build_search_queries, enabled_sites, load_catalog
 from ..sources.discovery import discover_site
 from ..sources.health import save_health
 from ..sources.http_client import HttpClient
-from ..sources.search_provider import choose_provider
+from ..sources.search_provider import ChainedSearch, provider_chain
 from .base import Collector, CollectorError, register_collector
 
 
@@ -31,10 +31,11 @@ class SearchDiscoveryCollector(Collector):
         catalog = load_catalog(Path(sources_path))
         query_catalog = load_catalog(Path(queries_path))
         client = HttpClient(timeout=self.settings.timeout_seconds)
-        provider = choose_provider(client)
+        provider = ChainedSearch(provider_chain(client), sleep=client._sleep)
         state_dir = root / "automation" / "state"
         reports = []
         postings: list[RawPosting] = []
+        self.source_note = ""
         for site in enabled_sites(catalog):
             queries = build_search_queries(query_catalog, domains=site["domains"], max_queries=max_queries)
             report = discover_site(
@@ -53,10 +54,24 @@ class SearchDiscoveryCollector(Collector):
                 break
         if reports:
             save_health(state_dir, reports)
+        failed = [format_site_failure(item) for item in reports if not int(item.get("valid") or 0)]
+        if postings and failed:
+            self.source_note = "部分平台没有可发布岗位：" + "；".join(failed)
         if not postings:
-            errors = "; ".join(f"{item['source']}={item['status']}" for item in reports) or "no sites configured"
-            raise CollectorError(f"公开搜索未得到可发布岗位（{errors}）")
+            detail = "；".join(format_site_failure(item) for item in reports) or "no sites configured"
+            raise CollectorError(f"公开搜索未得到可发布岗位（{detail}）")
         return postings[: self.settings.limit] if self.settings.limit else postings
+
+
+def format_site_failure(item: dict[str, object]) -> str:
+    """One platform's status plus the reason, for the mailed source line."""
+
+    status = str(item.get("status") or "unavailable")
+    error = str(item.get("last_error") or "").strip()
+    text = f"{item.get('source')}={status}"
+    if error:
+        text += f": {error}"
+    return text
 
 
 register_collector("search_discovery", SearchDiscoveryCollector)
