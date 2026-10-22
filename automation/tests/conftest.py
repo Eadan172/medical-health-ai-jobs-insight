@@ -24,6 +24,7 @@ SAMPLE_POSTINGS = [
         "company_level": "上市公司",
         "description": "负责 CT/MRI 医学影像的深度学习模型研发，熟悉 PyTorch 与分割算法。",
         "publish_date": "2026-02-01",
+        "source_type": "fixture",
     },
     {
         "source_id": "a-2",
@@ -37,6 +38,7 @@ SAMPLE_POSTINGS = [
         "company_scale": "500-999人",
         "description": "靶点预测与化合物设计，使用机器学习加速药物发现，需要 Python 与分子生物学基础。",
         "publish_date": "2026-02-02",
+        "source_type": "fixture",
     },
     {
         "source_id": "a-3",
@@ -48,6 +50,7 @@ SAMPLE_POSTINGS = [
         "experience_text": "应届",
         "description": "负责接待与文档整理。",
         "publish_date": "2026-02-03",
+        "source_type": "fixture",
     },
 ]
 

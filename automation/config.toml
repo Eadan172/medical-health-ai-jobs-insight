@@ -127,7 +127,7 @@ enabled = true
 required = false
 platform = "51job"
 urls = ["https://we.51job.com/api/job/search-pc?api_key=51job&timestamp={timestamp}&keyword={keyword}&searchType=2&jobArea=000000&sortType=0&pageNum={page}&pageSize=20&source=1&pageCode=sou%7Csou%7Csoulb"]
-keywords = ["医疗 AI", "医疗大模型", "医学影像 算法", "AI 制药", "药物研发 算法"]
+keywords = ["医疗 AI", "医疗大模型", "医学影像 算法", "AI 制药", "药物研发 算法", "CADD", "计算化学"]
 limit = 200
 timeout_seconds = 20
 headers = { Cookie = "${JOB51_COOKIE}", Referer = "https://we.51job.com/pc/search" }

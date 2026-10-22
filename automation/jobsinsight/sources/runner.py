@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from typing import Any
 
 from ..config import Config
@@ -26,7 +27,12 @@ def test_sources(config: Config, *, source: str = "", test_all: bool = False, ma
         report = discover_site(
             source=site["name"],
             domains=site["domains"],
-            queries=build_search_queries(queries, domains=site["domains"], max_queries=max_queries),
+            queries=build_search_queries(
+                queries,
+                domains=site["domains"],
+                max_queries=max_queries,
+                focus_index=datetime.now(UTC).toordinal(),
+            ),
             provider=provider,
             client=client,
             limit=10,

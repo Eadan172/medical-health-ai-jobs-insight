@@ -20,7 +20,13 @@ from . import analysis
 from .collectors import CollectorContext, CollectorError, build_collector
 from .config import Config
 from .enrich import Enricher
-from .job_store import combine_existing_jobs, merge_jobs, should_preserve_previous
+from .job_store import (
+    combine_existing_jobs,
+    is_sample_record,
+    merge_jobs,
+    should_preserve_previous,
+    without_sample_jobs,
+)
 from .llm import LLMClient, LLMError, build_client
 from .models import Job, RawPosting, RunDiff
 from .quality import assess_jobs
@@ -207,7 +213,7 @@ class Pipeline:
             LOGGER.info("dry-run：跳过写入，%d 个岗位已处理", len(kept))
         else:
             report.outputs = [str(path) for path in self._write(final_jobs, stats, insights, report)]
-            self.store.save_snapshot([job.as_dict() for job in active_jobs])
+            self.store.save_snapshot([job.as_dict() for job in active_jobs if not is_sample_record(job)])
             self._write_coverage(source_reports)
             report.published = True
 
@@ -216,9 +222,11 @@ class Pipeline:
     def _existing_jobs(self) -> list[Job]:
         from .store import read_json
 
-        committed = _jobs_from_payload(read_json(self.config.data_dir / JOBS_FILE, []) or [])
+        committed = without_sample_jobs(_jobs_from_payload(read_json(self.config.data_dir / JOBS_FILE, []) or []))
         # The snapshot lives in automation/state, which run-local.ps1 does not restore.
-        catalog = _jobs_from_payload(self.store.load_snapshot())
+        # Seed rows have an empty source and no URL. Drop them so a disabled seed
+        # source does not keep last month's sample rows in the local snapshot.
+        catalog = without_sample_jobs(_jobs_from_payload(self.store.load_snapshot()))
         return combine_existing_jobs(committed, catalog)
 
     def _merge_reports(self, source_reports: list[dict[str, Any]]) -> list[dict[str, Any]]:

@@ -14,6 +14,23 @@ def test_query_catalog_contains_healthcare_terms():
     assert "上海" in catalog["cities"]
     queries = build_search_queries(catalog, domains=["zhipin.com"], max_queries=1)
     assert queries == ["site:zhipin.com 上海 医疗AI"]
+    assert "CADD" in catalog["keywords"]
+    assert "computational chemistry" in catalog["focus_keywords"]
+
+    capped = build_search_queries(catalog, domains=["zhipin.com"], max_queries=2, focus_index=0)
+    assert len(capped) == 2
+    assert capped[0] == "site:zhipin.com 上海 医疗AI"
+    assert capped[-1] == "site:zhipin.com 上海 CADD"
+
+    rotated = build_search_queries(catalog, domains=["zhipin.com"], max_queries=2, focus_index=1)
+    assert len(rotated) == 2
+    assert rotated[-1] == "site:zhipin.com 上海 计算机辅助药物设计"
+
+    last_slots = {
+        build_search_queries(catalog, domains=["zhipin.com"], max_queries=2, focus_index=index)[-1]
+        for index in range(len(catalog["focus_keywords"]))
+    }
+    assert len(last_slots) == len(catalog["focus_keywords"])
 
 
 def test_unknown_collector_is_rejected(tmp_path):

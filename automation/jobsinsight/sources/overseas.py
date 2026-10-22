@@ -93,6 +93,11 @@ _HEALTH = (
     "hospital",
     "patient",
     "health",
+    "cadd",
+    "computational chemistry",
+    "drug discovery",
+    "drug design",
+    "medicinal chemistry",
 )
 _AI_PHRASES = (
     "machine learning",
@@ -106,6 +111,10 @@ _AI_PHRASES = (
     "research scientist",
     "ml engineer",
     "ai engineer",
+    "cadd",
+    "computational chemistry",
+    "molecular dynamics",
+    "molecular simulation",
 )
 _AI_WORDS = ("ai", "ml", "nlp", "llm", "mle", "mlops")
 _ROLE_STRONG = (
@@ -122,6 +131,10 @@ _ROLE_STRONG = (
     "ml engineer",
     "ai engineer",
     "mlops",
+    "cadd",
+    "computational chemistry",
+    "molecular dynamics",
+    "molecular simulation",
 )
 _ROLE_STRONG_WORDS = ("ai", "ml", "nlp", "llm", "mle")
 _ROLE_MEDIUM = (

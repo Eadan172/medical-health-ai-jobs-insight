@@ -35,6 +35,7 @@ import urllib.request
 from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
+from ..keywords import with_cadd_keywords
 from ..models import RawPosting
 from .base import Collector, CollectorError, register_collector
 
@@ -90,7 +91,7 @@ class JsonApiCollector(Collector):
         """Expand ``{keyword}`` per keyword, then ``{page}`` and ``{timestamp}``."""
 
         for template in self.settings.urls:
-            keywords = self.settings.keywords if "{keyword}" in template else [""]
+            keywords = with_cadd_keywords(list(self.settings.keywords)) if "{keyword}" in template else [""]
             if not keywords:
                 keywords = [""]
             for keyword in keywords:

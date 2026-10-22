@@ -120,11 +120,22 @@ def test_job_item_singular_is_accepted(monkeypatch: pytest.MonkeyPatch):
         "resultbody": {"job": {"item": [{"jobId": 7, "jobName": "医疗大模型工程师", "fullCompanyName": "某公司"}]}}
     }
 
-    monkeypatch.setattr(JsonApiCollector, "_fetch", lambda self, url: payload)
+    seen: list[str] = []
+
+    def fake_fetch(self: JsonApiCollector, url: str) -> dict[str, object]:
+        seen.append(url)
+        return payload
+
+    monkeypatch.setattr(JsonApiCollector, "_fetch", fake_fetch)
     settings = _source(keywords=["医疗大模型"])
     postings = list(_collector(settings).collect())
 
-    assert [posting.source_id for posting in postings] == ["7"]
+    decoded = [urllib.parse.unquote(url) for url in seen]
+    assert decoded[0].startswith("https://we.51job.com/api/job/search-pc?keyword=医疗大模型&")
+    assert any("keyword=CADD&" in url for url in decoded)
+    assert any("keyword=计算化学&" in url for url in decoded)
+    assert len(decoded) == 3
+    assert postings[0].source_id == "7"
     assert postings[0].title == "医疗大模型工程师"
 
 
@@ -183,4 +194,5 @@ def test_delay_is_between_requests(monkeypatch: pytest.MonkeyPatch):
     settings = _source()
     settings.options = {**settings.options, "delay_seconds": 1.5}
     list(_collector(settings).collect())
-    assert sleeps == [1.5]
+    # Two configured keywords plus CADD and 计算化学: four requests, three gaps.
+    assert sleeps == [1.5, 1.5, 1.5]

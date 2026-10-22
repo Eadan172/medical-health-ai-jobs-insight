@@ -7,6 +7,7 @@ Search results are not treated as complete jobs unless a public page confirms th
 from __future__ import annotations
 
 from collections.abc import Iterable
+from datetime import UTC, datetime
 from pathlib import Path
 
 from ..models import RawPosting
@@ -37,7 +38,12 @@ class SearchDiscoveryCollector(Collector):
         postings: list[RawPosting] = []
         self.source_note = ""
         for site in enabled_sites(catalog):
-            queries = build_search_queries(query_catalog, domains=site["domains"], max_queries=max_queries)
+            queries = build_search_queries(
+                query_catalog,
+                domains=site["domains"],
+                max_queries=max_queries,
+                focus_index=datetime.now(UTC).toordinal(),
+            )
             report = discover_site(
                 source=site["name"],
                 domains=site["domains"],
