@@ -158,7 +158,15 @@ def test_shipped_config_enables_51job_without_committing_a_cookie():
     assert source.required is False
     assert source.type == "json_api"
     assert source.platform == "51job"
-    assert source.keywords == ["医疗 AI", "医疗大模型", "医学影像 算法", "AI 制药", "药物研发 算法"]
+    assert source.keywords == [
+        "医疗 AI",
+        "医疗大模型",
+        "医学影像 算法",
+        "AI 制药",
+        "药物研发 算法",
+        "CADD",
+        "计算化学",
+    ]
     assert source.options["items_path"] == "resultbody.job.items"
     assert source.options["pages"] == 2
     assert source.options["delay_seconds"] == 1.5

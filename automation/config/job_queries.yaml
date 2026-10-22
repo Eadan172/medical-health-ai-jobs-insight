@@ -23,6 +23,18 @@ keywords:
   - 分子建模
   - Medical LLM
   - Healthcare AI
+  - CADD
+  - 计算机辅助药物设计
+  - 计算化学
+  - 分子模拟
+  - computational chemistry
+# One of these fills the last search slot. The daily cap stays the same.
+focus_keywords:
+  - CADD
+  - 计算机辅助药物设计
+  - 计算化学
+  - 分子模拟
+  - computational chemistry
 cities:
   - 上海
   - 杭州

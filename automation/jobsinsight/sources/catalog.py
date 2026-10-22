@@ -39,15 +39,42 @@ def enabled_sites(catalog: dict[str, Any]) -> list[dict[str, Any]]:
     return sites
 
 
-def build_search_queries(catalog: dict[str, Any], *, domains: list[str], max_queries: int) -> list[str]:
+def build_search_queries(
+    catalog: dict[str, Any],
+    *,
+    domains: list[str],
+    max_queries: int,
+    focus_index: int = 0,
+) -> list[str]:
+    """Stay inside ``max_queries``. When the cap is at least 2, the last slot is one CADD term.
+
+    The term rotates with ``focus_index`` (the caller passes the day number) so
+    计算机辅助药物设计 / 分子模拟 / computational chemistry are searched across
+    days without adding a request.
+    """
+
     keywords = [str(item) for item in catalog.get("keywords") or []]
-    cities = [str(item) for item in catalog.get("cities") or []]
+    cities = [str(item) for item in catalog.get("cities") or []] or [""]
+    focus = [str(item) for item in catalog.get("focus_keywords") or []]
+    primary = _expand(keywords, cities, domains)
+    cap = max(0, max_queries)
+    if cap == 0:
+        return []
+    if cap == 1 or not focus:
+        return primary[:cap]
+    focus_queries = _expand([focus[focus_index % len(focus)]], cities[:1], domains)
+    head = [query for query in primary if query not in focus_queries][: cap - 1]
+    chosen = next((query for query in focus_queries if query not in head), None)
+    if chosen is None:
+        return primary[:cap]
+    return [*head, chosen]
+
+
+def _expand(keywords: list[str], cities: list[str], domains: list[str]) -> list[str]:
     queries: list[str] = []
     for keyword in keywords:
-        for city in cities or [""]:
+        for city in cities:
             for domain in domains:
                 text = " ".join(part for part in (f"site:{domain}", city, keyword) if part)
                 queries.append(text)
-                if len(queries) >= max_queries:
-                    return queries
     return queries

@@ -27,7 +27,7 @@ ENRICH_INSTRUCTIONS = f"""你是医药健康 + AI 招聘数据的结构化专家
 - education：只能取 {EDUCATION_LEVELS}
 - job_level：只能取 {JOB_LEVELS}
 - skills：3-8 个技能标签，中文优先，去掉营销词
-- category：岗位方向，如 AI药物研发 / 医学影像AI / 临床数据科学 / 生物信息 / 医疗大模型 / 智能医疗产品 / 其他
+- category：岗位方向，如 AI药物研发（CADD、计算化学、分子模拟也归这里） / 医学影像AI / 临床数据科学 / 生物信息 / 医疗大模型 / 智能医疗产品 / 其他
 - summary：不超过 40 字的一句话摘要
 - relevance：0-100，衡量该岗位与“医药健康 + AI”的相关度，与主题无关的岗位给低分
 只输出 JSON：{{"results": [{{"source_id": "", "salary_min": 0, "salary_max": 0, "experience": "", "education": "", "job_level": "", "skills": [], "category": "", "summary": "", "relevance": 0}}]}}

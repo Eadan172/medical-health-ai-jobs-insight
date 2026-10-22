@@ -22,6 +22,12 @@ domains:
       - AI药物研发
       - 药物研发
       - 药物发现
+      - CADD
+      - cadd
+      - 计算机辅助药物设计
+      - 计算化学
+      - 分子模拟
+      - computational chemistry
   medical_ai:
     canonical: Medical AI
     categories:

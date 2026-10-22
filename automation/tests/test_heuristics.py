@@ -86,6 +86,13 @@ def test_infer_category():
     assert heuristics.infer_category("Senior AI Engineer", "Build ambient documentation software at Suki") == "其他"
     assert heuristics.infer_category("MLOps Engineer", "Deploy models and operate the platform") == "其他"
     assert heuristics.infer_category("Senior Machine Learning Scientist, Imaging", "CT and MRI models") == "医学影像AI"
+    assert heuristics.infer_category("CADD Scientist", "") == "AI药物研发"
+    assert heuristics.infer_category("计算机辅助药物设计工程师", "") == "AI药物研发"
+    assert heuristics.infer_category("计算化学研究员", "") == "AI药物研发"
+    assert heuristics.infer_category("分子模拟工程师", "") == "AI药物研发"
+    assert heuristics.infer_category("Computational Chemist", "molecular dynamics") == "AI药物研发"
+    assert heuristics.infer_category("需求对接专员", "负责客户对接与需求整理") == "其他"
+    assert heuristics.infer_category("化学分析员", "实验室样品分析") == "其他"
 
 
 def test_relevance_separates_on_topic_from_off_topic_postings():
@@ -93,6 +100,9 @@ def test_relevance_separates_on_topic_from_off_topic_postings():
     off_topic = heuristics.relevance_score("前台行政", "负责接待与文档整理", [])
     assert on_topic >= 60
     assert off_topic < 30
+    assert heuristics.relevance_score("计算化学研究员", "", []) >= 30
+    assert heuristics.relevance_score("CADD Scientist", "", []) >= 30
+    assert heuristics.relevance_score("需求对接专员", "负责客户对接", []) < 30
 
 
 def test_bare_wan_and_pay_count_are_monthly_but_explicit_year_stays_annual():

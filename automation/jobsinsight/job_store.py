@@ -7,6 +7,7 @@ Misses increase only after a healthy, complete read of that source.
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from typing import Any
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
@@ -97,13 +98,30 @@ def job_identity(job: Job) -> str:
     return "salary:" + "|".join((company, title, city, f"{job.salary_min}-{job.salary_max}"))
 
 
+def is_sample_record(record: object) -> bool:
+    """Seed rows have no source and no URL. Collected jobs keep a source even if the URL is blank."""
+
+    if isinstance(record, Mapping):
+        source_type = record.get("source_type")
+        url = record.get("url") or record.get("source_url")
+    else:
+        source_type = getattr(record, "source_type", "")
+        url = getattr(record, "url", "") or getattr(record, "source_url", "")
+    return not str(source_type or "").strip() and not str(url or "").strip()
+
+
+def without_sample_jobs(jobs: list[Job]) -> list[Job]:
+    return [job for job in jobs if not is_sample_record(job)]
+
+
 def combine_existing_jobs(committed: list[Job], catalog: list[Job]) -> list[Job]:
     """Union the git checkout with the local catalog.
 
     ``run-local.ps1`` restores ``web/public/data`` after each mail, which drops
     ``first_seen_at``. The catalog under ``automation/state/`` is gitignored and
-    is the copy that remembers which jobs were already seen. Jobs that exist
-    only in a freshly pulled seed file are still included.
+    is the copy that remembers which jobs were already seen. Callers drop seed
+    rows (empty source and no URL) before this union, so a restored jobs file
+    cannot put those sample rows back.
     """
 
     if not catalog:

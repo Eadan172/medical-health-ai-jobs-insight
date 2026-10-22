@@ -37,7 +37,25 @@ SKILL_KEYWORDS: dict[str, tuple[str, ...]] = {
 }
 
 CATEGORY_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
-    ("AI药物研发", ("药物", "靶点", "化合物", "aidd", "drug discovery", "drug design")),
+    (
+        "AI药物研发",
+        (
+            "药物",
+            "靶点",
+            "化合物",
+            "aidd",
+            "drug discovery",
+            "drug design",
+            "cadd",
+            "计算机辅助药物设计",
+            "计算化学",
+            "分子模拟",
+            "computational chemistry",
+            "computational chemist",
+            "molecular simulation",
+            "molecular dynamics",
+        ),
+    ),
     ("医学影像AI", ("影像", "病理", "放射", "dicom", "radiology", "pathology", "imaging", "ct", "mri")),
     ("临床数据科学", ("临床", "cro", "真实世界", "rwd", "生物统计", "clinical trial", "clinical data")),
     ("生物信息", ("基因", "测序", "组学", "生物信息", "bioinformatic", "genomic")),
@@ -57,6 +75,18 @@ _YEARS = re.compile(r"(?<!\d)(\d{1,2})\s*[-~到至]?\s*(\d{1,2})?\s*年")
 _EN_YEARS = re.compile(
     r"(?<!\d)(\d{1,2})\s*(\+|plus)?\s*(?:[-~–—]|to)?\s*(\d{1,2})?\s*\+?\s*(?:years?|yrs?)\b",
     re.I,
+)
+
+# Phrases only. Short pieces such as 化学 / 模拟 / 对接 match unrelated titles.
+_CADD_RELEVANCE = (
+    "cadd",
+    "计算机辅助药物设计",
+    "计算化学",
+    "分子模拟",
+    "computational chemistry",
+    "computational chemist",
+    "molecular simulation",
+    "molecular dynamics",
 )
 
 SCALE_BUCKETS: tuple[tuple[int, str], ...] = (
@@ -333,6 +363,7 @@ def relevance_score(title: str, description: str, skills: Iterable[str]) -> int:
             "genomic",
             "hospital",
             "patient",
+            *_CADD_RELEVANCE,
         )
         if word in haystack
     )
@@ -355,6 +386,7 @@ def relevance_score(title: str, description: str, skills: Iterable[str]) -> int:
             "data scientist",
             "data engineer",
             "ml engineer",
+            *_CADD_RELEVANCE,
         )
         if word in haystack
     )

@@ -20,6 +20,7 @@ from jobsinsight.sources.overseas import (
     collect_remoteok_postings,
     collect_wwr_postings,
     load_companies,
+    matches_remote_focus,
     repair_text,
     role_score,
 )
@@ -201,6 +202,11 @@ def test_wwr_matches_title_and_tags_not_the_description():
     assert "Clinical" in posting.description
     assert role_score("Account Executive") == 0
     assert role_score("Machine Learning Engineer") > role_score("Senior Software Engineer")
+    assert role_score("CADD Scientist") > 0
+    assert matches_remote_focus("CADD Scientist", [])
+    assert matches_remote_focus("Computational Chemistry Scientist", [])
+    assert not matches_remote_focus("Organic Chemist", [])
+    assert not matches_remote_focus("需求对接专员", ["对接"])
 
 
 def test_ats_collector_sends_a_user_agent_and_timeout(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):

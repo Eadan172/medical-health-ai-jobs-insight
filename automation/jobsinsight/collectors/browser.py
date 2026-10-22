@@ -18,6 +18,7 @@ from urllib.parse import quote, urljoin
 
 from ..accounts import DEFAULT_ACCOUNTS_FILE, BrowserAccount, get_account, storage_path
 from ..config import ConfigError
+from ..keywords import with_cadd_keywords
 from ..models import RawPosting
 from ..sources.urlutil import is_job_posting_url
 from .base import Collector, CollectorError, register_collector
@@ -52,7 +53,7 @@ class BrowserCollector(Collector):
         delay = float(options.get("delay_seconds", 0))
         urls = iter_search_urls(
             self.settings.urls,
-            self.settings.keywords,
+            with_cadd_keywords(list(self.settings.keywords)),
             pages=pages,
             page_start=page_start,
         )
