@@ -49,7 +49,13 @@ def parse_run_summary(raw: bytes) -> dict:
 
 
 def build_report(
-    jobs: list[dict], summary: dict, errors: list[str], *, now: dt.datetime, today: str
+    jobs: list[dict],
+    summary: dict,
+    errors: list[str],
+    *,
+    now: dt.datetime,
+    today: str,
+    previous_master_eligible: int | None = None,
 ) -> tuple[str, str]:
     """Return ``(subject, html)``. Jobs with an empty source_type are sample rows, not real postings."""
 
@@ -90,6 +96,7 @@ def build_report(
         f"<li>新增岗位薪资：{salary_stats(new)}</li>"
         "</ul>"
     )
+    parts.append(_cadd_section(real, new, previous_master_eligible=previous_master_eligible))
     if summary.get("sources"):
         parts.append(
             "<h3>各来源运行情况</h3><ul>"
@@ -141,13 +148,7 @@ def table(rows: list[dict]) -> str:
         url = job.get("url") or job.get("source_url")
         if url:
             title = f"<a href='{html.escape(str(url))}'>{title}</a>"
-        salary_text = str(job.get("salary_text") or "").strip()
-        if salary_text:
-            salary = html.escape(salary_text)
-        elif job.get("salary_min"):
-            salary = f"{job.get('salary_min', '')}-{job.get('salary_max', '')}k"
-        else:
-            salary = "面议"
+        salary = html.escape(_salary_label(job))
         body.append(
             "<tr>"
             f"<td>{title}</td>"
@@ -209,6 +210,126 @@ def salary_stats(rows: list[dict]) -> str:
         label = labels.get(key, "/".join(key))
         parts.append(f"{label}中位数约 {median:.0f}{unit}{note}（{len(values)} 条）")
     return "；".join(parts)
+
+
+CADD_NEW_TABLE_LIMIT = 20
+# 硕士可投：岗位接受硕士，或学历只要本科 / 不限 / 没写。博士岗位不计入。
+_MASTER_OK = frozenset({"", "不限", "学历不限", "硕士", "本科"})
+
+
+def _matches_cadd(job: dict) -> bool:
+    from jobsinsight.heuristics import matches_cadd_focus
+
+    return matches_cadd_focus(job)
+
+
+def _master_eligible(job: dict) -> bool:
+    return str(job.get("education") or "").strip() in _MASTER_OK
+
+
+def _master_trend(current: int, previous: int | None) -> str:
+    if previous is None:
+        return "硕士可投数量首次统计，尚无上次可比。"
+    delta = current - previous
+    if delta > 0:
+        return f"硕士可投比上次多 {delta} 条。"
+    if delta < 0:
+        return f"硕士可投比上次少 {-delta} 条。"
+    return "硕士可投与上次相同。"
+
+
+def _education_label(job: dict) -> str:
+    return str(job.get("education") or "").strip() or "未注明"
+
+
+def _cadd_section(real: list[dict], new: list[dict], *, previous_master_eligible: int | None) -> str:
+    """Statistics for CADD / AI药物研发, placed after the daily summary."""
+
+    chosen = [job for job in real if _matches_cadd(job)]
+    added = [job for job in new if _matches_cadd(job)]
+    eligible = sum(1 for job in chosen if _master_eligible(job))
+    domestic = sum(1 for job in chosen if not is_overseas(job))
+    overseas = len(chosen) - domestic
+    trend = _master_trend(eligible, previous_master_eligible)
+    if not chosen:
+        return (
+            "<h3>CADD / AI药物研发</h3>"
+            f"<p>累计 <b>0</b> 条，本次新增 <b>0</b> 条。没有来源的样例岗位不计入。{html.escape(trend)}</p>"
+        )
+    education_rows = [{**job, "education": _education_label(job)} for job in chosen]
+    return (
+        "<h3>CADD / AI药物研发</h3><ul>"
+        f"<li>累计 <b>{len(chosen)}</b> 条，本次新增 <b>{len(added)}</b> 条"
+        "（和上面的今日新增同一套规则：这次运行第一次见到的岗位）。</li>"
+        f"<li>国内 {domestic} 条，海外 {overseas} 条。</li>"
+        f"<li>学历：{counts(education_rows, 'education')}。"
+        f"其中硕士可投 <b>{eligible}</b> 条（要求为硕士、本科、不限或未注明）。{html.escape(trend)}</li>"
+        f"<li>经验：{counts(chosen, 'experience')}</li>"
+        f"<li>城市：{counts(chosen, 'city')}</li>"
+        f"<li>薪资：{salary_stats(chosen)}</li>"
+        "</ul>"
+        "<h4>本次新增的 CADD 岗位</h4>" + _cadd_new_table(added)
+    )
+
+
+def _cadd_new_table(rows: list[dict]) -> str:
+    if not rows:
+        return "<p>今天没有新增的 CADD 岗位。</p>"
+    shown = rows[:CADD_NEW_TABLE_LIMIT]
+    note = ""
+    if len(rows) > CADD_NEW_TABLE_LIMIT:
+        note = f"<p>新增 {len(rows)} 条，下表只列出前 {CADD_NEW_TABLE_LIMIT} 条。</p>"
+    header = (
+        "<table border=1 cellpadding=4 cellspacing=0 style='border-collapse:collapse;font-size:13px'>"
+        "<tr><th>岗位</th><th>公司</th><th>城市</th><th>薪资</th><th>学历</th><th>链接</th></tr>"
+    )
+    body = []
+    for job in shown:
+        url = str(job.get("url") or job.get("source_url") or "").strip()
+        link = f"<a href='{html.escape(url, quote=True)}'>打开</a>" if url else "无链接"
+        body.append(
+            "<tr>"
+            f"<td>{html.escape(str(job.get('title', '')))}</td>"
+            f"<td>{html.escape(str(job.get('company', '')))}</td>"
+            f"<td>{html.escape(str(job.get('city', '')))}</td>"
+            f"<td>{html.escape(_salary_label(job))}</td>"
+            f"<td>{html.escape(_education_label(job))}</td>"
+            f"<td>{link}</td>"
+            "</tr>"
+        )
+    return note + header + "".join(body) + "</table>"
+
+
+def cadd_state_counts(jobs: list[dict]) -> tuple[int, int]:
+    """Cumulative CADD jobs and how many of them accept a master's degree."""
+
+    chosen = [job for job in jobs if _keep_real(job) and _matches_cadd(job)]
+    return len(chosen), sum(1 for job in chosen if _master_eligible(job))
+
+
+def previous_master_eligible(state_dir: Path) -> int | None:
+    from jobsinsight.store import StateStore
+
+    raw = StateStore(state_dir).load_cadd_report_state().get("master_eligible")
+    if isinstance(raw, bool) or not isinstance(raw, int):
+        return None
+    return raw
+
+
+def record_cadd_state(state_dir: Path, jobs: list[dict]) -> None:
+    from jobsinsight.store import StateStore
+
+    cumulative, eligible = cadd_state_counts(jobs)
+    StateStore(state_dir).save_cadd_report_state(master_eligible=eligible, cumulative=cumulative)
+
+
+def _salary_label(job: dict) -> str:
+    salary_text = str(job.get("salary_text") or "").strip()
+    if salary_text:
+        return salary_text
+    if job.get("salary_min"):
+        return f"{job.get('salary_min', '')}-{job.get('salary_max', '')}k"
+    return "面议"
 
 
 def _requirement(value: object) -> str:
@@ -277,7 +398,15 @@ def main() -> None:
         jobs = []
     now = dt.datetime.now(dt.UTC)
     today = dt.datetime.now().strftime("%Y-%m-%d")
-    subject, body = build_report(jobs, summary, errors, now=now, today=today)
+    state_dir = repo / "automation" / "state"
+    subject, body = build_report(
+        jobs,
+        summary,
+        errors,
+        now=now,
+        today=today,
+        previous_master_eligible=previous_master_eligible(state_dir),
+    )
     message = MIMEText(body, "html", "utf-8")
     message["Subject"] = Header(subject, "utf-8")
     message["From"] = user
@@ -285,6 +414,7 @@ def main() -> None:
     with smtplib.SMTP_SSL("smtp.163.com", 465, timeout=60) as smtp:
         smtp.login(user, code)
         smtp.sendmail(user, [to], message.as_string())
+    record_cadd_state(state_dir, jobs)
     print("Report mailed:", subject)
 
 
