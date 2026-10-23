@@ -16,6 +16,12 @@ def test_query_catalog_contains_healthcare_terms():
     assert queries == ["site:zhipin.com 上海 医疗AI"]
     assert "CADD" in catalog["keywords"]
     assert "computational chemistry" in catalog["focus_keywords"]
+    added = ["化学信息", "AIDD", "数据标注", "医疗审核", "AI应用", "Agent", "计算模拟", "生物信息"]
+    for term in added:
+        assert catalog["keywords"].count(term) == 1
+        assert catalog["focus_keywords"].count(term) == 1
+    assert catalog["keywords"].count("计算化学") == 1
+    assert catalog["keywords"].count("生物信息学") == 1
 
     capped = build_search_queries(catalog, domains=["zhipin.com"], max_queries=2, focus_index=0)
     assert len(capped) == 2

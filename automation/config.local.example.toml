@@ -84,7 +84,7 @@ required = false
 platform = "BOSS直聘"
 urls = ["https://www.zhipin.com/web/geek/job?query={keyword}&page={page}"]
 # 采集时还会自动补上 CADD、计算化学（已有则不重复）。本机 config.local.toml 不用为了这两个词再改。
-keywords = ["医疗AI", "医疗大模型", "医学影像AI", "AI药物研发", "CADD", "计算化学"]
+keywords = ["医疗AI", "医疗大模型", "医学影像AI", "AI药物研发", "CADD", "计算化学", "化学信息", "AIDD", "数据标注", "医疗审核", "AI应用", "Agent", "计算模拟", "生物信息"]
 timeout_seconds = 45
 limit = 80
 
@@ -104,7 +104,7 @@ required = false
 platform = "猎聘"
 urls = ["https://www.liepin.com/zhaopin/?key={keyword}&currentPage={page}"]
 # 采集时还会自动补上 CADD、计算化学（已有则不重复）。本机 config.local.toml 不用为了这两个词再改。
-keywords = ["医疗AI", "医疗大模型", "医学影像AI", "AI药物研发", "CADD", "计算化学"]
+keywords = ["医疗AI", "医疗大模型", "医学影像AI", "AI药物研发", "CADD", "计算化学", "化学信息", "AIDD", "数据标注", "医疗审核", "AI应用", "Agent", "计算模拟", "生物信息"]
 timeout_seconds = 45
 limit = 80
 
@@ -125,7 +125,7 @@ required = false
 platform = "51job"
 urls = ["https://we.51job.com/pc/search?keyword={keyword}&searchType=2&pageNum={page}"]
 # 采集时还会自动补上 CADD、计算化学（已有则不重复）。本机 config.local.toml 不用为了这两个词再改。
-keywords = ["医疗AI", "医疗大模型", "医学影像AI", "AI药物研发", "CADD", "计算化学"]
+keywords = ["医疗AI", "医疗大模型", "医学影像AI", "AI药物研发", "CADD", "计算化学", "化学信息", "AIDD", "数据标注", "医疗审核", "AI应用", "Agent", "计算模拟", "生物信息"]
 timeout_seconds = 45
 limit = 80
 
