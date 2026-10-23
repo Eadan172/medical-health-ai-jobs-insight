@@ -166,6 +166,14 @@ def test_shipped_config_enables_51job_without_committing_a_cookie():
         "药物研发 算法",
         "CADD",
         "计算化学",
+        "化学信息",
+        "AIDD",
+        "数据标注",
+        "医疗审核",
+        "AI应用",
+        "Agent",
+        "计算模拟",
+        "生物信息",
     ]
     assert source.options["items_path"] == "resultbody.job.items"
     assert source.options["pages"] == 2
@@ -328,6 +336,23 @@ def test_local_example_enables_browser_sources_and_ci_config_does_not(monkeypatc
     assert not any(source.type == "browser" and source.enabled for source in ci.enabled_sources)
     browsers = [source for source in local.enabled_sources if source.type == "browser"]
     assert [source.name for source in browsers] == ["boss", "liepin", "job51"]
+    browser_keywords = [
+        "医疗AI",
+        "医疗大模型",
+        "医学影像AI",
+        "AI药物研发",
+        "CADD",
+        "计算化学",
+        "化学信息",
+        "AIDD",
+        "数据标注",
+        "医疗审核",
+        "AI应用",
+        "Agent",
+        "计算模拟",
+        "生物信息",
+    ]
+    assert [source.keywords for source in browsers] == [browser_keywords, browser_keywords, browser_keywords]
     assert all(source.required is False for source in browsers)
     assert all(source.options.get("pages") == 2 for source in browsers)
     assert all(float(source.options.get("delay_seconds", 0)) >= 1 for source in browsers)

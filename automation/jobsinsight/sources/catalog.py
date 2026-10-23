@@ -46,11 +46,11 @@ def build_search_queries(
     max_queries: int,
     focus_index: int = 0,
 ) -> list[str]:
-    """Stay inside ``max_queries``. When the cap is at least 2, the last slot is one CADD term.
+    """Stay inside ``max_queries``. When the cap is at least 2, the last slot is one focus term.
 
     The term rotates with ``focus_index`` (the caller passes the day number) so
-    计算机辅助药物设计 / 分子模拟 / computational chemistry are searched across
-    days without adding a request.
+    the CADD phrases and the other ``focus_keywords`` are searched across days
+    without adding a request.
     """
 
     keywords = [str(item) for item in catalog.get("keywords") or []]
