@@ -35,6 +35,7 @@ if ($At -notmatch '^\d{1,2}:\d{2}$') {
     exit 1
 }
 
+# Resolve from this clone. The task stores that path for this PC only; do not commit it.
 $script = (Resolve-Path (Join-Path $PSScriptRoot "run-local.ps1")).Path
 $argument = "-NoProfile -ExecutionPolicy Bypass -File `"$script`""
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $argument

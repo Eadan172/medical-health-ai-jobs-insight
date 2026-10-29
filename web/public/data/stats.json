@@ -1,266 +1,111 @@
 {
-  "total_jobs": 411,
-  "last_update": "2026-10-15",
-  "new_jobs_today": 4,
+  "total_jobs": 2,
+  "last_update": "2026-10-01",
+  "new_jobs_today": 0,
   "updated_jobs_today": 0,
   "deleted_jobs_today": 0,
-  "avg_salary": 63.3,
+  "avg_salary": 32.5,
   "platform_stats": {
-    "猎聘网": {
-      "count": 139,
-      "avg_salary": 64.5
-    },
-    "Boss直聘": {
-      "count": 132,
-      "avg_salary": 65.5
-    },
-    "51job": {
-      "count": 131,
-      "avg_salary": 59.8
-    },
-    "BOSS直聘": {
-      "count": 9,
-      "avg_salary": 0.0
+    "示例平台": {
+      "count": 2,
+      "avg_salary": 32.5
     }
   },
   "city_stats": {
-    "南京": {
-      "count": 50,
-      "avg_salary": 62.6
-    },
-    "武汉": {
-      "count": 49,
-      "avg_salary": 66.2
-    },
-    "上海": {
-      "count": 44,
-      "avg_salary": 71.6
-    },
-    "西安": {
-      "count": 42,
-      "avg_salary": 56.2
-    },
-    "杭州": {
-      "count": 42,
-      "avg_salary": 58.0
-    },
-    "广州": {
-      "count": 39,
-      "avg_salary": 57.1
-    },
-    "成都": {
-      "count": 39,
-      "avg_salary": 51.0
-    },
-    "苏州": {
-      "count": 34,
-      "avg_salary": 76.4
-    },
-    "北京": {
-      "count": 33,
-      "avg_salary": 65.2
-    },
-    "深圳": {
-      "count": 28,
-      "avg_salary": 77.2
-    },
-    "未知": {
-      "count": 9,
-      "avg_salary": 0.0
-    },
-    "上海·徐汇区": {
-      "count": 1,
-      "avg_salary": 3.0
-    },
-    "上海·静安区": {
-      "count": 1,
-      "avg_salary": 2.5
+    "示例城市": {
+      "count": 2,
+      "avg_salary": 32.5
     }
   },
   "skill_stats": {
-    "数据分析": 176,
-    "药物研发": 133,
-    "基因组学": 130,
-    "临床知识": 128,
-    "生物信息学": 111,
-    "医学影像": 108,
-    "分子生物学": 106,
-    "机器学习": 100,
-    "TensorFlow": 99,
-    "SQL": 92,
-    "NLP": 91,
-    "计算机视觉": 85,
-    "统计建模": 83,
-    "Python": 83,
-    "PyTorch": 82,
-    "深度学习": 82,
-    "R语言": 79,
-    "Spark": 77
+    "Python": 2,
+    "深度学习": 1,
+    "医学影像": 1,
+    "生物信息学": 1
   },
   "experience_stats": {
-    "应届": {
-      "count": 84,
-      "avg_salary": 24.4
-    },
     "1-3年": {
-      "count": 73,
-      "avg_salary": 31.5
+      "count": 1,
+      "avg_salary": 30.0
     },
     "3-5年": {
-      "count": 81,
-      "avg_salary": 48.3
-    },
-    "5-10年": {
-      "count": 80,
-      "avg_salary": 76.4
-    },
-    "10年以上": {
-      "count": 84,
-      "avg_salary": 131.8
-    },
-    "未知": {
-      "count": 9,
-      "avg_salary": 0.0
+      "count": 1,
+      "avg_salary": 35.0
     }
   },
   "education_stats": {
-    "本科": {
-      "count": 138,
-      "avg_salary": 63.1
-    },
     "硕士": {
-      "count": 132,
-      "avg_salary": 66.3
+      "count": 1,
+      "avg_salary": 35.0
     },
-    "博士": {
-      "count": 132,
-      "avg_salary": 60.6
-    },
-    "未知": {
-      "count": 9,
-      "avg_salary": 0.0
+    "本科": {
+      "count": 1,
+      "avg_salary": 30.0
     }
   },
   "job_level_stats": {
-    "高级": {
-      "count": 172,
-      "avg_salary": 95.1
-    },
     "中级": {
-      "count": 123,
-      "avg_salary": 39.2
+      "count": 1,
+      "avg_salary": 35.0
     },
     "初级": {
-      "count": 69,
-      "avg_salary": 24.4
-    },
-    "专家": {
-      "count": 27,
-      "avg_salary": 72.9
-    },
-    "资深专家": {
-      "count": 20,
-      "avg_salary": 59.7
+      "count": 1,
+      "avg_salary": 30.0
     }
   },
   "category_stats": {
-    "AI药物研发": 153,
-    "生物信息": 66,
-    "临床数据科学": 63,
-    "医学影像AI": 47,
-    "智能医疗产品": 34,
-    "医疗大模型": 28,
-    "其他": 20
+    "医学影像AI": 1,
+    "生物信息": 1
   },
   "salary_distribution": {
-    "15K以下": 4,
-    "15-25K": 56,
-    "25-35K": 69,
-    "35-50K": 74,
-    "50-70K": 65,
-    "70-100K": 59,
-    "100K+": 75
+    "25-35K": 1,
+    "35-50K": 1
   },
   "salary_distribution_detail": {
-    "15K以下": {
-      "count": 4,
-      "top_city": "上海",
-      "top_city_count": 2,
-      "top_title": "AI算法工程师",
-      "top_title_count": 2
-    },
-    "15-25K": {
-      "count": 56,
-      "top_city": "成都",
-      "top_city_count": 12,
-      "top_title": "健康数据分析员",
-      "top_title_count": 7
-    },
     "25-35K": {
-      "count": 69,
-      "top_city": "上海",
-      "top_city_count": 12,
-      "top_title": "健康数据分析员",
-      "top_title_count": 7
+      "count": 1,
+      "top_city": "示例城市",
+      "top_city_count": 1,
+      "top_title": "示例岗位：生物信息工程师",
+      "top_title_count": 1
     },
     "35-50K": {
-      "count": 74,
-      "top_city": "南京",
-      "top_city_count": 13,
-      "top_title": "AI药物研发工程师",
-      "top_title_count": 10
-    },
-    "50-70K": {
-      "count": 65,
-      "top_city": "苏州",
-      "top_city_count": 9,
-      "top_title": "AI药物研发工程师",
-      "top_title_count": 9
-    },
-    "70-100K": {
-      "count": 59,
-      "top_city": "武汉",
-      "top_city_count": 11,
-      "top_title": "智能健康管理师",
-      "top_title_count": 7
-    },
-    "100K+": {
-      "count": 75,
-      "top_city": "上海",
-      "top_city_count": 12,
-      "top_title": "医疗机器学习工程师",
-      "top_title_count": 8
+      "count": 1,
+      "top_city": "示例城市",
+      "top_city_count": 1,
+      "top_title": "示例岗位：医学影像算法工程师",
+      "top_title_count": 1
     }
   },
-  "run_id": "20261015T100925Z",
-  "generated_at": "2026-10-15T10:11:10+00:00",
-  "data_version": "7f07e1e1cdb2375d",
+  "run_id": "placeholder",
+  "generated_at": "2026-10-01T00:00:00+00:00",
+  "data_version": "example",
   "quality": {
-    "score": 77,
-    "total": 430,
+    "score": 85,
+    "total": 2,
     "missing_company": 0,
     "missing_salary": 0,
-    "missing_url": 398,
+    "missing_url": 2,
     "missing_publish_date": 0,
     "duplicate_fingerprints": 0,
     "warnings": [
-      "岗位链接缺失 398/430（93%）",
-      "398 条岗位发布日期超过 30 天"
+      "岗位链接缺失 2/2（100%）"
     ]
   },
   "freshness": {
-    "newest_publish_date": "2026-10-15",
-    "oldest_publish_date": "2026-01-20",
-    "median_age_days": 251,
-    "stale_over_30d": 398,
+    "newest_publish_date": "2026-10-01",
+    "oldest_publish_date": "2026-10-01",
+    "median_age_days": 0,
+    "stale_over_30d": 0,
     "future_dated": 0,
     "missing_publish_date": 0
   },
   "merge": {
-    "new": 4,
+    "new": 0,
     "updated": 0,
-    "unchanged": 407,
+    "unchanged": 2,
     "stale": 0,
     "deleted": 0
-  }
+  },
+  "note": "公开仓库中的统计只对应下面两条虚构示例，不是真实招聘市场。"
 }

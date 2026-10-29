@@ -1,97 +1,44 @@
 {
   "schema_version": 2,
-  "run_id": "20261015T100925Z",
-  "data_version": "7f07e1e1cdb2375d",
-  "generated_at": "2026-10-15T10:11:10+00:00",
-  "status": "partial",
+  "run_id": "placeholder",
+  "data_version": "example",
+  "generated_at": "2026-10-01T00:00:00+00:00",
+  "status": "skipped",
   "counts": {
-    "raw": 437,
-    "valid": 411,
-    "dropped": 7
+    "raw": 2,
+    "valid": 2,
+    "dropped": 0
   },
   "sources": [
     {
-      "name": "seed",
+      "name": "example",
       "type": "fixture",
       "required": false,
       "min_collected": 0,
-      "collected": 398,
-      "items_before_dedupe": 420,
+      "collected": 2,
+      "items_before_dedupe": 2,
       "status": "ok",
-      "duration_ms": 0
-    },
-    {
-      "name": "job-discovery",
-      "type": "search_discovery",
-      "required": false,
-      "min_collected": 0,
-      "collected": 0,
-      "items_before_dedupe": 0,
-      "status": "error",
-      "error": "来源 job-discovery 采集失败：公开搜索未得到可发布岗位（zhipin=unavailable; 51job=unavailable; liepin=unavailable）",
-      "duration_ms": 37328
-    },
-    {
-      "name": "company-careers",
-      "type": "company_careers",
-      "required": false,
-      "min_collected": 0,
-      "collected": 0,
-      "items_before_dedupe": 0,
-      "status": "ok",
-      "duration_ms": 0
-    },
-    {
-      "name": "boss",
-      "type": "browser",
-      "required": false,
-      "min_collected": 0,
-      "collected": 0,
-      "items_before_dedupe": 0,
-      "status": "error",
-      "error": "来源 boss 采集失败：账号 'boss' 的登录会话可能已过期（未见登录标志，也没有岗位卡片）；请执行 python -m jobsinsight browser-login boss",
-      "duration_ms": 9859
-    },
-    {
-      "name": "liepin",
-      "type": "browser",
-      "required": false,
-      "min_collected": 0,
-      "collected": 0,
-      "items_before_dedupe": 0,
-      "status": "error",
-      "error": "来源 liepin 采集失败：账号 'liepin' 的登录会话可能已过期（未见登录标志，也没有岗位卡片）；请执行 python -m jobsinsight browser-login liepin",
-      "duration_ms": 11906
-    },
-    {
-      "name": "job51",
-      "type": "browser",
-      "required": false,
-      "min_collected": 0,
-      "collected": 39,
-      "items_before_dedupe": 80,
-      "status": "ok",
-      "duration_ms": 46094
+      "duration_ms": 0,
+      "note": "公开仓库中的占位示例，不是真实抓取。"
     }
   ],
   "quality": {
-    "score": 77,
-    "total": 430,
+    "score": 85,
+    "total": 2,
     "missing_company": 0,
     "missing_salary": 0,
-    "missing_url": 398,
+    "missing_url": 2,
     "missing_publish_date": 0,
     "duplicate_fingerprints": 0,
     "warnings": [
-      "岗位链接缺失 398/430（93%）",
-      "398 条岗位发布日期超过 30 天"
+      "岗位链接缺失 2/2（100%）"
     ]
   },
   "freshness": {
-    "newest_publish_date": "2026-10-15",
-    "oldest_publish_date": "2026-01-20",
-    "median_age_days": 251,
-    "stale_over_30d": 398,
+    "newest_publish_date": "2026-10-01",
+    "oldest_publish_date": "2026-10-01",
+    "median_age_days": 0,
+    "stale_over_30d": 0,
     "future_dated": 0,
     "missing_publish_date": 0
   },
@@ -100,5 +47,6 @@
     "stats.json",
     "insights.json",
     "manifest.json"
-  ]
+  ],
+  "note": "占位清单。counts.valid 等于 jobs.json 的条数，便于 doctor 与发布校验。"
 }

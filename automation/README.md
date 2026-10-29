@@ -111,7 +111,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\automation\scripts\registe
 `run-local.ps1` 会 `git pull --ff-only origin main`（当前分支必须是 `main`），
 用 `.venv` 的 Python 和 `config.local.toml` 跑流水线，再检查
 `jobs.json` 非空且 `manifest.counts.valid == len(jobs)`，然后用 163 SMTP 发 HTML 日报。
-邮件发出后会把 `web/public/data` 还原成仓库里的版本，不提交、不推送。
+邮件发出后会把 `web/public/data` 还原成仓库里的示例占位，不提交、不推送。
+路径都相对仓库根目录；计划任务只在注册时记住这台电脑上的脚本位置，那个绝对路径不入库。
+跨次快照在已忽略的 `automation/state/`。
 计划任务是当前用户、`RunLevel Limited`，不需要管理员，并且只在该用户已登录时才会跑。
 
 三个 browser 来源都是 `required = false`。会话文件缺失、登录墙或验证码只让该来源
