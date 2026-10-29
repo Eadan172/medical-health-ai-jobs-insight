@@ -81,7 +81,8 @@ else {
 }
 & $VenvPython $Reporter $RunLog $fatal
 $mailExit = $LASTEXITCODE
-# 岗位正文在 web/public/data，发信后还原，避免把抓取结果提交或推送。
+# 岗位正文写在相对路径 web/public/data。发信后还原仓库里的示例占位，避免把抓取结果提交或推送。
+# 脚本位置由 $PSScriptRoot 推出，不依赖某一台电脑的盘符。
 # automation/state/jobs_snapshot.json 不入库，但必须留在本机：里面记着 first_seen，用来判断「今日新增」。
 # automation/state/cadd_report_state.json 同样留在本机，用来比较上次「硕士可投」数量。
 git -C $RepoRoot checkout -- web/public/data

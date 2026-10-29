@@ -209,7 +209,7 @@ automation/.venv/bin/python -m jobsinsight run
 automation/.venv/bin/python automation/scripts/send_report.py
 ```
 
-仓库里的每日计划任务只有 Windows 脚本 `register-daily-task.ps1`。macOS / Linux 没有对应的注册脚本。要用 cron，请调用上面这两条真实命令，并写成绝对路径。它不等于 `run-local.ps1`：没有 `git pull`，也不会在发信后还原 `web/public/data`。
+仓库里的每日计划任务只有 Windows 脚本 `register-daily-task.ps1`。macOS / Linux 没有对应的注册脚本。要用 cron，请调用上面这两条真实命令，并把路径写成你这台电脑上的克隆目录。那个绝对路径只放在 crontab 里，不要写进仓库。它不等于 `run-local.ps1`：没有 `git pull`，也不会在发信后还原 `web/public/data`。手动跑完后如果工作区里出现真实岗位，执行 `git checkout -- web/public/data` 还原示例，不要提交。
 
 ---
 
@@ -286,7 +286,7 @@ Windows 把 python 换成 `.\automation\.venv\Scripts\python.exe`。
 | 51job | 是 | 本机：`browser-login job51`。GitHub Actions 用的是 `config.toml` 里的 json_api，Cookie 来自 Secret `JOB51_COOKIE` |
 | 猎聘 | 是 | `browser-login liepin`。页面有腾讯验证码，必须人工完成 |
 | BOSS直聘 | 是 | `browser-login boss`。目前会拦截自动化浏览器，采集时页面可能是空白 |
-| seed | 否 | `automation/data/seed_postings.json` 里的样例，不是当天抓到的职位 |
+| seed | 否 | `automation/data/seed_postings.json` 里的两条虚构示例，不是当天抓到的职位 |
 
 **加一家海外公司**：编辑 `automation/config/overseas_companies.yaml`，在 `companies:` 下追加一项，只使用这四个字段：
 
@@ -311,6 +311,15 @@ Windows 把 python 换成 `.\automation\.venv\Scripts\python.exe`。
 ---
 
 ## 网页看板
+
+仓库里的 `web/public/data/jobs.json`、`stats.json`、`insights.json`、`manifest.json` 各有两条虚构岗位，标题和公司名都写了「示例」。`automation/data/seed_postings.json` 同样是占位，不是真实抓取。
+
+本机重新生成用相对路径，克隆放在哪一块盘都可以：
+
+- `data_dir` 和 `state_dir` 相对仓库根目录。不要把 `E:\...` 这类绝对路径写进提交的配置。
+- `automation/scripts/run-local.ps1` 从脚本位置找到仓库，把结果写到 `web/public/data`，发信后还原示例。哪些岗位已经见过，记在已忽略的 `automation/state/`。
+- 看板要一直显示刚抓到的数据时，直接跑流水线，不要接着还原。`git status` 里会出现这些 JSON，不要提交。
+- 本机 `config.local.toml`（不入库）可以把 `data_dir` 改成 `automation/data/local/public`。这个相对目录已在 `.gitignore` 里。每日邮件仍读 `web/public/data/jobs.json`，所以 `run-local.ps1` 请保持默认的 `data_dir`。
 
 看板读取 `web/public/data` 里的 JSON。后端没开时，开发服务器退回这些静态文件。
 
@@ -389,9 +398,13 @@ automation/.venv/bin/python -m jobsinsight config
 - `.env`、`.env.local`（LLM Key 和邮件变量放这里）
 - `automation/config.local.toml`，以及同名的 `.json` / `.yaml` / `.yml`
 - `automation/config/accounts.toml`、`automation/config/*.local.toml`
-- `automation/state/`（含 `automation/state/browser/` 里的登录 Cookie / storage state，以及运行日志）
+- `automation/state/`（含 `automation/state/browser/` 里的登录 Cookie / storage state、岗位快照，以及运行日志）
+- `automation/data/local/`、`web/public/data/local/`（本机另存的抓取结果）
+- `*.log`、`logs/`
 - `automation/.venv/`、仓库根目录的 `.venv/` 和 `venv/`
 - `connectivity_result_*.csv`、`connectivity_result_*.json`
+
+重新跑出来的 `web/public/data/*.json` 会改到已跟踪的示例文件上。`.gitignore` 盖不住对已跟踪文件的修改，所以不要把那次运行提交上去。GitHub Actions 的定时 workflow 跑完后会还原示例，不再推送抓取结果。
 
 可以提交的是示例：`config.local.example.toml`、`accounts.example.toml`。`jobsinsight config --raw` 的输出不要贴到 Issue 或聊天里。
 

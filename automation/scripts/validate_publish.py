@@ -1,7 +1,8 @@
-"""Publication gate shared with the GitHub Actions data commit step.
+"""Publication gate for a local run before the daily report is mailed.
 
-The workflow inlines the same two checks. This script is what
-``automation/scripts/run-local.ps1`` runs before committing ``web/public/data``.
+``automation/scripts/run-local.ps1`` calls this after the pipeline writes
+``web/public/data``, then restores the tracked example placeholders. GitHub
+Actions must not commit that directory.
 """
 
 from __future__ import annotations

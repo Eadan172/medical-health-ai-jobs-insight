@@ -96,7 +96,7 @@ def test_removed_postings_are_counted_as_deleted(config: Config, tmp_path: Path,
     assert report.diff["deleted_jobs"] == 0
     stored = read(config.data_dir / "jobs.json")
     assert len(stored) >= 2
-    # 与 .github/workflows/update-data.yml「提交数据变更」同一条完整性校验。
+    # 与 automation/scripts/validate_publish.py 同一条完整性校验。公开仓库不提交抓取结果。
     manifest = read(config.data_dir / "manifest.json")
     assert manifest["counts"]["valid"] == len(stored), "manifest 与 jobs.json 数量不一致"
     assert manifest["counts"]["valid"] > report.kept

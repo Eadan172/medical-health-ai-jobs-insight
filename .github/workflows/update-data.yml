@@ -1,5 +1,7 @@
-name: 定时更新岗位数据
+name: 定时检查岗位流水线
 
+# 这个 workflow 可以跑采集，但不会把抓取结果提交回仓库。
+# web/public/data 与 automation/data/seed_postings.json 里是示例占位。
 # cron 是 UTC，且必须写死在 YAML 里，所以这里用一个较粗的触发频率，
 # 真正“什么时候该跑”由 automation/config.toml 的 [schedule] 决定：
 # run --if-due 会读取用户设定的运行时间，没到点就直接跳过。
@@ -71,27 +73,15 @@ jobs:
             ${{ (github.event_name == 'schedule' || inputs.force != true) && '--if-due' || '' }} \
             ${{ inputs.limit && format('--limit {0}', inputs.limit) || '' }}
 
-      - name: 提交数据变更
+      # 公开仓库里的 web/public/data 只保留示例占位。真实抓取留在跑
+      # automation/scripts/run-local.ps1 的那台电脑上：脚本把结果写到相对路径
+      # web/public/data，发信后再 git checkout 还原。不要在这里提交或推送。
+      - name: 丢弃抓取结果，不写入公开仓库
+        if: always()
         run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          data = Path("web/public/data")
-          jobs = json.loads((data / "jobs.json").read_text(encoding="utf-8"))
-          manifest = json.loads((data / "manifest.json").read_text(encoding="utf-8"))
-          assert jobs, "拒绝提交空岗位列表"
-          assert manifest["counts"]["valid"] == len(jobs), "manifest 与 jobs.json 数量不一致"
-          print(f"数据校验通过：{len(jobs)} 条，版本 {manifest['data_version']}")
-          PY
-          if [ -z "$(git status --porcelain web/public/data)" ]; then
-            echo "数据没有变化，无需提交。"
-            exit 0
-          fi
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add web/public/data
-          git commit -m "chore(data): 自动更新岗位数据 $(date -u '+%Y-%m-%d %H:%M UTC')"
-          git push
+          git checkout -- web/public/data
+          git clean -fdq -- web/public/data
+          echo "未提交 web/public/data。公开 JSON 保持示例占位。"
 
       - name: 上传运行报告
         if: always()

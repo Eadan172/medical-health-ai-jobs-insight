@@ -47,6 +47,7 @@ generate_insights = true
 name = "seed"
 type = "fixture"
 enabled = true
+# 仓库里是两条虚构示例。本机采集结果不要提交回这个文件。
 path = "automation/data/seed_postings.json"
 limit = 500
 
@@ -177,6 +178,9 @@ timeout_seconds = 25
 delay_seconds = 0.5
 
 [output]
+# 相对仓库根目录。计划任务注册时会记住这台电脑上的脚本路径，那个路径不要写进仓库。
+# 默认写到 web/public/data，便于看板和 send_report.py 读取；run-local.ps1 发信后还原示例占位。
+# 快照在 state_dir（已 gitignore）。不要把 data_dir 改成 E:\ 或其他绝对路径。
 data_dir = "web/public/data"
 state_dir = "automation/state"
 keep_runs = 50

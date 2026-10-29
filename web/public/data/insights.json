@@ -1,40 +1,37 @@
 {
-  "generated_at": "2026-10-15T10:11:10+00:00",
-  "provider": "disabled",
+  "generated_at": "2026-10-01T00:00:00+00:00",
+  "provider": "example",
   "model": "",
   "schedule": {
     "mode": "daily",
-    "description": "每天 00:00 (Asia/Shanghai)",
+    "description": "示例占位，不是一次真实运行",
     "timezone": "Asia/Shanghai",
-    "next_run": "2026-10-16T00:00+08:00"
+    "next_run": ""
   },
   "run": {
-    "total_jobs": 411,
-    "new_jobs": 4,
+    "total_jobs": 2,
+    "new_jobs": 0,
     "updated_jobs": 0,
     "deleted_jobs": 0,
-    "unchanged_jobs": 407
+    "unchanged_jobs": 2
   },
-  "source": "rules",
-  "headline": "共 411 个医药健康+AI 岗位，南京需求最集中",
-  "summary": "本次共收录 411 个岗位，其中今日新增 4 个。整体均薪约 63.3K/月。该摘要由统计规则生成；在配置里启用真实 LLM 后，会替换为模型撰写的分析。",
+  "source": "example",
+  "headline": "示例数据：2 条虚构岗位，不是真实抓取",
+  "summary": "仓库里只保留占位示例，方便看板在没有本机数据时仍能打开。真实岗位由本机流水线写到相对路径，并留在已忽略的 automation/state/。",
   "highlights": [
-    "南京岗位最多，50 个，均薪 62.6K",
-    "深圳薪资最高，均薪 77.2K",
-    "最高频技能是数据分析，出现在 176 个岗位中",
-    "资深岗位均薪是应届的 5.4 倍"
+    "这两条记录的公司名和标题都标明了「示例」",
+    "空链接、空 source_type，流水线会把它们当作样例行而不是历史抓取"
   ],
   "hot_skills": [
-    "数据分析",
-    "药物研发",
-    "基因组学",
-    "临床知识",
+    "Python",
+    "深度学习",
+    "医学影像",
     "生物信息学"
   ],
   "advice": [
-    "优先补齐高频技能：数据分析、药物研发、基因组学",
-    "岗位机会集中在南京、武汉、上海"
+    "在本机运行 automation/scripts/run-local.ps1 重新采集",
+    "不要把重新生成的 jobs.json 提交到公开仓库"
   ],
-  "run_id": "20261015T100925Z",
-  "data_version": "7f07e1e1cdb2375d"
+  "run_id": "placeholder",
+  "data_version": "example"
 }

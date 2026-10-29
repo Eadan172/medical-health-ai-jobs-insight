@@ -88,6 +88,7 @@ type = "fixture"
 enabled = true
 # required = true              # 失败/空结果时拒绝发布，保留上一版数据
 # min_collected = 20           # 低于预期条数时视为来源失败
+# 跟踪的文件只有两条虚构示例。真实抓取不要写回这个路径再提交。
 path = "automation/data/seed_postings.json"
 limit = 500
 
@@ -214,8 +215,12 @@ delay_seconds = 0.5
 # 产出
 # ---------------------------------------------------------------------------
 [output]
+# 都是相对仓库根目录的路径。克隆可以放在任意盘符，不要把某一台电脑的绝对路径写进仓库。
+# data_dir 里提交的 JSON 是示例占位。本机运行会暂时覆盖它；run-local.ps1 发信后还原。
+# 若要另存一份不入库的抓取结果，在 gitignore 的 config.local.toml 里把 data_dir 改成
+# automation/data/local/public（仍是相对路径）。每日邮件脚本读取的是 web/public/data。
 data_dir = "web/public/data"    # 前端读取的目录
-state_dir = "automation/state"  # 运行状态、历史、快照
+state_dir = "automation/state"  # 运行状态、历史、快照（已 gitignore）
 keep_runs = 50
 min_relevance = 30              # 相关度低于该值的岗位会被丢弃（0-100）
 max_jobs = 1000

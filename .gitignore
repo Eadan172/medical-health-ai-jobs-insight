@@ -9,11 +9,19 @@ venv/
 node_modules/
 web/dist/
 
-# 运行时状态（运行历史、快照、运行时覆盖的配置）
+# 运行时状态（运行历史、岗位快照、登录会话、运行日志）。
+# 流水线默认仍写入相对路径 web/public/data；run-local.ps1 发信后还原为仓库里的示例占位。
+# 跨次记忆（first_seen、jobs_snapshot.json）留在下面这个已忽略目录，不要写成某一台电脑的绝对路径。
 automation/state/
 # 候选人画像与匹配缓存含个人信息，不能进入前端静态资源，也不入库。
 automation/state/candidates/
 automation/state/matches/
+# 本机若把 output.data_dir 指到这些相对目录，抓取结果不入库。
+automation/data/local/
+web/public/data/local/
+# 一次性运行日志。采集器不依赖这些文件。
+*.log
+logs/
 # 私密招聘网站凭据；仅提交 accounts.example.toml。
 automation/config/accounts.toml
 automation/config/*.local.toml
